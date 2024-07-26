@@ -15,3 +15,4 @@ id = st_oauth('fwdoauth')
 st.session_state["pages"] = [st.Page("pages/callback.py", title="Callback"), st.Page("pages/home.py", title="Home")]
 
 nav = st.navigation(st.session_state["pages"])
+nav.run()
