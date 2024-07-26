@@ -1,7 +1,7 @@
 import streamlit as st
-from tools.snowflake import connect_snowflake
+from tools import snowflake
 
-st.write("# Welcome to Stilson Dashboard! 👋")
-st.write("For any bugs, please report them to Nicolas Au-Yeung via Teams or email (nicolas.au.yeung@fwd.com)")
+st.write("# Welcome to the Stilson Dashboard! 👋")
+st.write("For any enhancements or bugs, please contact Nicolas Au-Yeung via Teams or email (nicolas.au.yeung@fwd.com)")
 
-st.session_state["conn"] = connect_snowflake()
+st.session_state["conn"] = snowflake.connect_snowflake()
