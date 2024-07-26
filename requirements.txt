@@ -35,7 +35,6 @@ rich==13.7.1
 rpds-py==0.19.0
 six==1.16.0
 smmap==5.0.1
-st_oauth @ git+https://github.com/sfc-gh-bhess/st_oauth.git@4edef2cd1d9059d935a10799701cb39737ebd32d
 streamlit==1.36.0
 tenacity==8.5.0
 toml==0.10.2
