@@ -18,7 +18,7 @@ st.markdown('<style>' + open('./styles/style.css').read() + '</style>', unsafe_a
 
 id = st_oauth('fwdoauth')
 
-pages = [st.Page(home_page, title="Home"), st.Page(home_page2, title="Home2")]
+#pages = [st.Page(home_page, title="Home"), st.Page(home_page2, title="Home2")]
 
-nav = st.navigation(pages)
-nav.run()
+#nav = st.navigation(pages)
+#nav.run()
