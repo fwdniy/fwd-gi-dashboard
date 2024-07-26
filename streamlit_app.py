@@ -17,7 +17,7 @@ if st.secrets != {}:
 nav = st.navigation(pages)
 nav.run()
 
-if ("ST_AUTH" in st.session_state or st.secrets == {}) and "CALLBACK_REMOVED" not in st.session_state:
+if ("ST_OAUTH" in st.session_state or st.secrets == {}) and "CALLBACK_REMOVED" not in st.session_state:
     pages = st.session_state["pages"] = st.session_state["pages"][1:]
     st.session_state["CALLBACK_REMOVED"] = True
     nav = st.navigation(pages)
