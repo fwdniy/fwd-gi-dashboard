@@ -13,12 +13,15 @@ def home_page2():
     st.write("For any bugs, please report them to Nicolas Au-Yeung via Teams or email (nicolas.au.yeung@fwd.com)")
     st.write(id)
 
+def callback():
+    st.switch_page("Home")
+
 # Open css file
 st.markdown('<style>' + open('./styles/style.css').read() + '</style>', unsafe_allow_html=True)
 
 id = st_oauth('fwdoauth')
 
-pages = [st.Page(home_page, title="Home"), st.Page(home_page2, title="Home2")]
+pages = [st.Page(home_page, title="Home"), st.Page(home_page2, title="Home2"), st.Page(callback, title="Callback")]
 
 #nav = st.navigation(pages)
 #nav.run()
