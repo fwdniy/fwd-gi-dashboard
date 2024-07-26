@@ -12,7 +12,7 @@ if st.secrets != {}:
     id = st_oauth('fwdoauth')
 
 if 'ST_OAUTH' in st.session_state or st.secrets == {}:
-    pages = pages[1:]
+    pages = st.session_state["pages"]
 
 nav = st.navigation(pages)
 nav.run()
