@@ -11,13 +11,13 @@ if "pages" not in st.session_state:
 else:
     pages = st.session_state["pages"]
 
-if st.secrets != {}:
+if "fwdoauth" in st.secrets:
     id = st_oauth('fwdoauth')
 
 nav = st.navigation(pages)
 nav.run()
 
-if ("ST_OAUTH" in st.session_state or st.secrets == {}) and "CALLBACK_REMOVED" not in st.session_state:
+if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callback_removed" not in st.session_state:
     pages = st.session_state["pages"] = st.session_state["pages"][1:]
-    st.session_state["CALLBACK_REMOVED"] = True
+    st.session_state["callback_removed"] = True
     nav = st.navigation(pages)
