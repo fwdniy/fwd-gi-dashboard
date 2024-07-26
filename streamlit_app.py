@@ -6,8 +6,12 @@ st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='sty
 # Open css file
 st.markdown('<style>' + open('./styles/style.css').read() + '</style>', unsafe_allow_html=True)
 
-id = st_oauth('fwdoauth')
+st.session_state["pages"] = [st.Page("pages/callback.py", title="Callback"), st.Page("pages/home.py", title="Home"), st.Page("pages/asset_allocation.py", title="Asset Allocation")]
 
-st.session_state["pages"] = [st.Page("pages/callback.py", title="Callback"), st.Page("pages/home.py", title="Home")]
+if st.secrets == {}:
+    st.session_state["pages"] = st.session_state["pages"][1:]
+else:
+    id = st_oauth('fwdoauth')
 
 nav = st.navigation(st.session_state["pages"])
+nav.run()
