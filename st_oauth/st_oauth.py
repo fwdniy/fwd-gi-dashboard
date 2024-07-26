@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 import requests
 import streamlit as st
 import jwt
+from jwt import PyJWKClient
 
 import string
 import random
@@ -15,7 +16,7 @@ def qparms_cache(key):
 
 @st.cache_resource(ttl=360000)
 def jwks_client(jwks_uri):
-    return jwt.PyJWKClient(jwks_uri)
+    return PyJWKClient(jwks_uri)
 
 def logout():
     if _STKEY in st.session_state:
