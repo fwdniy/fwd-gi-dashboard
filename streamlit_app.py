@@ -6,13 +6,18 @@ st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='sty
 # Open css file
 st.markdown('<style>' + open('./styles/style.css').read() + '</style>', unsafe_allow_html=True)
 
-st.session_state["pages"] = pages = [st.Page("pages/callback.py", title="Callback"), st.Page("pages/home.py", title="Home"), st.Page("pages/asset_allocation.py", title="Asset Allocation")]
+if "pages" not in st.session_state:
+    pages = st.session_state["pages"] = [st.Page("pages/callback.py", title="Callback"), st.Page("pages/home.py", title="Home"), st.Page("pages/asset_allocation.py", title="Asset Allocation")]
+else:
+    pages = st.session_state["pages"]
 
 if st.secrets != {}:
     id = st_oauth('fwdoauth')
 
-if 'ST_OAUTH' in st.session_state or st.secrets == {}:
-    pages = st.session_state["pages"]
-
 nav = st.navigation(pages)
 nav.run()
+
+if ("ST_AUTH" in st.session_state or st.secrets == {}) and "CALLBACK_REMOVED" not in st.session_state:
+    pages = st.session_state["pages"] = st.session_state["pages"][1:]
+    st.session_state["CALLBACK_REMOVED"] = True
+    nav = st.navigation(pages)
