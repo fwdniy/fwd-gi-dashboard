@@ -10,11 +10,11 @@ st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='sty
 # Open css file
 st.markdown('<style>' + open('./styles/style.css').read() + '</style>', unsafe_allow_html=True)
 
+id = st_oauth('fwdoauth')
+
 pages = [st.Page(home_page, title="Home")]
 
 nav = st.navigation(pages)
 nav.run()
-
-id = st_oauth('fwdoauth')
 
 print(id)
