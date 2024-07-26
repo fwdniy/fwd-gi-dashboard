@@ -13,7 +13,12 @@ def home_page():
     st.write("For any bugs, please report them to Nicolas Au-Yeung via Teams or email (nicolas.au.yeung@fwd.com)")
     st.write(id)
 
-pages = [st.Page(home_page, title="Home")]
+def home_page2():
+    st.write("# Welcome to Stilson Dashboard! 👋")
+    st.write("For any bugs, please report them to Nicolas Au-Yeung via Teams or email (nicolas.au.yeung@fwd.com)")
+    st.write(id)
+
+pages = [st.Page(home_page, title="Home"), st.Page(home_page2, title="Home2")]
 
 nav = st.navigation(pages)
 nav.run()
