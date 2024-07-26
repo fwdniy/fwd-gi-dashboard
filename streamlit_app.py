@@ -20,5 +20,5 @@ id = st_oauth('fwdoauth')
 
 pages = [st.Page(home_page, title="Home"), st.Page(home_page2, title="Home2")]
 
-nav = st.navigation(pages)
+#nav = st.navigation(pages)
 #nav.run()
