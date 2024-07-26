@@ -26,6 +26,7 @@ pyarrow==16.1.0
 pycparser==2.22
 pydeck==0.9.1
 Pygments==2.18.0
+PyJWT==2.8.0
 python-dateutil==2.9.0.post0
 pytz==2024.1
 referencing==0.35.1
