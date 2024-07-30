@@ -10,7 +10,7 @@ def connect_snowflake():
         account='FWD-PROD',
         host='FWD-PROD.snowflakecomputing.com',
         role='GROUP_DASHBOARD_ROLE',
-        warehouse='FUNNELWEB',
+        warehouse='STREAMLIT',
         database='FUNNEL_PILOT',
         schema='FUNNEL'
     )

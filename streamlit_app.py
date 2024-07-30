@@ -1,5 +1,6 @@
 import streamlit as st
 from st_oauth import st_oauth
+from tools import snowflake
 
 st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
 
@@ -14,10 +15,10 @@ else:
 if "fwdoauth" in st.secrets:
     id = st_oauth('fwdoauth')
 
-nav = st.navigation(pages)
-nav.run()
-
 if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callback_removed" not in st.session_state:
+    st.session_state["conn"] = snowflake.connect_snowflake()
     pages = st.session_state["pages"] = st.session_state["pages"][1:]
     st.session_state["callback_removed"] = True
-    nav = st.navigation(pages)
+
+nav = st.navigation(pages)
+nav.run()
