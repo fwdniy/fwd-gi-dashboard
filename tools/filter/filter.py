@@ -6,28 +6,48 @@ from datetime import datetime, timedelta
 def build_lbu_filter():
     get_lbu_data()
     
+    indexes = []
+    index_classes = {}
+    i = 0
+
     for group in st.session_state["lbus"]:
+        indexes.append([i])
+        index_classes[i] = group
+        i += 1
         for lbu in group.lbus:
-            for type in lbu.fundTypes:
-                type.build_cas_item()
+            index_classes[i] = lbu
+            i += 1
+            for fund_type in lbu.fundTypes:
+                index_classes[i] = fund_type
+                i += 1
+                for fund in fund_type.funds:
+                    index_classes[i] = fund
+                    i += 1
+                fund_type.build_cas_item()
             lbu.build_cas_item()
         group.build_cas_item()
 
     items = [group.casItem for group in st.session_state["lbus"]]
     
-    indexes = []
-
-    i = 0
-    for group in items:
-        indexes.append([i])
-        i += 1
-        for lbu in group.children:
-            i += 1
-            for type in lbu.children:
-                i += 1 + len(type.children)
-
     st.write('LBU Group / LBU / Fund Type / Fund')
-    st.session_state['LBU Group / LBU / Fund Type / Fund'] = sac.cascader(items=items, multiple=True, search=True, clear=True, strict=True, return_index=True, index=indexes)
+    selected_indexes = sac.cascader(items=items, multiple=True, search=True, clear=True, strict=True, return_index=True, index=indexes)
+    
+    if selected_indexes == []:
+        selected_indexes = indexes
+
+    selected_classes = [index_classes[index[0]] if type(index) == list else index_classes[index] for index in selected_indexes]        
+
+    remove_selection = []
+    for selection in selected_classes:
+        exists = selection.lower_level_exists(selected_classes)
+
+        if exists:
+            remove_selection.append(selection)
+
+    for selection in remove_selection:
+        selected_classes.remove(selection)
+
+    st.session_state['LBU Group / LBU / Fund Type / Fund'] = selected_classes
 
 def build_date_filter():
     get_date_data()
@@ -56,16 +76,16 @@ def build_date_filter():
                     st.session_state['Comparison Date'] = selected_date - timedelta(days=adjuster)
 
         if not comparison_date:
-            return st.date_input(label, default_date, st.session_state["min_date"], st.session_state["max_date"], on_change=check_weekday, key=label)
+            st.date_input(label, default_date, st.session_state["min_date"], st.session_state["max_date"], on_change=check_weekday, key=label)
         else:
-            return st.date_input(label, default_date, st.session_state["min_date"], st.session_state["max_date"], on_change=check_weekday_comparison, key=label)
+            st.date_input(label, default_date, st.session_state["min_date"], st.session_state["max_date"], on_change=check_weekday_comparison, key=label)
 
     date_cols = st.columns(2)
 
     with date_cols[0]:
-        datetime.combine(create_date_filter('Valuation Date', st.session_state["max_date"]), datetime.min.time())
+        create_date_filter('Valuation Date', st.session_state["max_date"])
     with date_cols[1]:
-        datetime.combine(create_date_filter('Comparison Date', st.session_state["default_compare_date"]), datetime.min.time())
+        create_date_filter('Comparison Date', st.session_state["default_compare_date"])
 
 def build_currency_filter():
     get_currency_data()

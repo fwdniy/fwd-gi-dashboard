@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 def connect_snowflake():
-    return snowflake.connector.connect(
+    st.session_state["conn"] = snowflake.connector.connect(
         user=st.secrets["snowflake"]["username"],
         password=st.secrets["snowflake"]["password"],
         account='FWD-PROD',
@@ -46,6 +46,9 @@ def convert_columns(df, cur):
     return df
 
 def query(query, sort_columns = []):
+    if "conn" not in st.session_state:
+        connect_snowflake()
+    
     conn = st.session_state["conn"]
     cur = conn.cursor()
     cur.execute(query)
