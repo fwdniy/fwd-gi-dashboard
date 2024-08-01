@@ -18,7 +18,7 @@ if "fwdoauth" in st.secrets:
     st.markdown(
     """
         <style>
-            div[class="st-emotion-cache-q16mip e3g6aar1"] {
+            div[class="st-emotion-cache-1p1m4ay e3g6aar0"] {
                 display: none;
             }
         </style>
