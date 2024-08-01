@@ -33,7 +33,7 @@ if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callbac
     """
         <style>
             div[class="st-emotion-cache-1p1m4ay e3g6aar0"] {
-                display: visible;
+                display: flex !important;
             }
         </style>
     """,
