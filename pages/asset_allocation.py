@@ -5,6 +5,9 @@ from st_aggrid import AgGrid, GridOptionsBuilder, JsCode, ColumnsAutoSizeMode
 import streamlit.components as components
 from tools import filter, snowflake
 from styles.formatting import format_numbers, conditional_formatting
+from st_oauth import st_oauth
+
+session = st_oauth()
 
 filter.build_date_filter()
 filter.build_lbu_filter()
