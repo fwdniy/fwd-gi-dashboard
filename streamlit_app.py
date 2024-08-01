@@ -15,6 +15,12 @@ else:
     pages = st.session_state["pages"]
 
 if "fwdoauth" in st.secrets:
+    hide_github_icon = """
+    #GithubIcon {
+        visibility: hidden;
+    }
+    """
+    st.markdown(hide_github_icon, unsafe_allow_html=True)
     id = st_oauth('fwdoauth')
 
 if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callback_removed" not in st.session_state:
