@@ -14,8 +14,10 @@ if "pages" not in st.session_state:
 else:
     pages = st.session_state["pages"]
 
+hide_action_bar = st.empty()
+
 if "fwdoauth" in st.secrets:
-    st.markdown(
+    hide_action_bar = st.markdown(
     """
         <style>
             div[class="st-emotion-cache-1p1m4ay e3g6aar0"] {
