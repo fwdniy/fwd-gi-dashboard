@@ -11,6 +11,8 @@ if "pages" not in st.session_state:
     pages = st.session_state["pages"] = [st.Page("pages/callback.py", title="Callback")]
     nav = st.navigation(pages)
     nav.run()
+else:
+    pages = st.session_state["pages"]
 
 if "fwdoauth" in st.secrets:
     id = st_oauth('fwdoauth')
