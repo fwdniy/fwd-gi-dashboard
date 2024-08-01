@@ -90,12 +90,27 @@ def build_date_filter():
 def build_currency_filter():
     get_currency_data()
 
+    df = st.session_state["fxs_df"]
+
+    current_fx = st.session_state['fxs_current'] = df[(df['VALUATION_DATE'] == st.session_state['Valuation Date'])]
+    compare_fx = st.session_state['fxs_compare'] = df[(df['VALUATION_DATE'] == st.session_state['Comparison Date'])]
+
+    st.session_state['currencies'] = list(set(current_fx['FX'].unique()) & set(compare_fx['FX'].unique()))
+
     currencies = []
     for currency in st.session_state['currencies']:
         currencies.append(sac.CasItem(currency))
 
     st.write('Currency')
-    st.session_state['Currency'] = sac.cascader(currencies, search=True, strict=True, index=next((i for i, obj in enumerate(currencies) if obj.label == 'USD'), None))
+    currency = sac.cascader(currencies, search=True, strict=True, index=next((i for i, obj in enumerate(currencies) if obj.label == 'USD'), None))
+
+    if type(currency) == list:
+        currency = currency[0]
+
+    st.session_state['Currency'] = currency
+
+    st.session_state['fx_rate_current'] = current_fx[current_fx['FX'] == currency]["RATE"].iloc[0]
+    st.session_state['fx_rate_compare'] = compare_fx[compare_fx['FX'] == currency]["RATE"].iloc[0]
 
 def build_level_filter():
     if 'level' not in st.session_state:
@@ -103,3 +118,41 @@ def build_level_filter():
 
     st.write("Level")
     st.session_state['level'] = int(sac.buttons([sac.ButtonsItem(label='1'), sac.ButtonsItem(label='2'), sac.ButtonsItem(label='3'), sac.ButtonsItem(label='4')], index=1))
+
+def build_custom_cascader(columns, default_columns, title = '', key = ''):
+    def build_items(columns):
+        items = []
+
+        for column in columns:
+            if isinstance(column, str):
+                items.append(sac.CasItem(column))
+            elif isinstance(column, list):
+                children = build_items(column, i)
+                items.append(sac.CasItem(column[0], children=children))
+        
+        return items
+
+    def convert_selections(selections, columns):
+        items = []
+        for selection in selections:
+            if isinstance(selection, list):
+                item = convert_selections(selection, columns)
+                items += item
+            else:
+                items.append(columns[selection])
+        
+        return items
+    
+    if title != "":
+        st.write(title)
+
+    items = build_items(columns)
+
+    default_indexes = [[columns.index(col)] for col in default_columns]
+
+    selections = sac.cascader(items=items, multiple=True, search=True, clear=True, strict=True, return_index=True, index=default_indexes)
+
+    selections = convert_selections(selections, columns)
+
+    if key != "":
+        st.session_state[key] = selections

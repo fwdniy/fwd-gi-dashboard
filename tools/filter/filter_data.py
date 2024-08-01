@@ -34,14 +34,7 @@ def get_currency_data():
     if "fxs_df" in st.session_state:
         return
     
-    st.session_state["fxs_df"] = df = snowflake.query("SELECT valuation_date, fx, rate FROM funnel.fx_view;", ['VALUATION_DATE', 'FX'])
+    df = snowflake.query("SELECT valuation_date, fx, rate FROM funnel.fx_view;", ['VALUATION_DATE', 'FX'])
     df['VALUATION_DATE'] = df['VALUATION_DATE'].dt.date
 
-    current_fx = st.session_state['current_fxs'] = df[(df['VALUATION_DATE'] == st.session_state['max_date'])]
-    compare_fx = st.session_state['compare_fxs'] = df[(df['VALUATION_DATE'] == st.session_state['default_compare_date'])]
-
-    st.session_state['currencies'] = list(set(current_fx['FX'].unique()) & set(compare_fx['FX'].unique()))
-
-    st.session_state['default_currency'] = 'USD'
-    st.session_state['current_fx_rate'] = current_fx[current_fx['FX'] == st.session_state['default_currency']]["RATE"].iloc[0]
-    st.session_state['compare_fx_rate'] = compare_fx[compare_fx['FX'] == st.session_state['default_currency']]["RATE"].iloc[0]
+    st.session_state["fxs_df"] = df
