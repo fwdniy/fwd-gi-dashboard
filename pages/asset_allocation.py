@@ -7,7 +7,8 @@ from tools import filter, snowflake
 from styles.formatting import format_numbers, conditional_formatting
 from st_oauth import st_oauth
 
-session = st_oauth()
+if "fwdoauth" in st.secrets:
+    id = st_oauth('fwdoauth')
 
 filter.build_date_filter()
 filter.build_lbu_filter()
