@@ -9,6 +9,8 @@ st.markdown('<style>' + open('./styles/style.css').read() + '</style>', unsafe_a
 
 if "pages" not in st.session_state:
     pages = st.session_state["pages"] = [st.Page("pages/callback.py", title="Callback")]
+    nav = st.navigation(pages)
+    nav.run()
 
 if "fwdoauth" in st.secrets:
     id = st_oauth('fwdoauth')
@@ -16,6 +18,7 @@ if "fwdoauth" in st.secrets:
 if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callback_removed" not in st.session_state:
     pages = st.session_state["pages"] = pages = st.session_state["pages"] = [st.Page("pages/home.py", title="Home"), st.Page("pages/asset_allocation.py", title="Asset Allocation"), st.Page("pages/breakdown.py", title="Breakdown")]
     st.session_state["callback_removed"] = True
+    st.rerun()
 
 nav = st.navigation(pages)
 nav.run()

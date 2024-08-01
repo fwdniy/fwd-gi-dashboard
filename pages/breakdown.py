@@ -2,9 +2,6 @@ import streamlit as st
 from tools import filter
 from st_oauth import st_oauth
 
-if "fwdoauth" in st.secrets:
-    id = st_oauth('fwdoauth')
-
 columns = ['LBU_GROUP', 'LBU_CODE', 'L1_ASSET_TYPE', 
                'L2_ASSET_TYPE', 'L3_ASSET_TYPE', 'L4_ASSET_TYPE', 
                'FINAL_RATING', 'INDUSTRY_SECTOR', 'INDUSTRY_GROUP', 
