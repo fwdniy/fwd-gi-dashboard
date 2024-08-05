@@ -45,6 +45,7 @@ sortedcontainers==2.4.0
 streamlit==1.36.0
 streamlit-aggrid==1.0.5
 streamlit-antd-components==0.3.2
+streamlit-js-eval==0.1.7
 tenacity==8.5.0
 toml==0.10.2
 tomlkit==0.13.0

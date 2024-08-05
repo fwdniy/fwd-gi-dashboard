@@ -119,7 +119,7 @@ def build_level_filter():
     st.write("Level")
     st.session_state['level'] = int(sac.buttons([sac.ButtonsItem(label='1'), sac.ButtonsItem(label='2'), sac.ButtonsItem(label='3'), sac.ButtonsItem(label='4')], index=1))
 
-def build_custom_cascader(columns, default_columns, title = '', key = ''):
+def build_custom_cascader(columns, default_columns, title = '', key = None, select_all = False):
     def build_items(columns):
         items = []
 
@@ -127,7 +127,7 @@ def build_custom_cascader(columns, default_columns, title = '', key = ''):
             if isinstance(column, str):
                 items.append(sac.CasItem(column))
             elif isinstance(column, list):
-                children = build_items(column, i)
+                children = build_items(column)
                 items.append(sac.CasItem(column[0], children=children))
         
         return items
@@ -142,17 +142,34 @@ def build_custom_cascader(columns, default_columns, title = '', key = ''):
                 items.append(columns[selection])
         
         return items
-    
+
+    def create_cascader(items, default):
+        selections = sac.cascader(items=items, multiple=True, search=True, clear=True, strict=True, return_index=True, index=default)
+        selections = convert_selections(selections, columns)
+        return selections
+
     if title != "":
         st.write(title)
-
+            
     items = build_items(columns)
+    default = [[columns.index(col)] for col in default_columns]
 
-    default_indexes = [[columns.index(col)] for col in default_columns]
+    if key not in st.session_state:
+        st.session_state[f"{key}_default"] = default
+    elif key in st.session_state:
+        default = st.session_state[f"{key}_default"]
+    
+    if select_all:
+        col1, col2 = st.columns([0.8, 0.2])
 
-    selections = sac.cascader(items=items, multiple=True, search=True, clear=True, strict=True, return_index=True, index=default_indexes)
+        with col1:
+            selections = create_cascader(items, default)
+        with col2:
+            if st.button("Select all", f"Select All {title}", use_container_width=True):
+                st.session_state[key] = [[columns.index(col)] for col in columns]
+                st.rerun()
+    else:
+        selections = create_cascader(items, default)
 
-    selections = convert_selections(selections, columns)
 
-    if key != "":
-        st.session_state[key] = selections
+    return selections
