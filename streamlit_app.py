@@ -48,7 +48,7 @@ if "fwdoauth" in st.secrets:
             st.rerun()
 
 if "ST_OAUTH" in st.session_state:
-    st.sidebar.write(f"Logged in as {st.session_state['ST_OAUTH_ID']}")
+    st.sidebar.write(f"Logged in as {st.session_state['ST_OAUTH']}")
 else:
     st.sidebar.write(f"Local Debugging")
 
