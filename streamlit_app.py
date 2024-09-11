@@ -42,10 +42,10 @@ if "fwdoauth" in st.secrets:
     if "ST_OAUTH" not in st.session_state:
         result = oauth2.authorize_button("Authorize", fwdoauth["redirect_uri"], fwdoauth["scope"])
 
-    if result and 'token' in result:
-        # If authorization successful, save token in session state
-        st.session_state["ST_OAUTH"] = result.get('token')
-        st.rerun()
+        if result and 'token' in result:
+            # If authorization successful, save token in session state
+            st.session_state["ST_OAUTH"] = result.get('token')
+            st.rerun()
 
 if "ST_OAUTH" in st.session_state:
     st.sidebar.write(f"Logged in as {st.session_state['ST_OAUTH_ID']}")
