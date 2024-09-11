@@ -6,7 +6,6 @@
 #https://github.com/Schluca/streamlit_tree_select
 
 import streamlit as st
-from st_oauth import st_oauth
 from tools import snowflake
 import streamlit.components.v1 as components
 from streamlit_js_eval import streamlit_js_eval
@@ -33,8 +32,6 @@ if "fwdoauth" in st.secrets:
     """,
     unsafe_allow_html=True
     )
-
-    #st.session_state['ST_OAUTH_ID'] = st_oauth('fwdoauth')
 
     fwdoauth = st.secrets["fwdoauth"]
     oauth2 = OAuth2Component(fwdoauth["client_id"], fwdoauth["client_secret"], fwdoauth["authorization_endpoint"], fwdoauth["token_endpoint"], None, None)
