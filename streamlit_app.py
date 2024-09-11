@@ -37,7 +37,7 @@ if "fwdoauth" in st.secrets:
     #st.session_state['ST_OAUTH_ID'] = st_oauth('fwdoauth')
 
     fwdoauth = st.secrets["fwdoauth"]
-    oauth2 = OAuth2Component(fwdoauth["client_id"], fwdoauth["client_secret"], fwdoauth["authorization_endpoint"], fwdoauth["token_endpoint"], REFRESH_TOKEN_URL=None, REVOKE_TOKEN_URL=None)
+    oauth2 = OAuth2Component(fwdoauth["client_id"], fwdoauth["client_secret"], fwdoauth["authorization_endpoint"], fwdoauth["token_endpoint"], None, None)
 
     if "ST_OAUTH" not in st.session_state:
         result = oauth2.authorize_button("Authorize", fwdoauth["redirect_uri"], fwdoauth["scope"])
