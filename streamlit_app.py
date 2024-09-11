@@ -1,9 +1,19 @@
+#https://discuss.streamlit.io/t/streamlit-qs-make-permalinks-and-take-names-query-string-utils/44630
+#https://discuss.streamlit.io/t/new-library-streamlit-server-state-a-new-way-to-share-states-across-sessions-on-the-server/14981
+#https://discuss.streamlit.io/t/streamlit-on-hover-tabs-for-custom-navigation-bar/23879
+#https://discuss.streamlit.io/t/new-component-streamlit-oauth/40364
+#https://discuss.streamlit.io/t/new-component-streamlit-navigation-bar/66032
+#https://github.com/Schluca/streamlit_tree_select
+
 import streamlit as st
 from st_oauth import st_oauth
 from tools import snowflake
 import streamlit.components.v1 as components
+from streamlit_js_eval import streamlit_js_eval
+from streamlit_oauth import OAuth2Component
 
 st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
+streamlit_js_eval(js_expressions="window.innerWidth", key='SCR')
 
 if "pages" not in st.session_state:
     pages = st.session_state["pages"] = [st.Page("pages/callback.py", title="Callback")]
@@ -24,15 +34,26 @@ if "fwdoauth" in st.secrets:
     unsafe_allow_html=True
     )
 
-    id = st_oauth('fwdoauth')
+    #st.session_state['ST_OAUTH_ID'] = st_oauth('fwdoauth')
+
+    fwdoauth = st.secrets["fwdoauth"]
+    oauth2 = OAuth2Component(fwdoauth["client_id"], fwdoauth["client_secret"], fwdoauth["authorization_endpoint"], fwdoauth["token_endpoint"], REFRESH_TOKEN_URL=None, REVOKE_TOKEN_URL=None)
+
+    if "ST_OAUTH" not in st.session_state:
+        result = oauth2.authorize_button("Authorize", fwdoauth["redirect_uri"], fwdoauth["scope"])
+
+    if result and 'token' in result:
+        # If authorization successful, save token in session state
+        st.session_state["ST_OAUTH"] = result.get('token')
+        st.rerun()
 
 if "ST_OAUTH" in st.session_state:
-    st.sidebar.write(f"Logged in as {st.session_state['ST_OAUTH']}")
+    st.sidebar.write(f"Logged in as {st.session_state['ST_OAUTH_ID']}")
 else:
     st.sidebar.write(f"Local Debugging")
 
 if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callback_removed" not in st.session_state:
-    pages = st.session_state["pages"] = [st.Page("pages/home.py", title="Home"), st.Page("pages/asset_allocation.py", title="Asset Allocation"), st.Page("pages/breakdown.py", title="Breakdown")]
+    pages = st.session_state["pages"] = [st.Page("pages/home.py", title="Home"), st.Page("pages/asset_allocation.py", title="Asset Allocation"), st.Page("pages/breakdown.py", title="Breakdown"), st.Page("pages/repo.py", title="Repos")]
     st.session_state["callback_removed"] = True
     st.rerun()
 

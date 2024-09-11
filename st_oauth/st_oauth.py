@@ -96,8 +96,10 @@ def st_oauth(config=None, label="Login via OAuth"):
         except requests.exceptions.RequestException as e:
             st.error(e)
             show_auth_link(config, label)
+            
         token = ret.json()
         valid, msg = validate_token(token, config)
+
         if valid:
             st.session_state[_STKEY] = token
         else:

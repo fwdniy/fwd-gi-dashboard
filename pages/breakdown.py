@@ -3,8 +3,7 @@ import pandas as pd
 from tools import filter, snowflake
 from st_aggrid import AgGrid, GridOptionsBuilder, JsCode, ColumnsAutoSizeMode
 from styles.formatting import format_numbers, conditional_formatting
-
-filter.build_date_filter()
+from streamlit_tree_select import tree_select
 
 columns = ['LBU_GROUP', 'LBU_CODE', 'L1_ASSET_TYPE', 
                'L2_ASSET_TYPE', 'L3_ASSET_TYPE', 'L4_ASSET_TYPE', 
@@ -22,11 +21,16 @@ display_names = {'CLOSING_DATE': 'Closing Date', 'LBU_GROUP': 'LBU Group', 'LBU_
             'FINAL_RATING': 'Final Rating', 'INDUSTRY_SECTOR': 'Industry Sector', 'INDUSTRY_GROUP': 'Industry Group', 
             'INDUSTRY': 'Industry', 'MANAGER': 'Manager', 'CLEAN_MV_USD': 'Clean MV', 'NET_MV': 'Net MV'}
 
-selected_columns = filter.build_custom_cascader([display_names[column] for column in columns], [display_names[column] for column in default_columns], 'Columns', 'breakdown_columns')
-selected_values = filter.build_custom_cascader([display_names[column] for column in values], [display_names[column] for column in default_values], 'Values', 'breakdown_values')
+with st.expander("Filters"):
+    filter.build_date_filter()
+    selected = filter.build_tree_selectors({"breakdown_columns": {"title": "Columns", "values": columns, "checked": default_columns, "column_label_dict": display_names, "buttons": True},
+                                "breakdown_values": {"title": "Values", "values": values, "checked": default_values, "column_label_dict": display_names, "buttons": True}})
 
-column_string = ", ".join([key.lower() for key, value in display_names.items() if value in selected_columns])
-value_string = "SUM(" + '), SUM('.join([key.lower() for key, value in display_names.items() if value in selected_values]) + ")"
+selected_columns = selected["breakdown_columns"]["checked"]
+selected_values = selected["breakdown_values"]["checked"]
+
+column_string = ", ".join(selected_columns)
+value_string = "SUM(" + '), SUM('.join(selected_values) + ")"
 query = f"SELECT closing_date, {column_string}, {value_string} FROM funnel.funnelweb GROUP BY closing_date, {column_string} ORDER BY closing_date, {column_string};"
 
 if len(selected_columns) > 0 and len(selected_values) > 0:
@@ -43,19 +47,11 @@ if len(selected_columns) > 0 and len(selected_values) > 0:
         compare_date = st.session_state['Comparison Date']
 
         df = df[(df['CLOSING_DATE'].dt.date == current_date) | (df['CLOSING_DATE'].dt.date == compare_date)]
-        df['CLOSING_DATE'] = pd.to_datetime(df['CLOSING_DATE'], unit='s').dt.strftime('%Y-%m-%d')
-        df.rename(columns=lambda x: x[4:-1] if x.startswith('SUM(') and x.endswith(')') else x, inplace=True)
-        df.rename(columns=lambda x: display_names[x] if x in display_names.keys() else x, inplace=True)
-
-        with st.expander("Column Filters"):
-            for column in selected_columns:
-                unique_values = list(df[column].unique())
-                selected_column_values = filter.build_custom_cascader(unique_values, unique_values, column, f'breakdown_columns_{column}')
-                
-                if len(selected_column_values) == 0:
-                    selected_column_values = unique_values
-                    
-                df = df[df[column].isin(selected_column_values)]
+        df.loc[:, 'CLOSING_DATE'] = pd.to_datetime(df['CLOSING_DATE'], unit='s').dt.strftime('%Y-%m-%d')
+        #df.rename(columns=lambda x: x[4:-1] if x.startswith('SUM(') and x.endswith(')') else x, inplace=True)
+        df.columns = [col[4:-1] if col.startswith('SUM(') and col.endswith(')') else col for col in df.columns]
+        #df.rename(columns=lambda x: display_names[x] if x in display_names.keys() else x, inplace=True)
+        df.columns = [display_names[col] if col in display_names else col for col in df.columns]
         
         st.write(query)
 
@@ -68,12 +64,12 @@ if len(selected_columns) > 0 and len(selected_values) > 0:
         )
 
         for column in selected_columns:
-            gb.configure_column(field=column, rowGroup=True, hide=True)
+            gb.configure_column(field=display_names[column], rowGroup=True, hide=True)
 
         gb.configure_column(field=display_names['CLOSING_DATE'], pivot=True)
 
         for value in selected_values:
-            gb.configure_column(field=value, aggFunc= "sum", valueFormatter=format_numbers(divide_by=1000000))
+            gb.configure_column(field=display_names[value], aggFunc= "sum", valueFormatter=format_numbers(divide_by=1000000))
 
         go = gb.build()
         go['pivotMode'] = True

@@ -2,6 +2,9 @@ import streamlit as st
 from tools.filter.filter_data import get_lbu_data, get_date_data, get_currency_data
 import streamlit_antd_components as sac
 from datetime import datetime, timedelta
+from streamlit_js_eval import streamlit_js_eval
+import time
+from streamlit_tree_select import tree_select
 
 def build_lbu_filter():
     get_lbu_data()
@@ -28,9 +31,19 @@ def build_lbu_filter():
         group.build_cas_item()
 
     items = [group.casItem for group in st.session_state["lbus"]]
+
+    if "lbu_default" in st.session_state:
+        indexes = st.session_state["lbu_default"]
     
     st.write('LBU Group / LBU / Fund Type / Fund')
-    selected_indexes = sac.cascader(items=items, multiple=True, search=True, clear=True, strict=True, return_index=True, index=indexes)
+    col1, col2 = st.columns([0.8, 0.2])
+
+    with col1:
+        selected_indexes = st.session_state[f"lbu_default"] = sac.cascader(items=items, multiple=True, search=True, clear=True, strict=True, return_index=True, index=indexes)
+    with col2:
+        if st.button("Select all", f"Select All LBU", use_container_width=True):
+            st.session_state["lbu_default"] = [[item.value] for item in items]
+            st.rerun()
     
     if selected_indexes == []:
         selected_indexes = indexes
@@ -119,57 +132,36 @@ def build_level_filter():
     st.write("Level")
     st.session_state['level'] = int(sac.buttons([sac.ButtonsItem(label='1'), sac.ButtonsItem(label='2'), sac.ButtonsItem(label='3'), sac.ButtonsItem(label='4')], index=1))
 
-def build_custom_cascader(columns, default_columns, title = '', key = None, select_all = False):
-    def build_items(columns):
-        items = []
+def build_tree_selectors(data, height=200):
+    cols = st.columns(len(data))
+    keys = list(data.keys())
+    width = st.session_state["SCR"]
+    selected_values = {}
 
-        for column in columns:
-            if isinstance(column, str):
-                items.append(sac.CasItem(column))
-            elif isinstance(column, list):
-                children = build_items(column)
-                items.append(sac.CasItem(column[0], children=children))
-        
-        return items
+    for i in range (0, len(cols)):
+        key = keys[i]
+        parameters = data[key]
+        title = parameters["title"]
+        items = parameters["values"]
+        checked = parameters["checked"]
+        display_names = parameters["column_label_dict"]
+        buttons = parameters["buttons"]
 
-    def convert_selections(selections, columns):
-        items = []
-        for selection in selections:
-            if isinstance(selection, list):
-                item = convert_selections(selection, columns)
-                items += item
-            else:
-                items.append(columns[selection])
-        
-        return items
-
-    def create_cascader(items, default):
-        selections = sac.cascader(items=items, multiple=True, search=True, clear=True, strict=True, return_index=True, index=default)
-        selections = convert_selections(selections, columns)
-        return selections
-
-    if title != "":
-        st.write(title)
-            
-    items = build_items(columns)
-    default = [[columns.index(col)] for col in default_columns]
-
-    if key not in st.session_state:
-        st.session_state[f"{key}_default"] = default
-    elif key in st.session_state:
-        default = st.session_state[f"{key}_default"]
+        with cols[i]:
+            with st.container(border=True):
+                st.write(title)
+                if buttons:
+                    button_space = st.columns(2)
+                    if key in st.session_state and st.session_state[key] != None:
+                        checked = st.session_state[key]
+                    with button_space[0]:
+                        if st.button("Select All", f"{key}_select_all", use_container_width=True):
+                            checked = items
+                    with button_space[1]:
+                        if st.button("Clear", f"{key}_clear", use_container_width=True):
+                            checked = []
+                with st.container(height=height):
+                    selected = tree_select([{"label": display_names[item], "value": item} for item in items], check_model='leaf', key=key, checked=checked)
+                    selected_values[key] = selected
     
-    if select_all:
-        col1, col2 = st.columns([0.8, 0.2])
-
-        with col1:
-            selections = create_cascader(items, default)
-        with col2:
-            if st.button("Select all", f"Select All {title}", use_container_width=True):
-                st.session_state[key] = [[columns.index(col)] for col in columns]
-                st.rerun()
-    else:
-        selections = create_cascader(items, default)
-
-
-    return selections
+    return selected_values
