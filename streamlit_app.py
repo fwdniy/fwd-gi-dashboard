@@ -47,11 +47,6 @@ if "fwdoauth" in st.secrets:
             st.session_state["ST_OAUTH"] = result.get('token')
             st.rerun()
 
-if "ST_OAUTH" in st.session_state:
-    st.sidebar.write(f"Logged in as {st.session_state['ST_OAUTH']}")
-else:
-    st.sidebar.write(f"Local Debugging")
-
 if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callback_removed" not in st.session_state:
     pages = st.session_state["pages"] = [st.Page("pages/home.py", title="Home"), st.Page("pages/asset_allocation.py", title="Asset Allocation"), st.Page("pages/breakdown.py", title="Breakdown"), st.Page("pages/repo.py", title="Repos")]
     st.session_state["callback_removed"] = True
