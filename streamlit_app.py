@@ -37,15 +37,20 @@ if "fwdoauth" in st.secrets:
     oauth2 = OAuth2Component(fwdoauth["client_id"], fwdoauth["client_secret"], fwdoauth["authorization_endpoint"], fwdoauth["token_endpoint"], None, None)
 
     if "ST_OAUTH" not in st.session_state:
-        result = oauth2.authorize_button("Authorize", fwdoauth["redirect_uri"], fwdoauth["scope"])
+        result = oauth2.authorize_button("Continue with Okta SSO", fwdoauth["redirect_uri"], fwdoauth["scope"])
 
         if result and 'token' in result:
+            print(result)
             # If authorization successful, save token in session state
             st.session_state["ST_OAUTH"] = result.get('token')
             st.rerun()
 
 if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callback_removed" not in st.session_state:
-    pages = st.session_state["pages"] = [st.Page("pages/home.py", title="Home"), st.Page("pages/asset_allocation.py", title="Asset Allocation"), st.Page("pages/breakdown.py", title="Breakdown"), st.Page("pages/repo.py", title="Repos")]
+    pages = st.session_state["pages"] = [st.Page("pages/home.py", title="Home"), 
+                                         st.Page("pages/asset_allocation.py", title="Asset Allocation"), 
+                                         st.Page("pages/breakdown.py", title="Breakdown"), 
+                                         st.Page("pages/repo.py", title="Repos"),
+                                         st.Page("pages/snapshot.py", title="Snapshot")]
     st.session_state["callback_removed"] = True
     st.rerun()
 
