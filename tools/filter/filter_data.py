@@ -7,7 +7,7 @@ def get_lbu_data():
     if "lbus_df" in st.session_state:
         return
     
-    st.session_state["lbus_df"] = df = snowflake.query(f"SELECT l.group_name, f.lbu, f.type, f.short_name, l.bloomberg_name, l.lbu_group FROM supp.fund AS f LEFT JOIN supp.lbu AS l ON l.name = f.lbu WHERE l.bloomberg_name <> 'LT';", ['GROUP_NAME', 'LBU', 'TYPE', 'SHORT_NAME'])
+    st.session_state["lbus_df"] = df = snowflake.query(f"SELECT l.group_name, f.lbu, f.type, f.short_name, l.bloomberg_name, l.lbu_group, f.sub_lbu FROM supp.fund AS f LEFT JOIN supp.lbu AS l ON l.name = f.lbu WHERE l.bloomberg_name <> 'LT' ORDER BY group_name, lbu, sub_lbu, type, short_name;", ['GROUP_NAME', 'LBU', 'TYPE', 'SHORT_NAME', 'SUB_LBU'])
 
     lbus = []
     for index, row in df.iterrows():

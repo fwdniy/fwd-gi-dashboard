@@ -51,7 +51,7 @@ def conditional_formatting(lower_bound = -5, mid_point = 0, upper_bound = 5):
                     
             var fontColor = 'black';
                                    
-            if(Math.abs(value) >= 2){
+            if(value >= (upper_bound - mid_point) * 0.4 || value <= (lower_bound - mid_point) * 0.4){
                 fontColor = 'white';
             }
                     

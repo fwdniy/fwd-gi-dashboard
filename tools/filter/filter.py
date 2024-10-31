@@ -62,6 +62,53 @@ def build_lbu_filter():
 
     st.session_state['LBU Group / LBU / Fund Type / Fund'] = selected_classes
 
+def build_lbu_tree(hk_entities = False):
+    get_lbu_data()
+    
+    values = []
+    entities = {}
+
+    for group in st.session_state["lbus"]:
+        childrenLbus = []
+
+        if not hk_entities:
+            lbus = group.lbus
+        elif group.lbu_group_code == 'HK':
+            lbus = group.entities
+        else:
+            continue
+
+        for lbu in lbus:
+            childrenFundTypes = []
+
+            if hk_entities and lbu not in entities:
+                entities[lbu.lbu_code] = []
+
+            for fund_type in lbu.fundTypes:
+                childrenFunds = []
+                for fund in fund_type.funds:
+                    if hk_entities:
+                        entities[lbu.lbu_code].append(fund.fund_code)
+                    
+                    childrenFunds.append({"label": fund.fund_code, "value": f"fund_code:{fund.fund_code}"})
+                childrenFundTypes.append({"label": fund.fund_type, "value": f"fund_type:{lbu.lbu_code}-{fund.fund_type}", "children": childrenFunds})
+            childrenLbus.append({"label": lbu.lbu_name, "value": f"lbu_code:{lbu.lbu_code}", "children": childrenFundTypes})
+        values.append({"label": group.lbu_group_name, "value": f"lbu_group:{group.lbu_group_code}", "children": childrenLbus})
+    
+    all = []
+    all.append({"label": "Select All", "value": "all", "children": values})
+
+    expanded = []
+    
+    if hk_entities:
+        expanded.extend([entity['value'] for entity in all[0]['children']])
+        expanded.append("all")
+        st.session_state['hk_entities'] = entities
+
+    selected_values = build_tree_selectors({"lbu_tree": {"title": "LBUs", "data": all, "expanded": expanded}})
+
+    st.session_state['lbu_tree_data'] = [value.replace('fund_code:', '') for value in selected_values['lbu_tree']['checked'] if 'fund_code:' in value]
+
 def build_date_filter():
     get_date_data()
     
@@ -135,33 +182,40 @@ def build_level_filter():
 def build_tree_selectors(data, height=200):
     cols = st.columns(len(data))
     keys = list(data.keys())
-    width = st.session_state["SCR"]
     selected_values = {}
 
     for i in range (0, len(cols)):
         key = keys[i]
         parameters = data[key]
         title = parameters["title"]
-        items = parameters["values"]
-        checked = parameters["checked"]
-        display_names = parameters["column_label_dict"]
-        buttons = parameters["buttons"]
+        
+        if "data" not in parameters:
+            items = parameters["values"]
+            checked = parameters["checked"]
+            display_names = parameters["column_label_dict"]
+            data = [{"label": display_names[item], "value": item} for item in items]
+        else:
+            data = parameters["data"]
+            values = lambda d: [d['value']] + sum([values(c) for c in d.get('children', [])], [])
+            checked = sum([values(item) for item in data], [])
+
+            if "expanded" != []:
+                expanded = parameters["expanded"]
+            elif 'all' in checked:
+                expanded = ['all']
+            else:
+                expanded = []
 
         with cols[i]:
             with st.container(border=True):
                 st.write(title)
-                if buttons:
-                    button_space = st.columns(2)
-                    if key in st.session_state and st.session_state[key] != None:
-                        checked = st.session_state[key]
-                    with button_space[0]:
-                        if st.button("Select All", f"{key}_select_all", use_container_width=True):
-                            checked = items
-                    with button_space[1]:
-                        if st.button("Clear", f"{key}_clear", use_container_width=True):
-                            checked = []
                 with st.container(height=height):
-                    selected = tree_select([{"label": display_names[item], "value": item} for item in items], check_model='leaf', key=key, checked=checked)
+                    
+                    if type(checked) == dict:
+                        expanded = checked["expanded"]
+                        checked = checked["checked"]
+
+                    selected = tree_select(data, check_model='leaf', key=key, checked=checked, expanded=expanded)
                     selected_values[key] = selected
     
     return selected_values

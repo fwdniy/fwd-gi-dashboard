@@ -166,7 +166,7 @@ with st.spinner('Loading your data...'):
         ".ag-header-cell-resize": {"display": "none"}
     }
 
-    AgGrid(df_grouped, gridOptions=go, theme='streamlit', height=700, allow_unsafe_jscode=True, custom_css=custom_css)
+    AgGrid(df_grouped, gridOptions=go, theme='streamlit', allow_unsafe_jscode=True, custom_css=custom_css)
 
     #endregion
 

@@ -5,15 +5,23 @@ class LbuGroup:
         self.lbu_group_code = row["LBU_GROUP"]
         self.lbu_group_name = row["GROUP_NAME"]
         self.lbus = [Lbu(row)]
+        self.entities = [Lbu(row, True)]
     
     def add(self, row):
         lbu_code = row["BLOOMBERG_NAME"]
         index = next((i for i, group in enumerate(self.lbus) if group.lbu_code == lbu_code), -1)
+        sub_lbu = row["SUB_LBU"]
+        index_entities = next((i for i, group in enumerate(self.entities) if group.lbu_code == sub_lbu), -1)
 
         if index == -1:
             self.lbus.append(Lbu(row))
         else:
             self.lbus[index].add(row)
+
+        if index_entities == -1:
+            self.entities.append(Lbu(row, True))
+        else:
+            self.entities[index_entities].add(row)
 
     def build_cas_item(self):
         children = [lbu.casItem for lbu in self.lbus]
@@ -33,11 +41,17 @@ class LbuGroup:
         return False
 
 class Lbu:
-    def __init__(self, row):
+    def __init__(self, row, entity = False):
         self.lbu_group_code = row["LBU_GROUP"]
         self.lbu_group_name = row["GROUP_NAME"]
-        self.lbu_code = row["BLOOMBERG_NAME"]
-        self.lbu_name = row["LBU"]
+
+        if not entity:
+            self.lbu_code = row["BLOOMBERG_NAME"]
+            self.lbu_name = row["LBU"]
+        else:
+            self.lbu_code = row["SUB_LBU"]
+            self.lbu_name = row["SUB_LBU"]
+            
         self.fundTypes = [FundType(row)]
 
     def add(self, row):
