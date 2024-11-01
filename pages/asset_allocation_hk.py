@@ -4,6 +4,7 @@ from tools import filter, snowflake
 from st_aggrid import AgGrid, GridOptionsBuilder, JsCode, ColumnsAutoSizeMode
 from styles.formatting import format_numbers, conditional_formatting
 from streamlit_tree_select import tree_select
+from streamlit.components.v1 import html
 
 with st.expander("Filters"):
     filter.build_date_filter()
@@ -24,6 +25,8 @@ custom_css = {
         ".ag-theme-streamlit": {"--ag-cell-horizontal-border": "none"},
         ".ag-header-cell": {"color": "white", "background-color": "rgb(232,119,34)", "--ag-header-cell-hover-background-color": "rgb(246,179,128)"},
         ".ag-header-cell-resize": {"display": "none"},
+        ".ag-header-group-cell.ag-header-group-cell-with-group": {"display": "flex", "justify-content": "flex-end"},
+        ".ag-header-group-cell.ag-header-group-cell-with-group[aria-expanded='true']": {"display": "flex", "justify-content": "flex-start"},
 }
 
 #region Actual Allocation by Bloomberg Asset Type
@@ -256,4 +259,3 @@ df = df[['ENTITY', 'FUND_CODE', 'FWD_ASSET_TYPE', 'SUM_NET_MV', 'SUMPRODUCT_WARF
 build_wa_aggrid(df, 'SUMPRODUCT_WARF', 'WARF', 'SUM_NET_MV')
 
 #endregion
-
