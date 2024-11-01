@@ -18,6 +18,9 @@ def format_numbers(decimal_points = 2, divide_by = 1):
                     return params.value;
                 } else {
                     var value = params.value / divide_by;
+                    if (value === 0) {
+                        return '';
+                    }
                     value = value.toLocaleString(undefined, { minimumFractionDigits: decimal_points, maximumFractionDigits: decimal_points });
                     return value;
                 }
@@ -27,6 +30,7 @@ def format_numbers(decimal_points = 2, divide_by = 1):
     number_formatting = number_formatting.replace('decimal_points', str(decimal_points)).replace('divide_by', str(divide_by))
 
     return JsCode(number_formatting)
+
 
 def conditional_formatting(lower_bound = -5, mid_point = 0, upper_bound = 5):
     conditional_formatting = """

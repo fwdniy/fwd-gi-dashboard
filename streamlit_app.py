@@ -56,8 +56,7 @@ if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callbac
                                             #st.Page("pages/snapshot.py", title="Snapshot")
                                             ],
                                             'Hong Kong':
-                                            [st.Page("pages/asset_allocation_hk.py", title="Asset Allocation and Sensitivity"),
-                                            st.Page("pages/ratings_profile.py", title="Ratings Profile")
+                                            [st.Page("pages/asset_allocation_hk.py", title="Asset Allocation, Sensitivity and Ratings Profile"),
                                             ]}
     st.session_state["callback_removed"] = True
     st.rerun()
