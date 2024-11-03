@@ -20,8 +20,6 @@ if fund_codes == '':
     st.write('No funds selected!')
     st.stop()
 
-
-
 #region CSS
 
 custom_css = {

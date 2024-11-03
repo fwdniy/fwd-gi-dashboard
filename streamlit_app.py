@@ -50,7 +50,8 @@ if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callbac
                                             [st.Page("pages/home.py", title="Home")
                                              ],
                                          'Group': 
-                                            [st.Page("pages/asset_allocation.py", title="Asset Allocation")
+                                            [st.Page("pages/asset_allocation.py", title="Asset Allocation"),
+                                            st.Page("pages/monitor.py", title="Funnelweb Monitor"),
                                             #st.Page("pages/breakdown.py", title="Breakdown"), 
                                             #st.Page("pages/repo.py", title="Repos"),
                                             #st.Page("pages/snapshot.py", title="Snapshot")
