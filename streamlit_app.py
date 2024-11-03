@@ -43,6 +43,7 @@ if "fwdoauth" in st.secrets:
             print(result)
             # If authorization successful, save token in session state
             st.session_state["ST_OAUTH"] = result.get('token')
+            print(st.session_state["ST_OAUTH"])
             st.rerun()
 
 if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callback_removed" not in st.session_state:
