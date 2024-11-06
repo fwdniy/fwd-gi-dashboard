@@ -8,6 +8,7 @@ import json
 import base64
 
 # Decrypt the data
+'''
 def decrypt_data(encrypted_data):
     key = st.secrets["fwdoauth"]["client_secret"]
     f = Fernet(key)
@@ -17,6 +18,7 @@ def decrypt_data(encrypted_data):
 # Example usage
 encrypted_message = st.session_state["ST_OAUTH"]["access_token"]
 print(decrypt_data(encrypted_message))
+'''
 
 id_token = st.session_state["token"]["id_token"]
 # verify the signature is an optional step for security
