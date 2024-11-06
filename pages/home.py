@@ -7,13 +7,9 @@ from cryptography.fernet import Fernet
 import json
 import base64
 
-# Load the key
-def load_key():
-    return open("key.key", "rb").read()
-
 # Decrypt the data
 def decrypt_data(encrypted_data):
-    key = load_key()
+    key = st.secrets["fwdoauth"]["client_secret"]
     f = Fernet(key)
     decrypted_data = f.decrypt(encrypted_data)
     return decrypted_data.decode()
