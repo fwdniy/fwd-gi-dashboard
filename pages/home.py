@@ -20,7 +20,7 @@ encrypted_message = st.session_state["ST_OAUTH"]["access_token"]
 print(decrypt_data(encrypted_message))
 '''
 
-id_token = st.session_state["token"]["id_token"]
+id_token = st.session_state["ST_OAUTH"]["id_token"]
 # verify the signature is an optional step for security
 payload = id_token.split(".")[1]
 # add padding to the payload if needed
@@ -28,4 +28,4 @@ payload += "=" * (-len(payload) % 4)
 payload = json.loads(base64.b64decode(payload))
 email = payload["email"]
 
-st.write()
+st.write(email)
