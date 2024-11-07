@@ -37,13 +37,13 @@ with st.expander("Filters"):
         curve_name = build_curve_filter()
         filter.build_date_filter(True)
 
-current_date = st.session_state['Valuation Date']
+    current_date = st.session_state['Valuation Date']
 
-if "selected_curves" not in st.session_state:
-    st.session_state["selected_curves"] = []
+    if "selected_curves" not in st.session_state:
+        st.session_state["selected_curves"] = []
 
-if st.button("Add"):
-    st.session_state["selected_curves"].append(f"{current_date}/{curve_name}")
+    if st.button("Add"):
+        st.session_state["selected_curves"].append(f"{current_date}/{curve_name}")
 
 def map_tenor_to_double(tenors):
     tenor_mapping = {"1m": 1 / 12, "3m": 3 / 12, "6m": 6 / 12}
