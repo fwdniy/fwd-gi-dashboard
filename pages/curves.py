@@ -49,9 +49,12 @@ with st.expander("Filters"):
 
 def map_tenor_to_double(tenors):
     tenor_mapping = {"1m": 1 / 12, "3m": 3 / 12, "6m": 6 / 12}
+    tenor_ignore = ["50"]
     tenor_list = []
     for tenor in tenors:
-        if tenor.isdigit():
+        if tenor in tenor_ignore:
+            continue
+        elif tenor.isdigit():
             tenor_list.append(float(tenor))
         elif tenor in tenor_mapping.keys():
             tenor_list.append(tenor_mapping[tenor])
