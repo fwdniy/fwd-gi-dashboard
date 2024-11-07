@@ -81,7 +81,7 @@ else:
 
     # Add titles and labels
     fig.update_layout(
-        title='Government Yield Curve',
+        title='Yield Curve',
         xaxis_title='Maturity (Years)',
         yaxis_title='Yield (%)',
         template='plotly_dark',
