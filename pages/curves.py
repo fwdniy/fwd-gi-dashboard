@@ -85,7 +85,7 @@ else:
     # Add titles and labels
     fig.update_layout(
         title='Yield Curve',
-        xaxis_title='Maturity (Years)',
+        xaxis_title='Tenor (Years)',
         yaxis_title='Zero Coupon Rate (Continuous) (%)',
         template='plotly_dark',
         showlegend=True
