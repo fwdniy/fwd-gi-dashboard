@@ -3,6 +3,8 @@ from tools import filter, snowflake
 from tools.filter.filter import build_tree_selectors
 from datetime import datetime
 import plotly.graph_objects as go
+import pandas as pd
+import io
 
 def get_curve_data():
     if "curves_rates_df" in st.session_state or "curve_names_df" in st.session_state:
@@ -32,7 +34,7 @@ def build_curve_filter():
 
     return curve_name
 
-with st.expander("Filters"):
+with st.expander("Filters", True):
     with st.spinner('Fetching curve data...'):
         curve_name = build_curve_filter()
         filter.build_date_filter(True)
@@ -47,40 +49,49 @@ with st.expander("Filters"):
         if name not in st.session_state["selected_curves"]:
             st.session_state["selected_curves"].append(name)
 
-def map_tenor_to_double(tenors):
+def map_tenor_to_double(tenors, rates):
     tenor_mapping = {"1m": 1 / 12, "3m": 3 / 12, "6m": 6 / 12}
     tenor_ignore = ["50"]
     tenor_list = []
-    for tenor in tenors:
+    rates_list = []
+    for tenor, rate in zip(tenors, rates):
         if tenor in tenor_ignore:
             continue
         elif tenor.isdigit():
             tenor_list.append(float(tenor))
+            rates_list.append(float(rate))
         elif tenor in tenor_mapping.keys():
             tenor_list.append(tenor_mapping[tenor])
+            rates_list.append(float(rate))
         else:
             st.write(f"Unknown tenor name '{tenor}'!")
 
-    return tenor_list
+    return (tenor_list, rates_list)
 
 if len(st.session_state["selected_curves"]) == 0:
     st.write("Pick a curve!")
 else:
     fig = go.Figure()
 
+    df = st.session_state["curves_rates_df"]
+    values_df = pd.DataFrame(columns=['CURVE', 'VALUATION_DATE', 'TENOR', 'RATE'])
+
     for item in st.session_state["selected_curves"]:
-        df = st.session_state["curves_rates_df"]
         split_list = item.split('/')
         date = split_list[0].replace("'", "")
         curve_name = split_list[1]
         values = df[(df['VALUATION_DATE'] == datetime.strptime(date, '%Y-%m-%d').date()) & (df['CURVE'] == curve_name)]
 
-        tenors = map_tenor_to_double(values['TENOR'])
+        (tenors, rates) = map_tenor_to_double(values['TENOR'], values['RATE'])
         
         name = f"{curve_name} - {date}"
 
+        values = pd.DataFrame({'CURVE': [curve_name] * len(tenors), 'VALUATION_DATE': [datetime.strptime(date, '%Y-%m-%d').date()] * len(tenors), 'TENOR': tenors,'RATE': rates})
+
+        values_df = pd.concat([values_df, values], ignore_index=True)
+
         # Add the yield curve trace
-        fig.add_trace(go.Scatter(x=tenors, y=values['RATE'], mode='lines+markers', name=name))
+        fig.add_trace(go.Scatter(x=tenors, y=rates, mode='lines+markers', name=name))
 
     # Add titles and labels
     fig.update_layout(
@@ -93,6 +104,20 @@ else:
 
     st.plotly_chart(fig)
 
+    buffer = io.BytesIO()
+
+    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        values_df.to_excel(writer, sheet_name='Data', index=False)
+
+    buffer.seek(0)
+
+    st.download_button(
+        label="Download",
+        data=buffer,
+        file_name='curve_rates.xlsx',
+        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
     for item in st.session_state["selected_curves"]:
         split_list = item.split('/')
         date = split_list[0].replace("'", "")
@@ -102,4 +127,3 @@ else:
         if st.button(f"Remove {name}"):
             st.session_state["selected_curves"].remove(item)
             st.rerun()
-        

@@ -24,7 +24,7 @@ else:
 
 authenticate()
 
-if "ST_OAUTH_EMAIL" not in st.session_state:
+if "ST_OAUTH_EMAIL" not in st.session_state and "fwdoauth" in st.secrets:
     st.stop()
 
 pages = {'Home': 
