@@ -32,9 +32,10 @@ def build_curve_filter():
 
     return curve_name
 
-with st.spinner('Fetching curve data...'):
-    curve_name = build_curve_filter()
-    filter.build_date_filter(True)
+with st.expander("Filters"):
+    with st.spinner('Fetching curve data...'):
+        curve_name = build_curve_filter()
+        filter.build_date_filter(True)
 
 current_date = st.session_state['Valuation Date']
 
