@@ -86,7 +86,7 @@ else:
     fig.update_layout(
         title='Yield Curve',
         xaxis_title='Maturity (Years)',
-        yaxis_title='Yield (%)',
+        yaxis_title='Zero Coupon Rate (Continuous) (%)',
         template='plotly_dark',
         showlegend=True
     )
