@@ -24,6 +24,9 @@ else:
 
 authenticate()
 
+if "ST_OAUTH_EMAIL" not in st.session_state:
+    st.stop()
+
 pages = {'Home': 
             [st.Page("pages/home.py", title="Home")
         ],
