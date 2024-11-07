@@ -6,15 +6,22 @@ import streamlit.components as components
 from tools import filter, snowflake
 from styles.formatting import format_numbers, conditional_formatting
 
-filter.build_date_filter()
-filter.build_lbu_filter()
-filter.build_currency_filter()
-filter.build_level_filter()
+with st.expander("Filters"):
+    filter.build_date_filter()
+    filter.build_lbu_tree()
+    filter.build_currency_filter()
+    filter.build_level_filter()
 
 current_date = st.session_state['Valuation Date']
 compare_date = st.session_state['Comparison Date']
-lbu_selection = st.session_state['LBU Group / LBU / Fund Type / Fund']
-lbu_column_mapping = {"LBU_GROUP": "LBU_GROUP", "LBU": "LBU_CODE", "FUND_TYPE": "FUND_TYPE", "FUND": "FUND_CODE"}
+lbu_selection = st.session_state['lbu_tree_data']
+
+fund_codes = str(lbu_selection).replace("[", "").replace("]", "")
+
+if fund_codes == '':
+    st.write('No funds selected!')
+    st.stop()
+
 level = st.session_state['level']
 
 with st.spinner('Loading your data...'):
@@ -33,20 +40,11 @@ with st.spinner('Loading your data...'):
     #endregion
 
     #region Filter Data
-
+    
+    df = df[df['FUND_CODE'].isin(lbu_selection)]    
     df_current = df[(df['CLOSING_DATE'].dt.date == current_date) & (df['LEVEL'] <= level)]
     df_compare = df[(df['CLOSING_DATE'].dt.date == compare_date) & (df['LEVEL'] <= level)]
-
-    for selection in lbu_selection:
-        selection.filter(df_current, lbu_column_mapping)
-        selection.filter(df_compare, lbu_column_mapping)
     
-    df_current = df_current[df_current['LBU_FILTER'] == True]
-    df_compare = df_compare[df_compare['LBU_FILTER'] == True]
-
-    del df_current['LBU_FILTER']
-    del df_compare['LBU_FILTER']
-
     #endregion
 
     #region Merge Data
@@ -150,6 +148,9 @@ with st.spinner('Loading your data...'):
 
     #region Autofit
 
+    min_height = 10
+    asset_types = df_grouped.shape[0] if df_grouped.shape[0] > min_height else min_height
+    height = 10 + 30 * asset_types
     column_defs = go["columnDefs"]
 
     for col_def in column_defs:
@@ -166,8 +167,10 @@ with st.spinner('Loading your data...'):
         ".ag-header-cell-resize": {"display": "none"}
     }
 
-    AgGrid(df_grouped, gridOptions=go, theme='streamlit', allow_unsafe_jscode=True, custom_css=custom_css)
+    AgGrid(df_grouped, height=height, gridOptions=go, theme='streamlit', allow_unsafe_jscode=True, custom_css=custom_css)
 
     #endregion
+
+    
 
 st.toast('Data loaded!', icon="✅")

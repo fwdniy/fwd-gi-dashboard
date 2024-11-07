@@ -11,6 +11,26 @@ def set_title(page_name):
         </style>
         """, unsafe_allow_html=True)'''
 
+def add_login_name():
+    if "ST_OAUTH_EMAIL" not in st.session_state:
+        return
+    
+    footer = f"""
+        <style>
+            .footer {{
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                text-align: left;
+            }}
+        </style>
+        <div class="footer">
+            <p>Logged in as {st.session_state["ST_OAUTH_EMAIL"]}</p>
+        </div>
+        """
+
+    st.sidebar.markdown(footer, unsafe_allow_html=True)
+
 def format_numbers(decimal_points = 2, divide_by = 1):
     number_formatting = """
             function(params) {

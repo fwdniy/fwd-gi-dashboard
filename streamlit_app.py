@@ -6,10 +6,11 @@
 #https://github.com/Schluca/streamlit_tree_select
 
 import streamlit as st
-from tools import snowflake
+from tools.snowflake import connect_snowflake
+from tools.auth import authenticate
 import streamlit.components.v1 as components
 from streamlit_js_eval import streamlit_js_eval
-from streamlit_oauth import OAuth2Component
+from styles.formatting import add_login_name
 
 st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
 streamlit_js_eval(js_expressions="window.innerWidth", key='SCR')
@@ -21,50 +22,31 @@ if "pages" not in st.session_state:
 else:
     pages = st.session_state["pages"]
 
-if "fwdoauth" in st.secrets:
-    st.markdown(
-    """
-        <style>
-            div[class="st-emotion-cache-1p1m4ay e3g6aar0"] {
-                display: none;
-            }
-        </style>
-    """,
-    unsafe_allow_html=True
-    )
+authenticate()
 
-    fwdoauth = st.secrets["fwdoauth"]
-    oauth2 = OAuth2Component(fwdoauth["client_id"], fwdoauth["client_secret"], fwdoauth["authorization_endpoint"], fwdoauth["token_endpoint"], None, None)
-
-    if "ST_OAUTH" not in st.session_state:
-        result = oauth2.authorize_button("Continue with Okta SSO", fwdoauth["redirect_uri"], fwdoauth["scope"])
-
-        if result and 'token' in result:
-            print(result)
-            # If authorization successful, save token in session state
-            st.session_state["ST_OAUTH"] = result.get('token')
-            print(st.session_state["ST_OAUTH"])
-            st.rerun()
+pages = {'Home': 
+            [st.Page("pages/home.py", title="Home")
+        ],
+        'Group': 
+            [st.Page("pages/asset_allocation.py", title="Asset Allocation"),
+            st.Page("pages/monitor.py", title="Funnelweb Monitor"),
+            st.Page("pages/curves.py", title="Curves"),
+            #st.Page("pages/breakdown.py", title="Breakdown"), 
+            #st.Page("pages/repo.py", title="Repos"),
+            #st.Page("pages/snapshot.py", title="Snapshot")
+        ],
+        'Hong Kong':
+            [st.Page("pages/asset_allocation_hk.py", title="Asset Allocation, Sensitivity and Ratings Profile")
+        ]}
 
 if ("ST_OAUTH" in st.session_state or "fwdoauth" not in st.secrets) and "callback_removed" not in st.session_state:
-    pages = st.session_state["pages"] = {'Home': 
-                                            [st.Page("pages/home.py", title="Home")
-                                             ],
-                                         'Group': 
-                                            [st.Page("pages/asset_allocation.py", title="Asset Allocation"),
-                                            st.Page("pages/monitor.py", title="Funnelweb Monitor"),
-                                            #st.Page("pages/breakdown.py", title="Breakdown"), 
-                                            #st.Page("pages/repo.py", title="Repos"),
-                                            #st.Page("pages/snapshot.py", title="Snapshot")
-                                            ],
-                                            'Hong Kong':
-                                            [st.Page("pages/asset_allocation_hk.py", title="Asset Allocation, Sensitivity and Ratings Profile")
-                                            ]}
+    st.session_state["pages"] = pages
     st.session_state["callback_removed"] = True
     st.rerun()
 
 nav = st.navigation(pages)
 nav.run()
 
-if "conn" not in st.session_state:
-    snowflake.connect_snowflake()
+add_login_name()
+
+connect_snowflake()

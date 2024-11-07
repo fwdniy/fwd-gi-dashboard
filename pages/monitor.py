@@ -56,12 +56,12 @@ AND sum_cs.security_name NOT IN (WITH counts AS (SELECT security_name, account_c
 
 query = f"""WITH spreads AS (SELECT bbgid_v2, closing_date, avg(clean_price) AS price, avg(credit_spread_bp) AS credit_spread 
 FROM funnelweb 
-WHERE closing_date BETWEEN '2023-12-29' AND '2024-11-01' 
-AND bbgid_V2 IN (SELECT DISTINCT bbgid_v2 FROM funnelweb WHERE closing_date = '2024-11-01' AND is_bbg_fi = true AND (bbg_asset_type NOT IN ('Bond Option', 'Repo Liability', 'Money Market') OR (bbg_asset_type = 'Money Market' AND clean_price <> 100)) AND cic NOT LIKE '%51')
-AND bbgid_v2 NOT IN (WITH data AS (SELECT bbgid_v2, count(distinct clean_price) AS distinct_prices, (max(closing_date) - min(closing_date)) / 30 holding_months FROM funnelweb WHERE closing_date BETWEEN '2023-12-29' AND '2024-11-01' AND is_bbg_fi = true AND (bbg_asset_type NOT IN ('Bond Option', 'Repo Liability', 'Money Market') OR (bbg_asset_type = 'Money Market' AND clean_price <> 100)) GROUP BY bbgid_v2 ORDER BY bbgid_v2)
+WHERE closing_date BETWEEN '{compare_date}' AND '{current_date}' 
+AND bbgid_V2 IN (SELECT DISTINCT bbgid_v2 FROM funnelweb WHERE closing_date = '{current_date}' AND is_bbg_fi = true AND (bbg_asset_type NOT IN ('Bond Option', 'Repo Liability', 'Money Market') OR (bbg_asset_type = 'Money Market' AND clean_price <> 100)) AND cic NOT LIKE '%51')
+AND bbgid_v2 NOT IN (WITH data AS (SELECT bbgid_v2, count(distinct clean_price) AS distinct_prices, (max(closing_date) - min(closing_date)) / 30 holding_months FROM funnelweb WHERE closing_date BETWEEN '{compare_date}' AND '{current_date}' AND is_bbg_fi = true AND (bbg_asset_type NOT IN ('Bond Option', 'Repo Liability', 'Money Market') OR (bbg_asset_type = 'Money Market' AND clean_price <> 100)) GROUP BY bbgid_v2 ORDER BY bbgid_v2)
 SELECT bbgid_v2 FROM data WHERE distinct_prices + 1 < FLOOR(holding_months))
 GROUP BY bbgid_v2, closing_date ORDER BY bbgid_v2, closing_date),
-names AS (SELECT DISTINCT security_name, bbgid_v2 FROM funnelweb WHERE closing_date = '2024-11-01')
+names AS (SELECT DISTINCT security_name, bbgid_v2 FROM funnelweb WHERE closing_date = '{current_date}')
 SELECT names.security_name, names.bbgid_v2, closing_date, price, credit_spread FROM spreads, names WHERE spreads.bbgid_v2 = names.bbgid_v2;"""
 
 df = snowflake.query(query)

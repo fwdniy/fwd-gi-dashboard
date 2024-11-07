@@ -4,6 +4,9 @@ import pandas as pd
 import streamlit as st
 
 def connect_snowflake():
+    if "conn" in st.session_state:
+        return
+    
     st.session_state["conn"] = snowflake.connector.connect(
         user=st.secrets["snowflake"]["username"],
         password=st.secrets["snowflake"]["password"],
@@ -25,7 +28,7 @@ def get_schema(cur):
             column_type = float
         elif column[1] == 2:
             column_type = str
-        elif column[1] == 3:
+        elif column[1] in [3, 8]:
             column_type = datetime
         else:
             print(f"error datatype for column '{column[0]}'")

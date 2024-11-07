@@ -109,7 +109,7 @@ def build_lbu_tree(hk_entities = False):
 
     st.session_state['lbu_tree_data'] = [value.replace('fund_code:', '') for value in selected_values['lbu_tree']['checked'] if 'fund_code:' in value]
 
-def build_date_filter():
+def build_date_filter(current_date_only = False):
     get_date_data()
     
     def create_date_filter(label, default_date, comparison_date = False):
@@ -139,6 +139,10 @@ def build_date_filter():
             st.date_input(label, default_date, st.session_state["min_date"], st.session_state["max_date"], on_change=check_weekday, key=label)
         else:
             st.date_input(label, default_date, st.session_state["min_date"], st.session_state["max_date"], on_change=check_weekday_comparison, key=label)
+
+    if (current_date_only):
+        create_date_filter('Valuation Date', st.session_state["max_date"])
+        return
 
     date_cols = st.columns(2)
 
