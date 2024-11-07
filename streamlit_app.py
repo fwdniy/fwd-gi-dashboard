@@ -29,7 +29,7 @@ pages = {'Home':
         ],
         'Group': 
             [st.Page("pages/asset_allocation.py", title="Asset Allocation"),
-            st.Page("pages/monitor.py", title="Funnelweb Monitor"),
+            #st.Page("pages/monitor.py", title="Funnelweb Monitor"),
             st.Page("pages/curves.py", title="Curves"),
             #st.Page("pages/breakdown.py", title="Breakdown"), 
             #st.Page("pages/repo.py", title="Repos"),
