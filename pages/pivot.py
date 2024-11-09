@@ -10,7 +10,7 @@ def build_filters():
     values = ['NET_MV', 'CLEAN_MV_USD']#, 'WARF', 'YTM', 'CREDIT_SPREAD_BP', 'DV01_000', 'CONVEXITY', 'CS01_000', 'DURATION', 'GIECA_CS_STRESSED_VALUE_1_IN_200', 'GIECA_EQUITY_STRESSED_VALUE_1_IN_200', 'GIECA_IR_STRESSED_VALUE_1_IN_200']
 
     with st.expander("Filters"):
-        filter.build_date_filter()
+        filter.build_date_filter(True)
         filter.build_lbu_tree()
         filter.build_vanilla_tree('Columns', columns, columns, checked=False)
         filter.build_vanilla_tree('Values', values, values, checked=False)
