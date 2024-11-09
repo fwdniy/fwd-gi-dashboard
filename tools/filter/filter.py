@@ -98,11 +98,10 @@ def build_lbu_tree(hk_entities = False):
     all = []
     all.append({"label": "Select All", "value": "all", "children": values})
 
-    expanded = []
+    expanded = ["all"]
     
     if hk_entities:
         expanded.extend([entity['value'] for entity in all[0]['children']])
-        expanded.append("all")
         st.session_state['hk_entities'] = entities
 
     selected_values = build_tree_selectors({"lbu_tree": {"title": "LBUs", "data": all, "expanded": expanded}})
@@ -201,7 +200,11 @@ def build_tree_selectors(data, height=200):
         else:
             data = parameters["data"]
             values = lambda d: [d['value']] + sum([values(c) for c in d.get('children', [])], [])
-            checked = sum([values(item) for item in data], [])
+            
+            if 'checked' not in parameters or parameters['checked']:
+                checked = sum([values(item) for item in data], [])
+            elif parameters['checked'] == False:
+                checked = []
 
             if "expanded" != []:
                 expanded = parameters["expanded"]
@@ -223,3 +226,20 @@ def build_tree_selectors(data, height=200):
                     selected_values[key] = selected
     
     return selected_values
+
+def build_vanilla_tree(tree_name, column_labels, columns, expand_all=True, checked=True):
+    values = []
+
+    for column_label, column in zip(column_labels, columns):
+        values.append({"label": column_label, "value": column})
+    
+    all = []
+    all.append({"label": "Select All", "value": "all", "children": values})
+
+    expanded = []
+
+    if expand_all:
+        expanded.extend([column['value'] for column in all[0]['children']])
+        expanded.append("all")
+
+    st.session_state[f'tree_selected_{tree_name.lower()}'] = build_tree_selectors({f"{tree_name.lower()}_tree": {"title": tree_name, "data": all, "expanded": expanded, "checked": checked}})

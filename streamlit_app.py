@@ -37,6 +37,7 @@ pages = {'Home':
             #st.Page("pages/breakdown.py", title="Breakdown"), 
             #st.Page("pages/repo.py", title="Repos"),
             #st.Page("pages/snapshot.py", title="Snapshot")
+            st.Page("pages/pivot.py", title="Funnelweb Pivot"),
         ],
         'Hong Kong':
             [st.Page("pages/asset_allocation_hk.py", title="Asset Allocation, Sensitivity and Ratings Profile")
