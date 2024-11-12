@@ -87,7 +87,7 @@ else:
 
         values = pd.DataFrame({'CURVE': [curve_name] * len(tenors), 'VALUATION_DATE': [datetime.strptime(date, '%Y-%m-%d').date()] * len(tenors), 'TENOR': tenors,'RATE': rates})
 
-        values_df = pd.concat([values_df, values], ignore_index=True)
+        values_df = pd.concat([values_df.astype(values.dtypes), values.astype(values_df.dtypes)], ignore_index=True)
 
         # Add the yield curve trace
         fig.add_trace(go.Scatter(x=tenors, y=rates, mode='lines+markers', name=name))
