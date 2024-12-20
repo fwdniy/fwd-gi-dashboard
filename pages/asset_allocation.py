@@ -41,7 +41,7 @@ with st.spinner('Loading your data...'):
 
     #region Filter Data
     
-    df = df[df['FUND_CODE'].isin(lbu_selection)]    
+    df = df[df['FUND_CODE'].isin(lbu_selection)]   
     df_current = df[(df['CLOSING_DATE'].dt.date == current_date) & (df['LEVEL'] <= level)]
     df_compare = df[(df['CLOSING_DATE'].dt.date == compare_date) & (df['LEVEL'] <= level)]
     

@@ -243,3 +243,6 @@ def build_vanilla_tree(tree_name, column_labels, columns, expand_all=True, check
         expanded.append("all")
 
     st.session_state[f'tree_selected_{tree_name.lower()}'] = build_tree_selectors({f"{tree_name.lower()}_tree": {"title": tree_name, "data": all, "expanded": expanded, "checked": checked}})
+
+def build_multiselect(name, column_labels, columns):
+    st.session_state[f'tree_selected_{name.lower()}'] = st.multiselect(name, column_labels)
