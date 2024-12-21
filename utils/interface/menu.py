@@ -14,7 +14,7 @@ def menu(page_name):
 
 def authenticated_menu():
     with st.sidebar:
-        st.page_link("streamlit_app.py", label="Home")
+        #st.page_link("streamlit_app.py", label="Home")
 
         with st.expander("Group", True):
             st.page_link("nav/asset_allocation.py", label="Asset Allocation")
