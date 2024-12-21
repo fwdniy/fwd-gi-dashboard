@@ -16,6 +16,7 @@ def authenticate():
     unsafe_allow_html=True
     )
 
+    st.page_link("streamlit_app.py", label="Home")
     st.page_link("pages/callback.py", label="Callback")
 
     fwdoauth = st.secrets["fwdoauth"]
