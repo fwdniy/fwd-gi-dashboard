@@ -16,6 +16,10 @@ def authenticate():
     unsafe_allow_html=True
     )
 
+    pages = st.session_state["pages"] = [st.Page("pages/callback.py", title="Callback")]
+    nav = st.navigation(pages)
+    nav.run()
+
     fwdoauth = st.secrets["fwdoauth"]
     oauth2 = OAuth2Component(fwdoauth["client_id"], fwdoauth["client_secret"], fwdoauth["authorization_endpoint"], fwdoauth["token_endpoint"], None, None)
 
