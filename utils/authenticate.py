@@ -16,19 +16,16 @@ def authenticate():
     unsafe_allow_html=True
     )
 
-    st.page_link("streamlit_app.py", label="Home")
-    st.page_link("pages/callback.py", label="Callback")
-
     fwdoauth = st.secrets["fwdoauth"]
     oauth2 = OAuth2Component(fwdoauth["client_id"], fwdoauth["client_secret"], fwdoauth["authorization_endpoint"], fwdoauth["token_endpoint"], None, None)
 
     if "ST_OAUTH" in ss:
-        return
+        return True
 
     result = oauth2.authorize_button("Continue with Okta SSO", fwdoauth["redirect_uri"], fwdoauth["scope"])
 
     if not result or 'token' not in result:
-        return
+        return False
     
     # If authorization successful, save token in session state
     ss["ST_OAUTH"] = result.get('token')
