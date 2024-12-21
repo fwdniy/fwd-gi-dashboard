@@ -2,15 +2,15 @@ import streamlit as st
 from utils.authenticate import authenticate
 
 def menu(page_name):    
-    #set_title(page_name)
-    add_login_name()
-    
+    #set_title(page_name)    
     auth = authenticate()
 
     if not auth:
         st.stop()
 
     authenticated_menu()
+
+    add_login_name()
 
 def authenticated_menu():
     with st.sidebar:

@@ -1,2 +1,8 @@
 [global]
 disableWidgetStateDuplicationWarning = true
+
+[client]
+showSidebarNavigation = false
+
+[theme]
+base="light"
