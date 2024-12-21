@@ -14,15 +14,15 @@ def menu(page_name):
 
 def authenticated_menu():
     with st.sidebar:
-        #st.page_link("streamlit_app.py", label="Home")
+        st.page_link("streamlit_app.py", label="Home")
 
         with st.expander("Group", True):
-            st.page_link("nav/asset_allocation.py", label="Asset Allocation")
-            st.page_link("nav/pivot.py", label="Funnelweb Pivot Table")
-            st.page_link("nav/curves.py", label="Curves")
+            st.page_link("pages/asset_allocation.py", label="Asset Allocation")
+            st.page_link("pages/pivot.py", label="Funnelweb Pivot Table")
+            st.page_link("pages/curves.py", label="Curves")
 
         with st.expander("Hong Kong", True):
-            st.page_link("nav/hk_asset_allocation.py", label='Asset Allocation')
+            st.page_link("pages/hk_asset_allocation.py", label='Asset Allocation')
 
 def set_title(page_name):
     '''st.markdown(r"""

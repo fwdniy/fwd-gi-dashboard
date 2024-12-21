@@ -5,6 +5,9 @@ import base64
 from streamlit import session_state as ss
 
 def authenticate():    
+    if "fwdoauth" not in st.secrets:
+        return True
+    
     st.markdown(
     """
         <style>

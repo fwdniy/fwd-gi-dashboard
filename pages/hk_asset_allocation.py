@@ -46,7 +46,7 @@ def build_aa_by_bbg_asset_type():
 
     query_string = build_query(', '.join(columns), ', '.join(values.values()), True)
     df = query(query_string)
-    st.write(query_string)
+    
     df['CLOSING_DATE'] = df['CLOSING_DATE'].dt.date.replace({current_date: 'Current Date', comparison_date: 'Comparison Date'})
     df = df.pivot(index='BBG_ASSET_TYPE', columns='CLOSING_DATE', values='SUM_NET_MV')
     df = df[['Current Date', 'Comparison Date']]

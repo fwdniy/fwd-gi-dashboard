@@ -1,125 +1,112 @@
-import streamlit_antd_components as sac
+import pandas as pd
+from utils.snowflake.snowflake import query
 
-class LbuGroup:
-    def __init__(self, row):
-        self.lbu_group_code = row["LBU_GROUP"]
-        self.lbu_group_name = row["GROUP_NAME"]
-        self.lbus = [Lbu(row)]
-        self.entities = [Lbu(row, True)]
-    
-    def add(self, row):
-        lbu_code = row["BLOOMBERG_NAME"]
-        index = next((i for i, group in enumerate(self.lbus) if group.lbu_code == lbu_code), -1)
-        sub_lbu = row["SUB_LBU"]
-        index_entities = next((i for i, group in enumerate(self.entities) if group.lbu_code == sub_lbu), -1)
+class Fund:
+    name: str
+    type: str
 
-        if index == -1:
-            self.lbus.append(Lbu(row))
-        else:
-            self.lbus[index].add(row)
+    def __init__(self, df):
+        self.name = df['SHORT_NAME'][0]
+        self.type = df['TYPE'][0]
 
-        if index_entities == -1:
-            self.entities.append(Lbu(row, True))
-        else:
-            self.entities[index_entities].add(row)
-
-    def build_cas_item(self):
-        children = [lbu.casItem for lbu in self.lbus]
-        self.casItem = sac.CasItem(self.lbu_group_name, children=children)
-
-    def filter(self, df, mapping):
-        df.loc[df['LBU_FILTER'] == False, 'LBU_FILTER'] = df[mapping['LBU_GROUP']] == self.lbu_group_code
-    
-    def lower_level_exists(self, selections):
-        for selection in selections:
-            if selection == self:
-                continue
-
-            if selection.lbu_group_code == self.lbu_group_code:
-                return True
-        
-        return False
+    def build_tree_data(self):
+        data = {'label': self.name, 'value': f'f:{self.name}'}
+        return data
 
 class Lbu:
-    def __init__(self, row, entity = False):
-        self.lbu_group_code = row["LBU_GROUP"]
-        self.lbu_group_name = row["GROUP_NAME"]
+    name: str
+    code: str
+    funds: list[Fund] = []
 
-        if not entity:
-            self.lbu_code = row["BLOOMBERG_NAME"]
-            self.lbu_name = row["LBU"]
-        else:
-            self.lbu_code = row["SUB_LBU"]
-            self.lbu_name = row["SUB_LBU"]
+    def __init__(self, df, entity=False):
+        self.name = df['LBU'][0]
+        self.code = df['BLOOMBERG_NAME'][0]
+        self.funds = []
+
+        if entity:
+            self.code = self.name = df['SUB_LBU'][0]
+
+        unique_funds = df['SHORT_NAME'].unique()
+
+        for fund in unique_funds:
+            self.funds.append(Fund(df[df['SHORT_NAME'] == fund].reset_index(drop=True)))
+    
+    def build_tree_data(self):
+        data = {'label': self.name, 'value': f'l:{self.code}'}
+
+        children = []
+
+        fund_types = list(set([fund.type for fund in self.funds]))
+
+        for type in fund_types:
+            type_children = []
+
+            for fund in self.funds:
+                if fund.type == type:
+                    type_children.append(fund.build_tree_data())
             
-        self.fundTypes = [FundType(row)]
+            children.append({'label': type, 'value': f't:{self.code}/{type}', 'children': type_children})
 
-    def add(self, row):
-        fund_type = row["TYPE"]
-        index = next((i for i, fundType in enumerate(self.fundTypes) if fundType.fund_type == fund_type), -1)
+        data['children'] = children
 
-        if index == -1:
-            self.fundTypes.append(FundType(row))
+        return data
+
+class LbuGroup:
+    name: str
+    code: str
+    lbus: list[Lbu] = []
+    entities: list[Lbu] = []
+
+    def __init__(self, df):
+        self.name = df['GROUP_NAME'][0]
+        self.code = df['LBU_GROUP'][0]
+        self.lbus = []
+        self.entities = []
+        unique_lbus = df['LBU'].unique()
+
+        for lbu in unique_lbus:
+            self.lbus.append(Lbu(df[df['LBU'] == lbu].reset_index(drop=True)))
+
+        entities = df['SUB_LBU'].unique()
+
+        for entity in entities:
+            self.entities.append(Lbu(df[df['SUB_LBU'] == entity].reset_index(drop=True), True))
+    
+    def build_tree_data(self, entities: bool = False):
+        data = {'label': self.name, 'value': f'lg:{self.code}'}
+
+        children = []
+
+        if entities:
+            lbus = self.entities
         else:
-            self.fundTypes[index].add(row)
-
-    def build_cas_item(self):
-        children = [type.casItem for type in self.fundTypes]
-        self.casItem = sac.CasItem(self.lbu_name, children=children)
-
-    def filter(self, df, mapping):
-        df.loc[df['LBU_FILTER'] == False, 'LBU_FILTER'] = (df[mapping['LBU_GROUP']] == self.lbu_group_code) & (df[mapping['LBU']] == self.lbu_code)
-    
-    def lower_level_exists(self, selections):
-        for selection in selections:
-            if selection == self or type(selection) == LbuGroup:
-                continue
-
-            if selection.lbu_group_code == self.lbu_group_code and selection.lbu_code == self.lbu_code:
-                return True
+            lbus = self.lbus 
         
-        return False
+        for lbu in lbus:
+            children.append(lbu.build_tree_data())
 
-class FundType:
-    def __init__(self, row):
-        self.lbu_group_code = row["LBU_GROUP"]
-        self.lbu_group_name = row["GROUP_NAME"]
-        self.lbu_code = row["BLOOMBERG_NAME"]
-        self.lbu_name = row["LBU"]
-        self.fund_type = row["TYPE"]
-        self.funds = [Fund(row)]
+        data['children'] = children
 
-    def add(self, row):
-        self.funds.append(Fund(row))
-
-    def build_cas_item(self):
-        children = [sac.CasItem(fund.fund_code) for fund in self.funds]
-        self.casItem = sac.CasItem(self.fund_type, children=children)
-
-    def filter(self, df, mapping):
-        df.loc[df['LBU_FILTER'] == False, 'LBU_FILTER'] = (df[mapping['LBU_GROUP']] == self.lbu_group_code) & (df[mapping['LBU']] == self.lbu_code) & (df[mapping['FUND_TYPE']] == self.fund_type)
+        return data
     
-    def lower_level_exists(self, selections):
-        for selection in selections:
-            if selection == self or type(selection) == LbuGroup or type(selection) == Lbu:
-                continue
+    def build_entity_mapping(self):
+        entity_mapping = {}
 
-            if selection.lbu_group_code == self.lbu_group_code and selection.lbu_code == self.lbu_code and selection.fund_type == self.fund_type:
-                return True
-        
-        return False
-        
-class Fund:
-    def __init__(self, row):
-        self.lbu_group_code = row["LBU_GROUP"]
-        self.lbu_group_name = row["GROUP_NAME"]
-        self.lbu_code = row["BLOOMBERG_NAME"]
-        self.lbu_name = row["LBU"]
-        self.fund_type = row["TYPE"]
-        self.fund_code = row["SHORT_NAME"]
-    
-    def filter(self, df, mapping):
-        df.loc[df['LBU_FILTER'] == False, 'LBU_FILTER'] = (df[mapping['LBU_GROUP']] == self.lbu_group_code) & (df[mapping['LBU']] == self.lbu_code) & (df[mapping['FUND_TYPE']] == self.fund_type) & (df[mapping['FUND']] == self.fund_code)
-    
-    def lower_level_exists(self, selections):
-        return False
+        for entity in self.entities:
+            for fund in entity.funds:
+                entity_mapping[fund.name] = entity.name
+
+        return entity_mapping
+
+def build_lbu() -> list[LbuGroup]:
+    query_string: str = 'SELECT l.group_name, f.lbu, f.type, f.short_name, l.bloomberg_name, l.lbu_group, f.sub_lbu FROM supp.fund AS f LEFT JOIN supp.lbu AS l ON l.name = f.lbu WHERE l.bloomberg_name <> \'LT\' ORDER BY group_name, lbu, sub_lbu, type, short_name;'
+    df: pd.DataFrame = query(query_string)
+
+    groups = df['GROUP_NAME'].unique()
+
+    lbu_groups = []
+
+    for group in groups:
+        lbu_groups.append(LbuGroup(df[df['GROUP_NAME'] == group].reset_index(drop=True)))
+
+    return lbu_groups

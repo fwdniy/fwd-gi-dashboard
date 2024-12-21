@@ -1,1 +1,0 @@
-from tools.auth import authenticate
