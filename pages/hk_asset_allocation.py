@@ -89,8 +89,8 @@ def build_sum_by_fwd_asset_type():
         grid.add_options(pivot_total='left', group_total=True, remove_pivot_headers=False)
         grid.add_columns(['FWD_ASSET_TYPE'], value_formatter=None, sort='asc')
 
-        entity_comparator = grid.comparatorString.replace('value', "', '".join(df.groupby('ENTITY').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
-        fund_comparator = grid.comparatorString.replace('value', "', '".join(df.groupby('FUND_CODE').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
+        entity_comparator = grid.customOrderComparatorString.replace('value', "', '".join(df.groupby('ENTITY').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
+        fund_comparator = grid.customOrderComparatorString.replace('value', "', '".join(df.groupby('FUND_CODE').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
 
         grid.set_pivot_column('ENTITY', entity_comparator)
         grid.set_pivot_column('FUND_CODE', fund_comparator)
@@ -126,8 +126,8 @@ def build_wa_by_fwd_asset_type():
         grid.add_columns(['FWD_ASSET_TYPE'], value_formatter=None, sort='asc')
 
         weight_comparator = grid.weightedAverageFuncString.replace("aggColumn", 'SUMPRODUCT').replace("weightColumn", 'SUM_NET_MV')
-        entity_comparator = grid.comparatorString.replace('value', "', '".join(sum_df.groupby('ENTITY').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
-        fund_comparator = grid.comparatorString.replace('value', "', '".join(sum_df.groupby('FUND_CODE').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
+        entity_comparator = grid.customOrderComparatorString.replace('value', "', '".join(sum_df.groupby('ENTITY').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
+        fund_comparator = grid.customOrderComparatorString.replace('value', "', '".join(sum_df.groupby('FUND_CODE').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
 
         grid.set_pivot_column('ENTITY', entity_comparator)
         grid.set_pivot_column('FUND_CODE', fund_comparator)
@@ -149,8 +149,8 @@ def build_ratings_profile():
     grid.add_options(pivot_total='left', group_total=True, remove_pivot_headers=False)
     grid.add_columns(['FINAL_RATING'], value_formatter=None, sort='')
 
-    entity_comparator = grid.comparatorString.replace('value', "', '".join(df.groupby('ENTITY').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
-    fund_comparator = grid.comparatorString.replace('value', "', '".join(df.groupby('FUND_CODE').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
+    entity_comparator = grid.customOrderComparatorString.replace('value', "', '".join(df.groupby('ENTITY').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
+    fund_comparator = grid.customOrderComparatorString.replace('value', "', '".join(df.groupby('FUND_CODE').agg({'SUM_NET_MV': 'sum'}).sort_values(by='SUM_NET_MV', ascending=False).index.tolist()))
 
     grid.set_pivot_column('ENTITY', entity_comparator)
     grid.set_pivot_column('FUND_CODE', fund_comparator)

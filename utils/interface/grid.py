@@ -69,7 +69,7 @@ class AgGridBuilder:
             ".ag-header-group-cell.ag-header-group-cell-with-group[aria-expanded='true']": {"display": "flex", "justify-content": "flex-start"},
         }
     
-    comparatorString = """
+    customOrderComparatorString = """
         function entityPivotComparator(a, b) {
             const customOrder = ['value'];
             return customOrder.indexOf(a) - customOrder.indexOf(b);
@@ -142,19 +142,28 @@ class AgGridBuilder:
 
     def add_options(self, pivot_total=None, group_total=True, group_open=False, remove_pivot_headers=False, pivot_mode=True, group_expanded=-1):
         #pivotRowTotals='left'
-        self.gb.configure_grid_options(pivotMode=pivot_mode, autoGroupColumnDef={'cellRendererParams': { 'suppressCount': 'true'}, 'pinned': 'left'}, suppressAggFuncInHeader=True, groupDefaultExpanded=group_expanded, isGroupOpenByDefault=group_open, pivotDefaultExpanded=-1, pivotRowTotals=pivot_total, groupIncludeTotalFooter=group_total, removePivotHeaderRowWhenSingleValueColumn=remove_pivot_headers)
+        self.gb.configure_grid_options(pivotMode=pivot_mode, autoGroupColumnDef={'cellRendererParams': { 'suppressCount': 'true'}, 'pinned': 'left'}, suppressAggFuncInHeader=True, groupDefaultExpanded=group_expanded, isGroupOpenByDefault=group_open, pivotDefaultExpanded=-1, pivotRowTotals=pivot_total, grandTotalRow=group_total, removePivotHeaderRowWhenSingleValueColumn=remove_pivot_headers)
 
-    def add_columns(self, columns, row_group=True, value_formatter=format_numbers, sort=None, hide=False):
+    def add_columns(self, columns, row_group=True, value_formatter=format_numbers, sort=None, hide=False, comparator=None, labels=None):
         pinned = "left"
 
         if not row_group:
             pinned = None
+
+        if comparator != None:
+            comparator = JsCode(comparator)
+
+        if labels == None:
+            labels = columns
         
         for column in columns:
-            if value_formatter == None:
-                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide)
+            label = labels[columns.index(column)]
+            if comparator != None and value_formatter == None:
+                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, comparator=comparator, header_name=label)
+            elif value_formatter == None:
+                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label)
             else:
-                self.gb.configure_column(field=column, valueFormatter=value_formatter(), pinned=pinned, rowGroup=row_group, sort=sort, hide=hide)
+                self.gb.configure_column(field=column, valueFormatter=value_formatter(), pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label)
 
     def add_column(self, column, value_formatter=format_numbers, cell_style=conditional_formatting, cell_style_ranges=None):
         if cell_style == None and value_formatter == None:
@@ -174,17 +183,24 @@ class AgGridBuilder:
         
         self.gb.configure_column(column, pivot=True, pivotComparator=comparator)
 
-    def add_values(self, values):
+    def add_values(self, values, labels=None):
+        if labels == None:
+            labels = values
+
         for column in values:
-            self.gb.configure_column(column, aggFunc='sum', header_name=column, valueFormatter=format_numbers())
-    
-    def add_value(self, column, label, comparator = None):
+            label = labels[values.index(column)]
+            self.gb.configure_column(column, aggFunc='sum', header_name=label, valueFormatter=format_numbers())
+
+    def add_value(self, column, label, comparator = None, sort=None):
         if comparator != None:
             comparator = JsCode(comparator)
         else:
             comparator = 'sum'
         
-        self.gb.configure_column(column, aggFunc=comparator, header_name=label, valueFormatter=format_numbers())
+        if sort != None:
+            self.gb.configure_column(column, aggFunc=comparator, header_name=label, valueFormatter=format_numbers(), sort=sort)
+        else:
+            self.gb.configure_column(column, aggFunc=comparator, header_name=label, valueFormatter=format_numbers())
 
     def show_grid(self, height=630, auto_fit=False):
         go = self.gb.build()
