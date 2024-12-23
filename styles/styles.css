@@ -9,7 +9,7 @@
 
 /* Setting sidebar width */
 section[data-testid="stSidebar"] {
-    width: 100px !important;
+    width: 150px !important;
 }
 
 /* Add page text to sidebar button */
@@ -19,18 +19,6 @@ div.st-emotion-cache-oxb5th.eczjsme4 button[data-testid="baseButton-headerNoPadd
     width: 50px
 }
 
-/* Add style for top bar title */
-div[data-testid="stDecoration"] {
-    font-size: 36px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 0px;
-    padding-top: 40px;
-    pointer-events: none;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
 .st-emotion-cache-1dp5vir.ezrtsby1 {
     background-image: none;
 }
@@ -48,4 +36,4 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(> div[data-testid="element-c
 
 div[class="st-emotion-cache-1p1m4ay e3g6aar0"] {
     display: flex;
-}       
+}
