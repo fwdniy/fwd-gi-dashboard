@@ -3,6 +3,10 @@
     display: none;
 }
 
+#GithubIcon {
+    visibility: hidden;
+}
+
 /* Setting sidebar width */
 section[data-testid="stSidebar"] {
     width: 100px !important;

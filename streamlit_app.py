@@ -5,6 +5,12 @@ from streamlit_js_eval import streamlit_js_eval
 st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
 streamlit_js_eval(js_expressions="window.innerWidth", key='SCR')
 
+st.markdown("""
+#GithubIcon {
+  visibility: hidden;
+}
+""", unsafe_allow_html=True)
+
 menu('Home')
 
 st.write("# Welcome to the Stilson Dashboard! 👋")
