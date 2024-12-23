@@ -8,9 +8,7 @@ streamlit_js_eval(js_expressions="window.innerWidth", key='SCR')
 st.markdown(
     """
     <style>
-    .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
-    .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
-    .viewerBadge_text__1JaDK {
+    class="stToolbarActions st-emotion-cache-1p1m4ay e3i9eg82" {
         display: none;
     }
     </style>
