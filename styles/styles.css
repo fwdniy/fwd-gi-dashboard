@@ -7,11 +7,6 @@
     display: none;
 }
 
-/* Setting sidebar width */
-section[data-testid="stSidebar"] {
-    width: 200px !important;
-}
-
 /* Add page text to sidebar button */
 div.st-emotion-cache-oxb5th.eczjsme4 button[data-testid="baseButton-headerNoPadding"]::after {
     content: 'Pages';
