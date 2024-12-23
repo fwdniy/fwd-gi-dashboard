@@ -9,7 +9,7 @@
 
 /* Setting sidebar width */
 section[data-testid="stSidebar"] {
-    width: 150px !important;
+    width: 200px !important;
 }
 
 /* Add page text to sidebar button */
