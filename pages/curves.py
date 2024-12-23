@@ -9,7 +9,7 @@ from streamlit import session_state as ss
 from utils.interface.grid import AgGridBuilder
 from classes.curve import convert_floats_to_tenor
 
-menu('Curves')
+menu('pages/curves.py')
 
 #region Initialization
 

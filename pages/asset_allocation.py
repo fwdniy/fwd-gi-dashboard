@@ -9,7 +9,7 @@ from utils.interface.grid import AgGridBuilder
 from classes.fx import get_fx_rate
 from utils.interface.download import create_download_button
 
-menu('Hong Kong Asset Allocation')
+menu('pages/asset_allocation.py')
 
 with st.expander('Filters', True):
     dates = get_funnelweb_dates()

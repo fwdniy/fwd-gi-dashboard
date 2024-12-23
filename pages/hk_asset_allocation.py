@@ -7,7 +7,7 @@ from utils.snowflake.snowflake import query
 import pandas as pd
 from utils.interface.grid import AgGridBuilder
 
-menu('Hong Kong Asset Allocation')
+menu('pages/hk_asset_allocation.py')
 
 with st.expander('Filters', True):
     dates = get_funnelweb_dates()

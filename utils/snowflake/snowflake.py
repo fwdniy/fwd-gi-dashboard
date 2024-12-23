@@ -30,6 +30,8 @@ def get_schema(cur):
             column_type = str
         elif column[1] in [3, 8]:
             column_type = datetime
+        elif column[1] == 13:
+            column_type = bool
         else:
             print(f"error datatype for column '{column[0]}'")
 

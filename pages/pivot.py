@@ -8,7 +8,7 @@ from utils.snowflake.snowflake import query
 import pandas as pd
 from utils.interface.grid import AgGridBuilder
 
-menu('Funnelweb Pivot')
+menu('pages/pivot.py')
 
 columns = {'LBU Group': 'LBU_GROUP', 'LBU Code': 'LBU_CODE', 'Account Code': 'ACCOUNT_CODE', 'Fund Code': 'FUND_CODE', 'Fund Type': 'FUND_TYPE', 'Manager': 'MANAGER', 'FWD Asset Type': 'FWD_ASSET_TYPE', 'BBG Asset Type': 'BBG_ASSET_TYPE', 'L1 Asset Type': 'L1_ASSET_TYPE', 'L2 Asset Type': 'L2_ASSET_TYPE', 'L3 Asset Type': 'L3_ASSET_TYPE', 'L4 Asset Type': 'L4_ASSET_TYPE', 'Currency': 'CURRENCY', 'Final Rating': 'FINAL_RATING', 'Final Rating Letter': 'FINAL_RATING_LETTER', 'Country': 'COUNTRY_REPORT', 'Issuer': 'ISSUER', 'Ultimate Parent': 'ULTIMATE_PARENT_NAME', 'CAST Parent': 'CAST_PARENT_NAME', 'Industry Sector': 'INDUSTRY_SECTOR', 'Industry Group': 'INDUSTRY_GROUP', 'Industry': 'INDUSTRY', 'Ult Parent Industry Group': 'ULT_PARENT_INDUSTRY_GROUP'}
 values = {'Net MV': 'NET_MV', 'Clean MV': 'CLEAN_MV_USD', 'Credit Spread': 'CREDIT_SPREAD_BP', 'Duration': 'DURATION', 'YTM': 'YTM', 'DV01 000s': 'DV01_000', 'CS01 000s': 'CS01_000', 'Convexity': 'CONVEXITY', 'WARF': 'WARF'}
