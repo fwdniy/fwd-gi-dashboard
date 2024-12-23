@@ -2,6 +2,7 @@ import streamlit as st
 from utils.authenticate import authenticate
 
 def menu(page_name):    
+    apply_formatting()
     #set_title(page_name)    
     auth = authenticate()
 
@@ -53,3 +54,11 @@ def add_login_name():
         """
 
     st.sidebar.markdown(footer, unsafe_allow_html=True)
+
+def apply_formatting():
+        # Read the CSS file
+    with open("styles/styles.css") as f:
+        css = f.read()
+
+    # Inject the CSS into the Streamlit app
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)

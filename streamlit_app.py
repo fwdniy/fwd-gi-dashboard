@@ -5,17 +5,6 @@ from streamlit_js_eval import streamlit_js_eval
 st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
 streamlit_js_eval(js_expressions="window.innerWidth", key='SCR')
 
-st.markdown(
-    """
-    <style>
-    class="stToolbarActions st-emotion-cache-1p1m4ay e3i9eg82" {
-        display: none;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 menu('Home')
 
 st.write("# Welcome to the Stilson Dashboard! 👋")

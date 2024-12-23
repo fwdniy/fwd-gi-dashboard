@@ -3,8 +3,8 @@
     display: none;
 }
 
-#GithubIcon {
-    visibility: hidden;
+[data-testid="stToolbarActions"] {
+    display: none;
 }
 
 /* Setting sidebar width */
