@@ -10,7 +10,7 @@ menu('streamlit_app.py')
 
 st.write(f'# Stilson Dashboard')
 st.write(f'## Welcome {ss["nickname"]}! 👋')
-st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["name"]} via Teams or email via {st.secrets["admin"]["email"]}')
+st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["name"]} via Teams or email ({st.secrets["admin"]["email"]})')
 
 with st.expander("Change Notes", True):
     st.write("2025/01/02")
