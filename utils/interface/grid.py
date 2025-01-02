@@ -134,17 +134,19 @@ class AgGridBuilder:
         }
     """
     
-    def __init__(self, df):
+    def __init__(self, df, editable=False):
         self.df = df
         gb = GridOptionsBuilder.from_dataframe(df)
-        gb.configure_default_column(resizable=True, filterable=True, editable=False, flex=1, minWidth=170)
+        gb.configure_default_column(resizable=True, filterable=True, editable=editable, flex=1)#, minWidth=170)
         self.gb = gb
 
-    def add_options(self, pivot_total=None, group_total=True, group_open=False, remove_pivot_headers=False, pivot_mode=True, group_expanded=-1):
-        #pivotRowTotals='left'
-        self.gb.configure_grid_options(pivotMode=pivot_mode, autoGroupColumnDef={'cellRendererParams': { 'suppressCount': 'true'}, 'pinned': 'left'}, suppressAggFuncInHeader=True, groupDefaultExpanded=group_expanded, isGroupOpenByDefault=group_open, pivotDefaultExpanded=-1, pivotRowTotals=pivot_total, grandTotalRow=group_total, removePivotHeaderRowWhenSingleValueColumn=remove_pivot_headers)
 
-    def add_columns(self, columns, row_group=True, value_formatter=format_numbers, sort=None, hide=False, comparator=None, labels=None):
+    def add_options(self, pivot_total=None, group_total=True, group_open=False, remove_pivot_headers=False, pivot_mode=True, group_expanded=-1, cell_value_change=None, pinned_top=None):
+        #pivotRowTotals='left'
+        #onCellValueChanged='onCellValueChanged'
+        self.gb.configure_grid_options(pivotMode=pivot_mode, autoGroupColumnDef={'cellRendererParams': { 'suppressCount': 'true'}, 'pinned': 'left'}, suppressAggFuncInHeader=True, groupDefaultExpanded=group_expanded, isGroupOpenByDefault=group_open, pivotDefaultExpanded=-1, pivotRowTotals=pivot_total, grandTotalRow=group_total, removePivotHeaderRowWhenSingleValueColumn=remove_pivot_headers, onCellValueChanged=cell_value_change, pinnedTopRowData=pinned_top)
+
+    def add_columns(self, columns, row_group=True, value_formatter=format_numbers, sort=None, hide=False, comparator=None, labels=None, editable=False):
         pinned = "left"
 
         if not row_group:
@@ -159,11 +161,11 @@ class AgGridBuilder:
         for column in columns:
             label = labels[columns.index(column)]
             if comparator != None and value_formatter == None:
-                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, comparator=comparator, header_name=label)
+                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, comparator=comparator, header_name=label, editable=editable)
             elif value_formatter == None:
-                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label)
+                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label, editable=editable)
             else:
-                self.gb.configure_column(field=column, valueFormatter=value_formatter(), pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label)
+                self.gb.configure_column(field=column, valueFormatter=value_formatter(), pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label, editable=editable)
 
     def add_column(self, column, value_formatter=format_numbers, cell_style=conditional_formatting, cell_style_ranges=None):
         if cell_style == None and value_formatter == None:
@@ -202,7 +204,7 @@ class AgGridBuilder:
         else:
             self.gb.configure_column(column, aggFunc=comparator, header_name=label, valueFormatter=format_numbers())
 
-    def show_grid(self, height=630, auto_fit=False):
+    def show_grid(self, height=630, auto_fit=False, reload_data=False):
         go = self.gb.build()
 
         if auto_fit:
@@ -217,5 +219,4 @@ class AgGridBuilder:
                 max_len = int(df[col_name].astype(str).str.len().max())
                 col_def["width"] = max_len
                 
-        AgGrid(self.df, gridOptions=go, height=height, theme='streamlit', allow_unsafe_jscode=True, custom_css=self.custom_css)
-
+        self.grid = AgGrid(self.df, gridOptions=go, height=height, theme='streamlit', allow_unsafe_jscode=True, custom_css=self.custom_css, reload_data=reload_data)

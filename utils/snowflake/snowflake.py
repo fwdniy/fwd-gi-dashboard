@@ -65,3 +65,11 @@ def query(query, sort_columns = []):
         convert_columns(df, cur)
 
     return df
+
+def non_query(query):
+    if "conn" not in st.session_state:
+        connect_snowflake()
+    
+    conn = st.session_state["conn"]
+    cur = conn.cursor()
+    cur.execute(query)

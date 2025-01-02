@@ -88,23 +88,25 @@ def apply_formatting():
     # Inject the CSS into the Streamlit app
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
-def get_permissions():
-    #if 'ST_OAUTH_EMAIL' not in ss:
-    #    return True
-    
-    if 'streamlit_permissions' not in ss:
-        query_string = 'SELECT email, name, permissions, admin FROM supp.streamlit_users;'
+def get_permissions(force=False):
+    if 'streamlit_permissions' not in ss or force:
+        query_string = 'SELECT id, email, name, permissions, admin FROM supp.streamlit_users;'
         ss['streamlit_permissions'] = query(query_string)
 
     df = ss['streamlit_permissions']
-    #email = ss['ST_OAUTH_EMAIL'].str.lower()
-    email = 'nicolas.au.yeung@fwd.com'
+    
+    if 'ST_OAUTH_EMAIL' in ss:
+        email = ss['ST_OAUTH_EMAIL']
+    else:
+        email = st.secrets["admin"]["email"]
+        
     df['EMAIL'] = df['EMAIL'].str.lower()
     df = df[df['EMAIL'] == email].reset_index(drop=True)
 
-    if (len(df) == 1):
+    if len(df) == 1:
+        ss['nickname'] = df.at[0, 'NAME']
         ss['permissions'] = df.at[0, 'PERMISSIONS']
         ss['admin'] = df.at[0, 'ADMIN']
-    elif (len(df) == 0):
-        st.write("You have no permissions set... Please contact Nicolas Au-Yeung to get access!")
+    elif len(df) == 0:
+        st.write(f'You have no permissions set... Please contact {st.secrets["admin"]["name"]} to get access!')
         st.stop()
