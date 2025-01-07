@@ -96,9 +96,9 @@ def get_permissions(force=False):
     df = ss['streamlit_permissions']
     
     if 'ST_OAUTH_EMAIL' in ss:
-        email = ss['ST_OAUTH_EMAIL'].str.lower()
+        email = ss['ST_OAUTH_EMAIL'].lower()
     else:
-        email = st.secrets["admin"]["email"].str.lower()
+        email = st.secrets["admin"]["email"].lower()
         
     df['EMAIL'] = df['EMAIL'].str.lower()
     df = df[df['EMAIL'] == email].reset_index(drop=True)
