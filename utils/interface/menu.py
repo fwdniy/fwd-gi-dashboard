@@ -3,7 +3,7 @@ from utils.authenticate import authenticate
 from utils.snowflake.snowflake import query
 from streamlit import session_state as ss
 
-def menu(page_name):    
+def menu(page_name):
     apply_formatting()
     #set_title(page_name)
     auth = authenticate()
@@ -27,7 +27,7 @@ def authenticated_menu(page_name):
 
         pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves"},
                  "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation"},
-                 "Admin": {"pages/users.py": "Users"}}
+                 "Admin": {"pages/users.py": "Users", "pages/funnelweb_monitor.py": "Funnelweb Monitor"}}
 
         page_permissions = {"Group": "Group", "Hong Kong": "HK", "Admin": "Admin"}
         
@@ -96,9 +96,9 @@ def get_permissions(force=False):
     df = ss['streamlit_permissions']
     
     if 'ST_OAUTH_EMAIL' in ss:
-        email = ss['ST_OAUTH_EMAIL']
+        email = ss['ST_OAUTH_EMAIL'].str.lower()
     else:
-        email = st.secrets["admin"]["email"]
+        email = st.secrets["admin"]["email"].str.lower()
         
     df['EMAIL'] = df['EMAIL'].str.lower()
     df = df[df['EMAIL'] == email].reset_index(drop=True)

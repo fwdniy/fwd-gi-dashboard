@@ -13,8 +13,10 @@ st.write(f'## Welcome {ss["nickname"]}! 👋')
 st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["name"]} via Teams or email ({st.secrets["admin"]["email"]})')
 
 with st.expander("Change Notes", True):
+    st.write("2025/01/07")
+    st.write(" - Permissions: fixed issue with case sensitivity of user email and permissions")
     st.write("2025/01/02")
-    st.write(" - Add user permissions to restrict access to certain pages")
+    st.write(" - Permissions: added user permissions to restrict access to certain pages")
     st.write("2024/12/21")
     st.write(" - Curves: added implied forward rates")
     st.write(" - Funnelweb Pivot Table: enhanced interface and added weighted average metrics")
