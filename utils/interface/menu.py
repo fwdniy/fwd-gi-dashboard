@@ -27,7 +27,7 @@ def authenticated_menu(page_name):
 
         pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos"},
                  "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation"},
-                 "Admin": {"pages/users.py": "Users", "pages/funnelweb_monitor.py": "Funnelweb Monitor"}}
+                 "Admin": {"pages/users.py": "Users"}}#, "pages/funnelweb_monitor.py": "Funnelweb Monitor"}}
 
         page_permissions = {"Group": "Group", "Hong Kong": "HK", "Admin": "Admin"}
         
