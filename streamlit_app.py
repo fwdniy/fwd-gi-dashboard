@@ -13,6 +13,8 @@ st.write(f'## Welcome {ss["nickname"]}! 👋')
 st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["name"]} via Teams or email ({st.secrets["admin"]["email"]})')
 
 with st.expander("Change Notes", True):
+    st.write("2025,01/10")
+    st.write("- Repos: initial version released")
     st.write("2025/01/07")
     st.write(" - Permissions: fixed issue with case sensitivity of user email and permissions")
     st.write("2025/01/02")
