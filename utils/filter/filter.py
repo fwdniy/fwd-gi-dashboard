@@ -34,7 +34,7 @@ def build_curve_filter(key_suffix=''):
 
     curve = curves[curve_names.index(ss[key])]
     dates = curve.rates['VALUATION_DATE'].unique()
-    build_date_filter('Date', dates, key='selected_date' + key_suffix)
+    build_date_filter('Date', dates, max(dates), key='selected_date' + key_suffix)
 
     return curve
 
@@ -86,8 +86,8 @@ def build_lbu_filter(entities=False):
     ss['entity_mapping'] = entity_mapping
 
 def build_date_filter(label: str, dates: list[datetime], default:datetime = None, key: str = 'selected_date', on_change = None):
-    if default == None:
-        default = max(dates)
+    #if default == None:
+     #   default = max(dates)
     
     st.date_input(label, default, min(dates), max(dates), key, on_change=on_change)
 
@@ -97,7 +97,7 @@ def build_date_filter_buttons(label: str, dates: list[datetime], default: dateti
         pill_dates = {'Today': max(dates).date(), 'YTD': get_ytd(date, dates), 'QTD': get_qtd(date, dates), 'MTD': get_mtd(date, dates)}
         default = 'Today'
     
-    if pill_dates == None:
+    if pill_dates == None and default == None:
         pill_dates = {'YTD': get_ytd(date, dates), 'QTD': get_qtd(date, dates), 'MTD': get_mtd(date, dates)}
         default = 'YTD'
     
@@ -105,9 +105,13 @@ def build_date_filter_buttons(label: str, dates: list[datetime], default: dateti
         ss[key + '_pill_state'] = default
         ss[key + '_state'] = False
 
+    if default == '':
+        build_date_filter(label, dates, default=None, key=key)
+        return
+
     if ss[key + '_state']:
         ss[key] = pill_dates[ss[key + '_override']]
-
+        
     def reset_pills():
         ss[key + '_pill_state'] = None
         ss[key + '_state'] = False
@@ -116,7 +120,12 @@ def build_date_filter_buttons(label: str, dates: list[datetime], default: dateti
     selected_date = ss[key]
 
     if selected_date in pill_dates.values():
-        ss[key + '_override'] = ss[key + '_pill_state'] = next((k for k, v in pill_dates.items() if v == selected_date), None)
+        state = next((k for k, v in pill_dates.items() if v == selected_date), None)
+        
+        if key + '_override' in ss and pill_dates[state] == pill_dates[ss[key + '_override']]:
+            state = ss[key + '_override']
+            
+        ss[key + '_override'] = ss[key + '_pill_state'] = state
     else:
         ss[key + '_override'] = None
 
