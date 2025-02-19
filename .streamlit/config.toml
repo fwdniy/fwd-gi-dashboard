@@ -6,3 +6,6 @@ showSidebarNavigation = false
 
 [theme]
 base="light"
+
+[server]
+maxMessageSize=400
