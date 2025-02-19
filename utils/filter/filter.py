@@ -122,7 +122,7 @@ def build_date_filter_buttons(label: str, dates: list[datetime], default: dateti
     if selected_date in pill_dates.values():
         state = next((k for k, v in pill_dates.items() if v == selected_date), None)
         
-        if key + '_override' in ss and pill_dates[state] == pill_dates[ss[key + '_override']]:
+        if key + '_override' in ss and ss[key + '_override'] != None and pill_dates[state] == pill_dates[ss[key + '_override']]:
             state = ss[key + '_override']
             
         ss[key + '_override'] = ss[key + '_pill_state'] = state
