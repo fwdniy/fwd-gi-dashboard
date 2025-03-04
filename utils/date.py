@@ -11,7 +11,7 @@ def get_ytd(date: datetime, dates: list[datetime]):
 def get_qtd(date: datetime, dates: list[datetime]):
     qtd_months = [3, 6, 9, 12]
 
-    qtd_month = max([month for month in qtd_months if month < date.month or date.month < min(qtd_months) and month == max(qtd_months)])
+    qtd_month = max([month for month in qtd_months if month < date.month or date.month <= min(qtd_months) and month == max(qtd_months)])
 
     if qtd_month == 12:
         qtd_date = datetime(date.year - 1, 12, 31)
