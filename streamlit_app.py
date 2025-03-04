@@ -12,7 +12,7 @@ st.write(f'# Stilson Dashboard')
 st.write(f'## Welcome {ss["nickname"]}! 👋')
 st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["name"]} via Teams or email ({st.secrets["admin"]["email"]})')
 
-with st.expander("Change Notes", True):
+with st.expander("Release Notes", True):
     st.write("2025/01/10")
     st.write("- Repos: initial version released")
     st.write("2025/01/07")
