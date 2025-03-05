@@ -25,9 +25,12 @@ def authenticated_menu(page_name):
         admin = ss['admin']
         group = permissions == 'Group'
 
-        pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos", "pages/activity_monitor.py": "Activity Monitor", "pages/activity_monitor_old.py": "Activity Monitor Old"},
+        pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos" },
                  "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation"},
-                 "Admin": {"pages/users.py": "Users", "pages/funnelweb_monitor.py": "Funnelweb Monitor"}}
+                 "Admin": {"pages/users.py": "Users"}}
+        
+        beta_pages = {"Group": {"pages/activity_monitor.py": "Activity Monitor", "pages/activity_monitor_old.py": "Activity Monitor Old"},
+                      "Admin": {"pages/funnelweb_monitor.py": "Funnelweb Monitor"}}
 
         page_permissions = {"Group": "Group", "Hong Kong": "HK", "Admin": "Admin"}
         
@@ -45,6 +48,13 @@ def authenticated_menu(page_name):
 
                     if key2 == page_name:
                         verified = True
+                        
+                if "fwdoauth" not in st.secrets and key in beta_pages.keys():
+                    for key2, value2 in beta_pages[key].items():
+                        st.page_link(key2, label=value2)
+
+                        if key2 == page_name:
+                            verified = True
 
     if not verified and page_name != "streamlit_app.py":
         st.write("You are not authorized to view this page!")
