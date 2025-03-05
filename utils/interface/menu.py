@@ -25,9 +25,9 @@ def authenticated_menu(page_name):
         admin = ss['admin']
         group = permissions == 'Group'
 
-        pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos"},
+        pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos", "pages/activity_monitor.py": "Activity Monitor", "pages/activity_monitor_old.py": "Activity Monitor Old"},
                  "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation"},
-                 "Admin": {"pages/users.py": "Users"}}#, "pages/funnelweb_monitor.py": "Funnelweb Monitor"}}
+                 "Admin": {"pages/users.py": "Users", "pages/funnelweb_monitor.py": "Funnelweb Monitor"}}
 
         page_permissions = {"Group": "Group", "Hong Kong": "HK", "Admin": "Admin"}
         
@@ -80,18 +80,18 @@ def add_login_name():
 
     st.sidebar.markdown(footer, unsafe_allow_html=True)
 
-def apply_formatting():
-        # Read the CSS file
+def apply_formatting():    
+    try:
+        st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
+    except:
+        pass
+    
+    # Read the CSS file
     with open("styles/styles.css") as f:
         css = f.read()
 
     # Inject the CSS into the Streamlit app
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
-    
-    try:
-        st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
-    except:
-        pass
 
 def get_permissions(force=False):
     if 'streamlit_permissions' not in ss or force:
