@@ -10,6 +10,7 @@ menu('streamlit_app.py')
 st.write(f'# Stilson Dashboard')
 st.write(f'## Welcome {ss["nickname"]}! 👋')
 st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["name"]} via Teams or email ({st.secrets["admin"]["email"]})')
+st.write(f'Your permissions are set to {ss['permissions']}.')
 
 with st.expander("Release Notes", True):
     st.write("2025/01/10")
