@@ -3,9 +3,9 @@ from utils.interface.menu import menu
 from streamlit_js_eval import streamlit_js_eval
 from streamlit import session_state as ss
 
-streamlit_js_eval(js_expressions="window.innerWidth", key='SCR')
-
 menu('streamlit_app.py')
+
+streamlit_js_eval(js_expressions="window.innerWidth", key='SCR')
 
 st.write(f'# Stilson Dashboard')
 st.write(f'## Welcome {ss["nickname"]}! 👋')
