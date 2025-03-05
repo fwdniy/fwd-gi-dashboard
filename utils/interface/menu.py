@@ -87,6 +87,11 @@ def apply_formatting():
 
     # Inject the CSS into the Streamlit app
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+    
+    try:
+        st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
+    except:
+        pass
 
 def get_permissions(force=False):
     if 'streamlit_permissions' not in ss or force:

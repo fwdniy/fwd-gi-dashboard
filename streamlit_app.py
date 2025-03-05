@@ -3,7 +3,6 @@ from utils.interface.menu import menu
 from streamlit_js_eval import streamlit_js_eval
 from streamlit import session_state as ss
 
-st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
 streamlit_js_eval(js_expressions="window.innerWidth", key='SCR')
 
 menu('streamlit_app.py')
