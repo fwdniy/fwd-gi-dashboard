@@ -3,7 +3,6 @@ from utils.interface.menu import menu
 from streamlit_js_eval import streamlit_js_eval
 from streamlit import session_state as ss
 
-st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
 streamlit_js_eval(js_expressions="window.innerWidth", key='SCR')
 
 menu('streamlit_app.py')
@@ -11,6 +10,7 @@ menu('streamlit_app.py')
 st.write(f'# Stilson Dashboard')
 st.write(f'## Welcome {ss["nickname"]}! 👋')
 st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["name"]} via Teams or email ({st.secrets["admin"]["email"]})')
+st.write(f'Your permissions are set to {ss['permissions']}.')
 
 with st.expander("Release Notes", True):
     st.write("2025/01/10")

@@ -80,8 +80,13 @@ def add_login_name():
 
     st.sidebar.markdown(footer, unsafe_allow_html=True)
 
-def apply_formatting():
-        # Read the CSS file
+def apply_formatting():    
+    try:
+        st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='styles/fwd_ico.png')
+    except:
+        pass
+    
+    # Read the CSS file
     with open("styles/styles.css") as f:
         css = f.read()
 
