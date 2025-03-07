@@ -29,7 +29,7 @@ def authenticated_menu(page_name):
                  "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation"},
                  "Admin": {"pages/users.py": "Users"}}
         
-        beta_pages = {"Group": {"pages/activity_monitor.py": "Activity Monitor", "pages/activity_monitor_old.py": "Activity Monitor Old"},
+        beta_pages = {"Group": {"pages/activity_monitor.py": "Activity Monitor"},
                       "Admin": {"pages/funnelweb_monitor.py": "Funnelweb Monitor"}}
 
         page_permissions = {"Group": "Group", "Hong Kong": "HK", "Admin": "Admin"}
