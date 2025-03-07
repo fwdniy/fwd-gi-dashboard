@@ -139,6 +139,7 @@ class AgGridBuilder:
         gb = GridOptionsBuilder.from_dataframe(df)
         gb.configure_default_column(resizable=True, editable=editable, minWidth=min_width, filter=False)
         self.gb = gb
+        self.charts = []
 
     def add_options(self, pivot_total=None, group_total='top', group_open=False, remove_pivot_headers=False, pivot_mode=True, group_expanded=-1, cell_value_change=None, pinned_top=None, group_display_type=None, row_selection=None, header_name=None):
         #pivotRowTotals='left'
@@ -210,19 +211,103 @@ class AgGridBuilder:
         else:
             self.gb.configure_column(column, aggFunc=comparator, header_name=label, valueFormatter=format_numbers(), filter=filter)
 
-    def show_grid(self, height=630, auto_fit=False, reload_data=False):
-        go = self.gb.build()
-
-        if auto_fit:
-            df = self.df
-            min_height = 10
-            asset_types = df.shape[0] if df.shape[0] > min_height else min_height
-            height = 10 + 30 * asset_types
-            column_defs = go["columnDefs"]
-
-            for col_def in column_defs:
-                col_name = col_def["field"]
-                max_len = int(df[col_name].astype(str).str.len().max())
-                col_def["width"] = max_len
+    def add_chart(self, chart_type: str, categories: list, values: list, chart_title: str):
+        for category in categories:
+            self.gb.configure_column(field=category, headerName=category.title(), filter='agSetColumnFilter', chartDataType='category')
+            
+            chart_dict = """chartType: "{chartType}",
+                        cellRange: {
+                            columns: ["{columns}"]
+                        },
+                        aggFunc: "sum",
+                        chartThemeOverrides: {
+                            common : {
+                                title : {
+                                    enabled: true,
+                                    text: '{title}'
+                                }
+                            }
+                        },
+                        chartContainer: document.querySelector("#chart{count}"),"""
+            
+            chart_dict = chart_dict.replace("{chartType}", chart_type)
+            chart_dict = chart_dict.replace("{columns}", '", "'.join([category] + values))
+            chart_dict = chart_dict.replace("{count}", str(len(self.charts) + 1))
+            chart_dict = chart_dict.replace("{title}", category.replace("_", " ").title() + chart_title)
+            
+            self.charts.append(chart_dict)
+        
+        for value in values:
+            self.gb.configure_column(field=value, headerName=value.title(), chartDataType='series')
+        
+    def build_charts(self, grid_height = 400, chart_height = 400):
+        
+        charts = self.charts
+        
+        chart_count = len(charts)
+        div_count = math.ceil(chart_count / 2)
+        
+        charts_code = ""
+        divs_code = ""
+        
+        height = grid_height + div_count * chart_height
+        
+        for i in range(0, chart_count):
+            chart_code = """
+                    var chart{count} = document.createElement("div");
+                    chart{count}.id = "chart{count}";
+                    chart{count}.style.height = "{chart_height}px";
+                    chart{count}.style.width = "45%";
+                    
+                    chartDiv{div_count}.appendChild(chart{count});
+                    
+                    params.api.createCrossFilterChart({
+                        {chart}
+                    });
+                    """
+            
+            chart_code = chart_code.replace("{count}", str(i + 1))
+            chart_code = chart_code.replace("{div_count}", str(math.ceil((i + 1) / 2)))
+            chart_code = chart_code.replace("{chart}", charts[i])
+            chart_code = chart_code.replace("{chart_height}", str(chart_height))
+            
+            charts_code += chart_code
+        
+        for i in range(0, div_count):
+            div_code = """
+                    var chartDiv{count} = document.createElement("div");
+                    chartDiv{count}.id = "chartDiv{count}";
+                    chartDiv{count}.style.height = "{chart_height}px";
+                    chartDiv{count}.style.width = "100%";
+                    chartDiv{count}.style.marginTop = "20px"; 
+                    chartDiv{count}.style.display = "flex";
+                    chartDiv{count}.style.justifyContent = "space-between";
+                    grid.appendChild(chartDiv{count});
+                """
+            
+            div_code = div_code.replace("{count}", str(i + 1))
+            div_code = div_code.replace("{chart_height}", str(chart_height))
+            
+            divs_code += div_code
+        
+        generate_charts_code = """
+            function onFirstDataRendered(params) {
+                var grid = document.querySelector("#gridContainer");
+                var table = grid.childNodes[0];
+                table.style.height = "{grid_height}px";
                 
-        self.grid = AgGrid(self.df, gridOptions=go, height=height, theme='streamlit', allow_unsafe_jscode=True, custom_css=self.custom_css, reload_data=reload_data)
+                {divs}
+                {charts}
+            }
+        """
+        
+        generate_charts_code = generate_charts_code.replace("{grid_height}", str(grid_height))
+        generate_charts_code = generate_charts_code.replace("{divs}", divs_code)
+        generate_charts_code = generate_charts_code.replace("{charts}", charts_code)
+        
+        return (JsCode(generate_charts_code), height)
+        go = self.gb.build()
+        if self.charts != []:
+            (on_first_data_rendered, height) = self.build_charts()
+            go["onFirstDataRendered"] = on_first_data_rendered
+        
