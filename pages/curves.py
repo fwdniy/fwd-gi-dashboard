@@ -155,11 +155,11 @@ with forward:
                 rate_forward = rates[max([key for key in rates.keys() if key < tenor + tenor2])] / 100
 
                 # Calculate discount factors
-                df_start = 1 / (1 + rate_start * 0.5)
-                df_forward = 1 / (1 + rate_forward * 1)
-
+                df_start = (1 + rate_start) ** tenor
+                df_forward = (1 + rate_forward) ** (tenor + tenor2)
+                
                 # Calculate the forward rate for 1 year from 0.5 years
-                forward_rate = (df_start / df_forward) ** (1 / (1 - 0.5)) - 1
+                forward_rate = (df_forward / df_start) ** (1 / tenor2) - 1
                 forward_rate *= 100
 
                 df.at[tenor_keys.index(tenor), tenor_mapping[tenor2]] = forward_rate
