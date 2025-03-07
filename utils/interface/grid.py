@@ -1,5 +1,6 @@
 import streamlit as st
-from st_aggrid import AgGrid, GridOptionsBuilder, JsCode, ColumnsAutoSizeMode
+from st_aggrid import AgGrid, GridOptionsBuilder, JsCode
+import math
 
 def format_numbers(decimal_points = 2, divide_by = 1):
     number_formatting = """
