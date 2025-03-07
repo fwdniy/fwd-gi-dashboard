@@ -307,6 +307,14 @@ class AgGridBuilder:
         
         return (JsCode(generate_charts_code), height)
         go = self.gb.build()
+        autofit = JsCode("""
+        function onFirstDataRendered(params) {
+            params.api.autoSizeAllColumns();
+        }
+        """)
+        
+        go["onFirstDataRendered"] = autofit
+        
         if self.charts != []:
             (on_first_data_rendered, height) = self.build_charts()
             go["onFirstDataRendered"] = on_first_data_rendered
