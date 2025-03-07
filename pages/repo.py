@@ -16,7 +16,7 @@ def load_data():
         current_date = ss['selected_date']
         comparison_date = ss['selected_comparison_date']
 
-        query_string = f'SELECT CLOSING_DATE, LBU_CODE, ISSUER, L3_ASSET_TYPE, ACCOUNT_CODE, SECURITY_NAME, NET_MV FROM funnel.funnelweb WHERE bbg_asset_type = \'Repo Liability\' AND fund_code IN ({fund_codes}) AND closing_date IN (\'{current_date}\', \'{comparison_date}\') ORDER BY closing_date DESC;'
+        query_string = f'SELECT CLOSING_DATE, LBU_CODE, ISSUER, L3_ASSET_TYPE, ACCOUNT_CODE, SECURITY_NAME, NET_MV / 1000000 AS NET_MV FROM funnel.funnelweb WHERE bbg_asset_type = \'Repo Liability\' AND fund_code IN ({fund_codes}) AND closing_date IN (\'{current_date}\', \'{comparison_date}\') ORDER BY closing_date DESC;'
             
         return query_string
     
@@ -33,9 +33,8 @@ def load_data():
 
     with st.spinner('Fetching your requested data...'):
         df = ss['query_df'] = query(query_string)
-        
+    
     df['CLOSING_DATE'] = pd.to_datetime(df['CLOSING_DATE']).dt.strftime('%Y-%m-%d')
-    df['NET_MV'] = df['NET_MV'] / 1000000
     
     df = df.groupby(['CLOSING_DATE', 'LBU_CODE', 'ISSUER', 'L3_ASSET_TYPE', 'ACCOUNT_CODE', 'SECURITY_NAME']).sum().reset_index()
     
