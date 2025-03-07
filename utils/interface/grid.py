@@ -70,7 +70,7 @@ class AgGridBuilder:
         }
     
     customOrderComparatorString = """
-        function entityPivotComparator(a, b) {
+        function orderComparator(a, b) {
             const customOrder = ['value'];
             return customOrder.indexOf(a) - customOrder.indexOf(b);
         }
