@@ -52,17 +52,6 @@ def load_data():
             
         return query_string
 
-    def query_data(query_string: str):
-        if query_string == ss['sql_statement']:
-            return ss['query_df']
-        
-        with st.spinner('Fetching your requested data...'):
-            df = ss['query_df'] = query(query_string)
-
-        ss['sql_statement'] = query_string
-
-        return df
-
     def build_grid(df: pd.DataFrame):
         df['CLOSING_DATE'] = pd.to_datetime(df['CLOSING_DATE']).dt.strftime('%Y-%m-%d')
 
@@ -152,6 +141,9 @@ def load_data():
         """
 
         mv_list = [column for column in selected_values if 'MV' in column]
+        
+        if len(mv_list) == 0:
+            mv_list = ['Net MV']
 
         columnComparator = columnComparator.replace("{CURRENT_DATE}", current_date).replace("{SELECTED_VALUE}", selected_values[0])
 
@@ -185,7 +177,7 @@ def load_data():
 
     query_string = build_query()
 
-    df = query_data(query_string)
+    df = query(query_string)
 
     build_grid(df)
 
