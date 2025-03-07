@@ -134,10 +134,10 @@ class AgGridBuilder:
         }
     """
     
-    def __init__(self, df, editable=False):
+    def __init__(self, df, editable=False, min_width=None):
         self.df = df
         gb = GridOptionsBuilder.from_dataframe(df)
-        gb.configure_default_column(resizable=True, filterable=True, editable=editable, flex=1)#, minWidth=170)
+        gb.configure_default_column(resizable=True, editable=editable, minWidth=min_width, filter=False)
         self.gb = gb
 
 
@@ -146,7 +146,7 @@ class AgGridBuilder:
         #onCellValueChanged='onCellValueChanged'
         self.gb.configure_grid_options(pivotMode=pivot_mode, autoGroupColumnDef={'cellRendererParams': { 'suppressCount': 'true'}, 'pinned': 'left'}, suppressAggFuncInHeader=True, groupDefaultExpanded=group_expanded, isGroupOpenByDefault=group_open, pivotDefaultExpanded=-1, pivotRowTotals=pivot_total, grandTotalRow=group_total, removePivotHeaderRowWhenSingleValueColumn=remove_pivot_headers, onCellValueChanged=cell_value_change, pinnedTopRowData=pinned_top)
 
-    def add_columns(self, columns, row_group=True, value_formatter=format_numbers, sort=None, hide=False, comparator=None, labels=None, editable=False):
+    def add_columns(self, columns, row_group=True, value_formatter=format_numbers, sort=None, hide=False, comparator=None, labels=None, editable=False, filter=False):
         pinned = "left"
 
         if not row_group:
@@ -160,24 +160,25 @@ class AgGridBuilder:
         
         for column in columns:
             label = labels[columns.index(column)]
+            
             if comparator != None and value_formatter == None:
-                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, comparator=comparator, header_name=label, editable=editable)
+                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, comparator=comparator, header_name=label, editable=editable, filter=False)
             elif value_formatter == None:
-                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label, editable=editable)
+                self.gb.configure_column(field=column, pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label, editable=editable, filter=False)
             else:
-                self.gb.configure_column(field=column, valueFormatter=value_formatter(), pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label, editable=editable)
+                self.gb.configure_column(field=column, valueFormatter=value_formatter(), pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label, editable=editable, filter=False)
 
-    def add_column(self, column, value_formatter=format_numbers, cell_style=conditional_formatting, cell_style_ranges=None):
+    def add_column(self, column, value_formatter=format_numbers, cell_style=conditional_formatting, cell_style_ranges=None, filter=False):
         if cell_style == None and value_formatter == None:
-            self.gb.configure_column(field=column)
+            self.gb.configure_column(field=column, filter=False)
         elif cell_style == None:
-            self.gb.configure_column(field=column, valueFormatter=value_formatter())
+            self.gb.configure_column(field=column, valueFormatter=value_formatter(), filter=filter)
         elif type(cell_style) == dict and value_formatter == None:
-            self.gb.configure_column(field=column, cellStyle=cell_style)
+            self.gb.configure_column(field=column, cellStyle=cell_style, filter=filter)
         elif cell_style_ranges == None:
-            self.gb.configure_column(field=column, valueFormatter=value_formatter(), cellStyle=cell_style())
+            self.gb.configure_column(field=column, valueFormatter=value_formatter(), cellStyle=cell_style(), filter=filter)
         else:
-            self.gb.configure_column(field=column, valueFormatter=value_formatter(), cellStyle=cell_style(cell_style_ranges[0], cell_style_ranges[1], cell_style_ranges[2]))
+            self.gb.configure_column(field=column, valueFormatter=value_formatter(), cellStyle=cell_style(cell_style_ranges[0], cell_style_ranges[1], cell_style_ranges[2]), filter=filter)
         
     def set_pivot_column(self, column='CLOSING_DATE', comparator = None):
         if comparator != None:
@@ -185,24 +186,24 @@ class AgGridBuilder:
         
         self.gb.configure_column(column, pivot=True, pivotComparator=comparator)
 
-    def add_values(self, values, labels=None):
+    def add_values(self, values, labels=None, filter=False):
         if labels == None:
             labels = values
 
         for column in values:
             label = labels[values.index(column)]
-            self.gb.configure_column(column, aggFunc='sum', header_name=label, valueFormatter=format_numbers())
+            self.gb.configure_column(column, aggFunc='sum', header_name=label, valueFormatter=format_numbers(), filter=filter)
 
-    def add_value(self, column, label, comparator = None, sort=None):
+    def add_value(self, column, label, comparator = None, sort=None, filter=False):
         if comparator != None:
             comparator = JsCode(comparator)
         else:
             comparator = 'sum'
         
         if sort != None:
-            self.gb.configure_column(column, aggFunc=comparator, header_name=label, valueFormatter=format_numbers(), sort=sort)
+            self.gb.configure_column(column, aggFunc=comparator, header_name=label, valueFormatter=format_numbers(), sort=sort, filter=filter)
         else:
-            self.gb.configure_column(column, aggFunc=comparator, header_name=label, valueFormatter=format_numbers())
+            self.gb.configure_column(column, aggFunc=comparator, header_name=label, valueFormatter=format_numbers(), filter=filter)
 
     def show_grid(self, height=630, auto_fit=False, reload_data=False):
         go = self.gb.build()
