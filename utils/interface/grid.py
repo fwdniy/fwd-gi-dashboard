@@ -140,11 +140,16 @@ class AgGridBuilder:
         gb.configure_default_column(resizable=True, editable=editable, minWidth=min_width, filter=False)
         self.gb = gb
 
-
-    def add_options(self, pivot_total=None, group_total=True, group_open=False, remove_pivot_headers=False, pivot_mode=True, group_expanded=-1, cell_value_change=None, pinned_top=None):
+    def add_options(self, pivot_total=None, group_total='top', group_open=False, remove_pivot_headers=False, pivot_mode=True, group_expanded=-1, cell_value_change=None, pinned_top=None, group_display_type=None, row_selection=None, header_name=None):
         #pivotRowTotals='left'
         #onCellValueChanged='onCellValueChanged'
-        self.gb.configure_grid_options(pivotMode=pivot_mode, autoGroupColumnDef={'cellRendererParams': { 'suppressCount': 'true'}, 'pinned': 'left'}, suppressAggFuncInHeader=True, groupDefaultExpanded=group_expanded, isGroupOpenByDefault=group_open, pivotDefaultExpanded=-1, pivotRowTotals=pivot_total, grandTotalRow=group_total, removePivotHeaderRowWhenSingleValueColumn=remove_pivot_headers, onCellValueChanged=cell_value_change, pinnedTopRowData=pinned_top)
+        #groupDisplayType="multipleColumns"
+        #rowSelection={'mode': 'multiRow', 'groupSelects': 'filteredDescendants', 'checkboxLocation': 'autoGroupColumn'}
+        group_column_def = {'cellRendererParams': { 'suppressCount': 'true' }, 'pinned': 'left'}
+        if header_name != None:
+            group_column_def['headerName'] = header_name
+        
+        self.gb.configure_grid_options(pivotMode=pivot_mode, autoGroupColumnDef=group_column_def, suppressAggFuncInHeader=True, groupDefaultExpanded=group_expanded, isGroupOpenByDefault=group_open, pivotDefaultExpanded=-1, pivotRowTotals=pivot_total, grandTotalRow=group_total, removePivotHeaderRowWhenSingleValueColumn=remove_pivot_headers, onCellValueChanged=cell_value_change, pinnedTopRowData=pinned_top, groupDisplayType=group_display_type, rowSelection=row_selection, animateRows=False, suppressRowHoverHighlight=True)
 
     def add_columns(self, columns, row_group=True, value_formatter=format_numbers, sort=None, hide=False, comparator=None, labels=None, editable=False, filter=False):
         pinned = "left"
