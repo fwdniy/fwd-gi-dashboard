@@ -99,6 +99,6 @@ with st.spinner('Loading your data'):
         else:
             grid.add_column(column, cell_style=None)
 
-    grid.show_grid(auto_fit=True)
+    grid.show_grid()
 
     create_download_button(df_grouped)
