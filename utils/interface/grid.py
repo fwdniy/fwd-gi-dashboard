@@ -306,7 +306,14 @@ class AgGridBuilder:
         generate_charts_code = generate_charts_code.replace("{charts}", charts_code)
         
         return (JsCode(generate_charts_code), height)
+    
+    def show_grid(self, height=630, reload_data=False, update_on=[], update_mode='MODEL_CHANGED', custom_functions={}):
         go = self.gb.build()
+        
+        if len(custom_functions) > 0:
+            for key, value in custom_functions.items():
+                go[key] = value
+        
         autofit = JsCode("""
         function onFirstDataRendered(params) {
             params.api.autoSizeAllColumns();
@@ -319,3 +326,5 @@ class AgGridBuilder:
             (on_first_data_rendered, height) = self.build_charts()
             go["onFirstDataRendered"] = on_first_data_rendered
         
+        self.go = go
+        self.grid = AgGrid(self.df, gridOptions=go, height=height, theme='streamlit', allow_unsafe_jscode=True, custom_css=self.custom_css, reload_data=reload_data, update_on=update_on, update_mode=update_mode)
