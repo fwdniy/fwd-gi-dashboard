@@ -27,6 +27,10 @@ level = float(ss['selected_level'])
 current_fx_rate = get_fx_rate(ss['currencies'], ss['selected_currency'], current_date)
 comparison_fx_rate = get_fx_rate(ss['currencies'], ss['selected_currency'], comparison_date)
 
+if len(fund_codes) == 0:
+    st.warning('Please select at least one fund')
+    st.stop()
+
 with st.spinner('Loading your data'):
     df = get_asset_allocation()
     
