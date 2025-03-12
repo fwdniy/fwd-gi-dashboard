@@ -3,20 +3,31 @@ from datetime import datetime
 import pandas as pd
 import streamlit as st
 from streamlit import session_state as ss
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 def connect_snowflake():
     if "conn" in st.session_state:
         return
+
+    private_key_str = st.secrets["snowflake"]["private_key"]
+    
+    private_key = serialization.load_pem_private_key(
+        private_key_str.encode(),
+        password=None,
+        backend=default_backend()
+    )
     
     st.session_state["conn"] = snowflake.connector.connect(
         user=st.secrets["snowflake"]["username"],
-        password=st.secrets["snowflake"]["password"],
         account='FWD-PROD',
         host='FWD-PROD.snowflakecomputing.com',
         role='GROUP_DASHBOARD_ROLE',
         warehouse='STREAMLIT',
         database='FUNNEL_PILOT',
-        schema='FUNNEL'
+        schema='FUNNEL',
+        authenticator='snowflake_jwt',
+        private_key=private_key
     )
 
 def get_schema(cur):
