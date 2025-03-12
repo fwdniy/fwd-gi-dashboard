@@ -29,6 +29,8 @@ def connect_snowflake():
         authenticator='snowflake_jwt',
         private_key=private_key
     )
+    
+    st.success('Connected to Snowflake via RSA')
 
 def get_schema(cur):
     schema = cur.description
