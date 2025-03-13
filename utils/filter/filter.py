@@ -133,6 +133,8 @@ def build_date_filter_buttons(label: str, dates: list[datetime], default: dateti
         ss[key + '_state'] = True
 
     st.pills('Pills', pill_dates.keys(), label_visibility='collapsed', default=default, key=key + '_override', on_change=override_date)
+    
+    ss[key + '_string'] = selected_date.strftime('%Y-%m-%d')
 
 def build_level_filter():
     st.pills('Levels', ['1', '2', '3', '4'], selection_mode='single', default='2', key='selected_level')
