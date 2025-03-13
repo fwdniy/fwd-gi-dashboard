@@ -4,7 +4,7 @@ from classes.curve import build_curves
 from classes.lbu import build_lbu
 from datetime import datetime
 from streamlit import session_state as ss
-from utils.date import get_ytd, get_qtd, get_mtd
+from utils.date import get_ytd, get_qtd, get_mtd, get_one_week
 from utils.filter.tree import build_tree_selectors
 
 def build_fx_filter(key_suffix=''):
@@ -98,7 +98,7 @@ def build_date_filter_buttons(label: str, dates: list[datetime], default: dateti
         default = 'Today'
     
     if pill_dates == None and default == None:
-        pill_dates = {'YTD': get_ytd(date, dates), 'QTD': get_qtd(date, dates), 'MTD': get_mtd(date, dates)}
+        pill_dates = {'YTD': get_ytd(date, dates), 'QTD': get_qtd(date, dates), 'MTD': get_mtd(date, dates), '1W': get_one_week(date, dates)}
         default = 'YTD'
     
     if key + '_pill_state' not in ss:
