@@ -30,7 +30,7 @@ def connect_snowflake():
         private_key=private_key
     )
     
-    st.success('Connected to Snowflake via RSA')
+    st.toast('Connected to Snowflake')
 
 def get_schema(cur):
     schema = cur.description
