@@ -9,3 +9,4 @@ base="light"
 
 [server]
 maxMessageSize=400
+runOnSave = true
