@@ -281,17 +281,18 @@ class AgGridBuilder:
         for value in values:
             self.gb.configure_column(field=value, headerName=value.title(), chartDataType='series')
         
-    def build_charts(self, grid_height = 400, chart_height = 400):
+    def build_charts(self, grid_height = 400, chart_height = 500):
         
         charts = self.charts
         
+        margin_height = 20
         chart_count = len(charts)
         div_count = math.ceil(chart_count / 2)
         
         charts_code = ""
         divs_code = ""
         
-        height = grid_height + div_count * chart_height
+        height = grid_height + div_count * (chart_height + margin_height)
         
         for i in range(0, chart_count):
             chart_code = """
@@ -320,7 +321,7 @@ class AgGridBuilder:
                     chartDiv{count}.id = "chartDiv{count}";
                     chartDiv{count}.style.height = "{chart_height}px";
                     chartDiv{count}.style.width = "100%";
-                    chartDiv{count}.style.marginTop = "20px"; 
+                    chartDiv{count}.style.marginTop = "{margin}px"; 
                     chartDiv{count}.style.display = "flex";
                     chartDiv{count}.style.justifyContent = "space-between";
                     grid.appendChild(chartDiv{count});
@@ -328,6 +329,7 @@ class AgGridBuilder:
             
             div_code = div_code.replace("{count}", str(i + 1))
             div_code = div_code.replace("{chart_height}", str(chart_height))
+            div_code = div_code.replace("{margin}", str(margin_height))
             
             divs_code += div_code
         
@@ -368,4 +370,4 @@ class AgGridBuilder:
             go["onFirstDataRendered"] = on_first_data_rendered
         
         self.go = go
-        self.grid = AgGrid(self.df, gridOptions=go, height=height, theme='streamlit', allow_unsafe_jscode=True, custom_css=self.custom_css, reload_data=reload_data, update_on=update_on, update_mode=update_mode)
+        self.grid = AgGrid(self.df, gridOptions=go, height=height, themITe='streamlit', allow_unsafe_jscode=True, custom_css=self.custom_css, reload_data=reload_data, update_on=update_on, update_mode=update_mode)
