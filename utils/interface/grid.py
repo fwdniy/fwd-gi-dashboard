@@ -212,11 +212,12 @@ class AgGridBuilder:
         else:
             self.gb.configure_column(column, aggFunc=comparator, header_name=label, valueFormatter=format_numbers(), filter=filter)
 
-    def add_chart(self, chart_type: str, categories: list, values: list, chart_title: str):
+    def add_chart(self, chart_type: str, categories: list, values: list, chart_title: str, reverse: bool = False):
         for category in categories:
             self.gb.configure_column(field=category, headerName=category.title(), filter='agSetColumnFilter', chartDataType='category')
-            
+                        
             chart_dict = """chartType: "{chartType}",
+                        //chartThemeName: 'ag-vivid',
                         cellRange: {
                             columns: ["{columns}"]
                         },
@@ -225,8 +226,44 @@ class AgGridBuilder:
                             common : {
                                 title : {
                                     enabled: true,
-                                    text: '{title}'
-                                }
+                                    text: '{title}',
+                                    fontFamily: 'Source Sans Pro, sans-serif'
+                                },
+                                axes : {
+                                    category: {
+                                        label: { 
+                                            fontFamily: 'Source Sans Pro, sans-serif',
+                                        }
+                                    },
+                                    number : {
+                                        reverse: {reverse},
+                                        label: { 
+                                            fontFamily: 'Source Sans Pro, sans-serif',
+                                        }
+                                    },
+                                },
+                                series: {
+                                    label: {
+                                        enabled: true,
+                                        placement: 'outside-end',
+                                        fontFamily: 'Source Sans Pro, sans-serif',
+                                        formatter: (params) => {
+                                            const values = ['{values}'];
+                                            let lastValue = values.reduce((acc, value) => params.datum[value] != 0 ? value : acc, '');
+
+                                            if (params.yKey === lastValue) {
+                                                const total = params.datum['{param_values}'];
+                                                if (total != 0) {
+                                                    return total.toFixed(0);
+                                                }
+                                            }
+
+                                            return '';
+                                        },
+                                        padding: 10,
+                                        color: 'black',
+                                    },
+                                },
                             }
                         },
                         chartContainer: document.querySelector("#chart{count}"),"""
@@ -235,6 +272,9 @@ class AgGridBuilder:
             chart_dict = chart_dict.replace("{columns}", '", "'.join([category] + values))
             chart_dict = chart_dict.replace("{count}", str(len(self.charts) + 1))
             chart_dict = chart_dict.replace("{title}", category.replace("_", " ").title() + chart_title)
+            chart_dict = chart_dict.replace("{param_values}", '\'] + params.datum[\''.join(values))
+            chart_dict = chart_dict.replace("{values}", '\', \''.join(values))
+            chart_dict = chart_dict.replace("{reverse}", str(reverse).lower())
             
             self.charts.append(chart_dict)
         
