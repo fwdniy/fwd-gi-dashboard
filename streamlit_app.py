@@ -13,6 +13,8 @@ st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["na
 st.write(f'Your permissions are set to {ss["permissions"]}.')
 
 with st.expander("Release Notes", True):
+    st.write("2025/03/14")
+    st.write("- Activity Page: initial version released")
     st.write("2025/01/10")
     st.write("- Repos: initial version released")
     st.write("2025/01/07")
