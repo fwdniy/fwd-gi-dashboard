@@ -618,9 +618,9 @@ class ActivityMonitor:
     
         customOrderComparatorString = """
             function orderComparator(a, b, nodeA, nodeB) {                
-                if (nodeA.id.includes("Total") && !nodeB.id.includes("Total")) {
+                if (nodeA.id.includes("Total") && !nodeA.id.includes("Total Return") && !nodeB.id.includes("Total")) {
                     return 1;
-                } else if (!nodeA.id.includes("Total") && nodeB.id.includes("Total")) {
+                } else if (!nodeA.id.includes("Total") && nodeB.id.includes("Total") && !nodeB.id.includes("Total Return")) {
                     return -1;
                 }
                 
