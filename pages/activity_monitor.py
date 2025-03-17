@@ -22,7 +22,7 @@ class ActivityMonitor:
     
     # Query fields
     IDENTIFIER_COLUMNS = ['closing_date', 'position_id', 'security_name', 'bbgid_v2', 'lbu_group', 'lbu_code', 'fund_code', 'account_code']
-    STATIC_COLUMNS = ['country_report', 'manager', 'fwd_asset_type', 'l2_asset_type', 'l3_asset_type', 'bbg_asset_type', 'currency', 'maturity']
+    STATIC_COLUMNS = ['country_report', 'manager', 'fwd_asset_type', 'l2_asset_type', 'l3_asset_type', 'bbg_asset_type', 'currency', 'maturity', 'securitized_credit_type']
     CHARACTERISTIC_COLUMNS = ['net_mv', 'duration', 'final_rating', 'final_rating_letter', 'maturity_range', 'mtge_factor', 'principal_factor', 'last_trade_date', 'position', 'unit', 'rate', 'warf']
     FORMULA_COLUMNS = {'currency_pair': 'IFF(sw_pay_crncy IS NULL OR sw_rec_crncy IS NULL, NULL, sw_pay_crncy || \'/\' || sw_rec_crncy)'}
     
@@ -731,6 +731,9 @@ class ActivityMonitor:
         
         if merged_df['BBG_ASSET_TYPE'].isin(['Foreign Exchange Forward']).any():
             analysis_columns.append('CURRENCY_PAIR')
+            
+        if merged_df['BBG_ASSET_TYPE'].isin(['Mortgage Backed Security']).any():
+            analysis_columns.append('SECURITIZED_CREDIT_TYPE')
         
         for column in analysis_columns:
             if column + '_END' in merged_df.columns:
