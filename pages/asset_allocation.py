@@ -105,4 +105,4 @@ with st.spinner('Loading your data'):
 
     grid.show_grid()
 
-    create_download_button(df_grouped)
+    create_download_button(df_grouped, 'asset_allocation', add_time=True)
