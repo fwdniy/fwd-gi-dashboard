@@ -39,6 +39,7 @@ class ActivityMonitor:
         self.previous_end_date = None
         self.average_cost_dict = {}
         self.position_change_sql = ''
+        self.saa_group_dict = {}
         
     def build_filters(self):        
         """
@@ -674,6 +675,24 @@ class ActivityMonitor:
             
         return filtered_df
 
+    def __join_saa_group(self, df):
+        self.saa_group_dict = saa_group_dict = self.__build_saa_group_mapping()
+        df['SAA_GROUP'] = df.apply(lambda row: saa_group_dict[row['FUND_CODE']], axis=1)
+        
+        return df
+        
+    def __build_saa_group_mapping(self):
+        if len(self.saa_group_dict) == 0:
+            df = query("SELECT short_name, saa_group, lbu_group FROM supp.fund f, supp.lbu l WHERE f.lbu = l.name;")
+        else:
+            return self.saa_group_dict
+        
+        df['SAA_GROUP'] = df.apply(lambda row: ('Shareholder' if row['LBU_GROUP'] == 'HK' else row['SHORT_NAME']) if row['SAA_GROUP'] == 'None' else row['SAA_GROUP'], axis=1)
+        
+        saa_group_dict = dict(zip(df['SHORT_NAME'], df['SAA_GROUP']))
+        
+        return saa_group_dict
+
     def build_analysis(self):        
         st.write('Select checkboxes to show details below. Loading may take some time...')
         
@@ -723,11 +742,13 @@ class ActivityMonitor:
         merged_df = pd.merge(purchase_df, merged_df, on=list(purchase_df.columns), how='outer')
         merged_df = pd.merge(sold_df, merged_df, on=list(sold_df.columns), how='outer')
         
+        merged_df = self.__join_saa_group(filtered_df)
+        
         #endregion
         
         #region Build charts
             
-        analysis_columns = ['FUND_CODE', 'FINAL_RATING_LETTER', 'COUNTRY_REPORT', 'MANAGER', 'MATURITY_RANGE', 'CURRENCY']
+        analysis_columns = ['SAA_GROUP', 'FUND_CODE', 'FINAL_RATING_LETTER', 'COUNTRY_REPORT', 'MANAGER', 'MATURITY_RANGE', 'CURRENCY']
         
         if merged_df['BBG_ASSET_TYPE'].isin(['Foreign Exchange Forward']).any():
             analysis_columns.append('CURRENCY_PAIR')
