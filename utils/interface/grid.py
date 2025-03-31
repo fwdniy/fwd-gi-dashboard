@@ -350,9 +350,14 @@ class AgGridBuilder:
         
         return (JsCode(generate_charts_code), height)
     
-    def show_grid(self, height=630, reload_data=False, update_on=[], update_mode='MODEL_CHANGED', custom_functions={}):
+    def show_grid(self, height: float = 630, reload_data: bool = False, update_on: list[str] = [], update_mode: str = 'MODEL_CHANGED', custom_functions: dict[str, str] = {}, column_order: list[str] = []):
         go = self.gb.build()
         
+        if column_order != []:
+            column_names = [column['field'] for column in go['columnDefs']]
+            column_indexes = [column_names.index(column) for column in column_order]
+            go['columnDefs'] = [go['columnDefs'][index] for index in column_indexes]
+                    
         if len(custom_functions) > 0:
             for key, value in custom_functions.items():
                 go[key] = value
