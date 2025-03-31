@@ -1,0 +1,7 @@
+[
+    {"name": "ID", "datatype": "int", "type": "automatic", "definition": "the ID allocated to the specific account"},
+    {"name": "NAME", "datatype": "str", "type": "compulsory", "definition": "the name of the asset type"},
+    {"name": "CATEGORY", "datatype": "str", "type": "compulsory", "definition": "the name of the parent asset type"},
+    {"name": "SUB_CATEGORY", "datatype": "str", "type": "compulsory", "definition": "the name of the parent asset type"},
+    {"name": "OUTPUT_ORDER", "datatype": "str", "type": "legacy", "definition": "deprecated"}
+]

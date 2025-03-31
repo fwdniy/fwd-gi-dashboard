@@ -1,0 +1,8 @@
+[
+    {"name": "ID", "datatype": "int", "type": "automatic", "definition": "the ID allocated to the specific account"},
+    {"name": "ASSET_TYPE", "datatype": "str", "type": "compulsory", "definition": "the name of the asset type"},
+    {"name": "FIXED_INCOME", "datatype": "bool", "type": "compulsory", "definition": "whether the asset type is considered fixed income and should have duration"},
+    {"name": "LBU", "datatype": "str", "type": "compulsory", "definition": "the name of the LBUs to show for", "sql": "SELECT DISTINCT lbu_group FROM supp.lbu;", "split": ";"},
+    {"name": "TAG_LEVEL_1", "datatype": "str", "type": "optional", "definition": "the tag to recognize the sub asset type"},
+    {"name": "PARENT_ASSET_TYPE", "datatype": "str", "type": "optional", "definition": "the parent asset type of sub asset type"}
+]

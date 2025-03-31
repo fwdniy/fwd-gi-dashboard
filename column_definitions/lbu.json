@@ -1,0 +1,15 @@
+[
+    {"name": "ID", "datatype": "int", "type": "automatic", "definition": "the ID allocated to the specific LBU"},
+    {"name": "NAME", "datatype": "str", "type": "compulsory", "definition": "the long name used to identify the BU"},
+    {"name": "FX", "datatype": "str", "type": "compulsory", "definition": "the valuation currency of the BU", "sql": "SELECT name FROM supp.fx_name;"},
+    {"name": "BLOOMBERG_NAME", "datatype": "str", "type": "compulsory", "definition": "the name of the BU in Bloomberg"},
+    {"name": "LBU_GROUP", "datatype": "str", "type": "compulsory", "definition": "the group the BU belongs to, if entirely new please choose an appropriate code"},
+    {"name": "LOCAL_COUNTRY", "datatype": "str", "type": "compulsory", "definition": "the countries considered \"local\" to the BU, typically would have one only", "sql": "SELECT code FROM supp.country;", "split": ", "},
+    {"name": "LOCAL_CURRENCY", "datatype": "str", "type": "compulsory", "definition": "the currencies considered \"local\" to the BU, typically would have one only", "sql": "SELECT name FROM supp.fx_name;", "split": ", "},
+    {"name": "SAVE_PATH", "datatype": "str", "type": "compulsory", "definition": "the save path for Funnelweb Suite files, please create a new path if there is an entirely new BU"},
+    {"name": "COUNTRY", "datatype": "str", "type": "compulsory", "definition": "the main market that the BU operates in"},
+    {"name": "GROUP_NAME", "datatype": "str", "type": "compulsory", "definition": "the long name used for the LBU group"},
+    {"name": "LEGAL_NAME", "datatype": "str", "type": "optional", "definition": "the legal name of the entity, for reference only"},
+    {"name": "PARENT_COMPANY", "datatype": "str", "type": "optional", "definition": "the entity owning the BU, for reference only"},
+    {"name": "MAV_NAME", "datatype": "str", "type": "legacy", "definition": "the Bloomberg MAV file the BU belongs to, deprecated"}
+]

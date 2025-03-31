@@ -1,0 +1,12 @@
+[
+    {"name": "ID", "datatype": "int", "type": "automatic", "definition": "the ID allocated to the specific SAA"},
+    {"name": "NAME", "datatype": "str", "type": "compulsory", "definition": "the name used to identify the SAA"},
+    {"name": "FUND", "datatype": "str", "type": "compulsory", "definition": "the short name used to idenfity the fund for the SAA", "sql": "SELECT short_name FROM supp.fund;"},
+    {"name": "APPLY_DATE", "datatype": "date", "type": "compulsory", "definition": "the beginning date for applying the SAA"},
+    {"name": "IS_IMPLEMENTATION_SCHEDULE", "datatype": "bool", "type": "compulsory", "definition": "whether the SAA is the LT SAA or not, default should be false"},
+    {"name": "IS_LEGACY_SAA", "datatype": "bool", "type": "compulsory", "definition": "whether the SAA is a legacy SAA, default should be false"},
+    {"name": "IS_TEST_SAA", "datatype": "bool", "type": "compulsory", "definition": "whether the SAA is under testing, used for dev environments, default should be false"},
+    {"name": "WDV_ID", "datatype": "int", "type": "compulsory", "definition": "the ID of the SAA in the WDV access database"},
+    {"name": "TEST_APPLY_DATE", "datatype": "date", "type": "optional", "definition": "the beginning date for applying the SAA in dev environment"},
+    {"name": "COMMENT", "datatype": "str", "type": "optional", "definition": "any additional comments"}
+]

@@ -1,0 +1,16 @@
+[
+    {"name": "ID", "datatype": "int", "type": "automatic", "definition": "the ID allocated to the specific fund"},
+    {"name": "NAME", "datatype": "str", "type": "compulsory", "definition": "the long name used to identify the fund"},
+    {"name": "LBU", "datatype": "str", "type": "compulsory", "definition": "the long name used to identify the BU associated with the fund", "sql": "SELECT name FROM supp.lbu;"},
+    {"name": "SHORT_NAME", "datatype": "str", "type": "compulsory", "definition": "the short name used to idenfity the fund"},
+    {"name": "DISPLAY_POSITION", "datatype": "float", "type": "compulsory", "definition": "the order to which the fund is displayed in, applies to HK output file only, new funds should be using a higher number than the current max"},
+    {"name": "TYPE", "datatype": "str", "type": "compulsory", "definition": "the type of the fund, 'Par' / 'Non Par' / 'SHF' / 'N/A'", "options": ["Par", "Non Par", "SHF", "N/A"]},
+    {"name": "SUB_LBU", "datatype": "str", "type": "compulsory", "definition": "the name of the entity the fund is in, used for ad-hoc reports in Hong Kong only"},
+    {"name": "SAA_GROUP", "datatype": "str", "type": "compulsory", "definition": "the saa group of the fund, used in TAA template for Hong Kong only"},
+    {"name": "VFA", "datatype": "bool", "type": "compulsory", "definition": "whether the fund is using a variable fee approach (typically par = VFA and non-par = non-VFA, UL breaks the role and is non-par but VFA)"},
+    {"name": "COMMENT", "datatype": "str", "type": "optional", "definition": "any additional comments"},
+    {"name": "ALTERNATE_PAM_ACCOUNT", "datatype": "str", "type": "legacy", "definition": "deprecated"},
+    {"name": "PAM_ACCOUNT", "datatype": "str", "type": "legacy", "definition": "deprecated"},
+    {"name": "BBG_ACCOUNT", "datatype": "str", "type": "legacy", "definition": "deprecated"},
+    {"name": "CODE", "datatype": "str", "type": "legacy", "definition": "deprecated"}
+]

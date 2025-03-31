@@ -27,7 +27,7 @@ def authenticated_menu(page_name):
 
         pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos", "pages/activity_monitor.py": "Activity Monitor" },
                  "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation"},
-                 "Admin": {"pages/users.py": "Users"}}
+                 "Admin": {"pages/users.py": "Users", "pages/lbu_manager.py": "LBU Manager"}}
         
         beta_pages = {"Group": {},
                       "Admin": {}}

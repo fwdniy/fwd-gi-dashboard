@@ -1,0 +1,14 @@
+[
+    {"name": "ID", "datatype": "int", "type": "automatic", "definition": "the ID allocated to the specific SAA allocation"},
+    {"name": "SAA_ID", "datatype": "int", "type": "compulsory", "definition": "the ID allocated to the specific SAA associated with this allocation"},
+    {"name": "ASSET_TYPE", "datatype": "str", "type": "compulsory", "definition": "the asset type for this allocation"},
+    {"name": "SAA", "datatype": "float", "type": "compulsory", "definition": "the long term SAA %"},
+    {"name": "TAA_LOWER", "datatype": "float", "type": "compulsory", "definition": "the TAA lower bound"},
+    {"name": "TAA_UPPER", "datatype": "float", "type": "compulsory", "definition": "the TAA upper bound"},
+    {"name": "ST_SAA", "datatype": "float", "type": "compulsory", "definition": "the short term SAA %"},
+    {"name": "DESCRIPTION", "datatype": "str", "type": "compulsory", "definition": "the description for this allocation, usually just the asset type"},
+    {"name": "TAG_LEVEL_1", "datatype": "bool", "type": "optional", "definition": "the sub asset type for the allocation, for reference only and applies to Japan only"},
+    {"name": "DURATION", "datatype": "float", "type": "legacy", "definition": "deprecated"},
+    {"name": "DURATION_DATE", "datatype": "date", "type": "legacy", "definition": "deprecated"},
+    {"name": "BENCHMARK_INDEX", "datatype": "str", "type": "legacy", "definition": "deprecated"}
+]
