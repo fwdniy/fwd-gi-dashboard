@@ -1,12 +1,13 @@
 [global]
-disableWidgetStateDuplicationWarning = true
+disableWidgetStateDuplicationWarning=true
 
 [client]
-showSidebarNavigation = false
+showSidebarNavigation=false
 
 [theme]
 base="light"
 
 [server]
 maxMessageSize=400
-runOnSave = true
+runOnSave=true
+maxUploadSize=20
