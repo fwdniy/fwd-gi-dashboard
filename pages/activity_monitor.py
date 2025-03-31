@@ -742,7 +742,7 @@ class ActivityMonitor:
         merged_df = pd.merge(purchase_df, merged_df, on=list(purchase_df.columns), how='outer')
         merged_df = pd.merge(sold_df, merged_df, on=list(sold_df.columns), how='outer')
         
-        merged_df = self.__join_saa_group(filtered_df)
+        merged_df = self.__join_saa_group(merged_df)
         
         #endregion
         
