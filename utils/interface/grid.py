@@ -135,6 +135,56 @@ class AgGridBuilder:
         }
     """
     
+    buttonString = """
+        class BtnCellRenderer {
+            init(params) {
+                if (params.node.rowPinned === 'top') {
+                    this.params = params;
+                    this.eGui = document.createElement('div');
+                    this.eGui.style.height = '25px';
+                    this.eGui.innerHTML = `
+                    <span>
+                        <button id='click-button' 
+                            class='btn-simple' 
+                            style='color: ${this.params.color}; background-color: ${this.params.background_color}; text-align: center; line-height: 20px; height: 25px'>Click!</button>
+                    </span>
+                    `;
+                    this.eButton = this.eGui.querySelector('#click-button');
+                    this.btnClickedHandler = this.btnClickedHandler.bind(this);
+                    this.eButton.addEventListener('click', this.btnClickedHandler);
+                }
+            }
+
+            getGui() {
+                return this.eGui;
+            }
+
+            refresh() {
+                return true;
+            }
+
+            destroy() {
+                if (this.eButton) {
+                    this.eGui.removeEventListener('click', this.btnClickedHandler);
+                }
+            }
+
+            btnClickedHandler(event) {
+                if (confirm('Are you sure you want to CLICK?') == true) {
+                    if(this.params.getValue() == 'clicked') {
+                        this.refreshTable('');
+                    } else {
+                        this.refreshTable('clicked');
+                    }
+                }
+            }
+
+            refreshTable(value) {
+                this.params.setValue(value);
+            }
+        };
+    """
+    
     def __init__(self, df, editable=False, min_width=None):
         self.df = df
         gb = GridOptionsBuilder.from_dataframe(df)
@@ -349,6 +399,9 @@ class AgGridBuilder:
         generate_charts_code = generate_charts_code.replace("{charts}", charts_code)
         
         return (JsCode(generate_charts_code), height)
+    
+    def add_button_column(self):
+        self.gb.configure_column('ADD', cellRenderer=JsCode(AgGridBuilder.buttonString))
     
     def show_grid(self, height: float = 630, reload_data: bool = False, update_on: list[str] = [], update_mode: str = 'MODEL_CHANGED', custom_functions: dict[str, str] = {}, column_order: list[str] = []):
         go = self.gb.build()
