@@ -138,3 +138,7 @@ def build_date_filter_buttons(label: str, dates: list[datetime], default: dateti
 
 def build_level_filter():
     st.pills('Levels', ['1', '2', '3', '4'], selection_mode='single', default='2', key='selected_level')
+    
+def build_multi_select_filter(label, mapping, key, default, disabled=False):
+    selected = st.multiselect(label, mapping.keys(), key=key, default=default, disabled=disabled)
+    ss[f'{key}_converted'] = [mapping[column] for column in selected]
