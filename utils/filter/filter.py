@@ -109,7 +109,9 @@ def build_date_filter_buttons(label: str, dates: list[datetime], default: dateti
     if date == None:
         date = datetime.now().date()
         pill_dates = {'Today': max(dates).date(), 'YTD': get_ytd(date, dates), 'QTD': get_qtd(date, dates), 'MTD': get_mtd(date, dates)}
-        default = 'Today'
+        
+        if default == None:
+            default = 'Today'
     
     if pill_dates == None and default == None:
         pill_dates = {'YTD': get_ytd(date, dates), 'QTD': get_qtd(date, dates), 'MTD': get_mtd(date, dates), '1W': get_one_week(date, dates)}
