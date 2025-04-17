@@ -38,7 +38,7 @@ def build_curve_filter(key_suffix=''):
 
     return curve
 
-def build_lbu_filter(entities=False):
+def build_lbu_filter(entities=False, height=300):
     if "lbus" not in ss:
         ss['lbus'] = build_lbu()
 
@@ -76,7 +76,7 @@ def build_lbu_filter(entities=False):
     if entities:
         expanded.append('lg:HK')
 
-    build_tree_selectors('LBUs', data, 'selected_lbus', checked, expanded)
+    build_tree_selectors('LBUs', data, 'selected_lbus', checked, expanded, height=height)
 
     if ss['selected_lbus'] == None:
         ss['selected_funds'] = funds
