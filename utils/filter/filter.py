@@ -158,3 +158,5 @@ def build_level_filter():
 def build_multi_select_filter(label, mapping, key, default, disabled=False):
     selected = st.multiselect(label, mapping.keys(), key=key, default=default, disabled=disabled)
     ss[f'{key}_converted'] = [mapping[column] for column in selected]
+    
+    return selected
