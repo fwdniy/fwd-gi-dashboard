@@ -99,7 +99,7 @@ class LbuGroup:
         return entity_mapping
 
 def build_lbu() -> list[LbuGroup]:
-    query_string: str = 'SELECT l.group_name, f.lbu, f.type, f.short_name, l.bloomberg_name, l.lbu_group, f.sub_lbu FROM supp.fund AS f LEFT JOIN supp.lbu AS l ON l.name = f.lbu WHERE l.bloomberg_name <> \'LT\' ORDER BY group_name, lbu, sub_lbu, type, short_name;'
+    query_string: str = "SELECT l.group_name, f.lbu, f.type, f.short_name, l.bloomberg_name, l.lbu_group, f.sub_lbu FROM supp.fund AS f LEFT JOIN supp.lbu AS l ON l.name = f.lbu WHERE l.bloomberg_name <> \'LT\' AND f.type <> 'N/A' ORDER BY group_name, lbu, sub_lbu, type, short_name;"
     df: pd.DataFrame = query(query_string)
 
     groups = df['GROUP_NAME'].unique()
