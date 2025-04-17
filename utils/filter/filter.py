@@ -85,6 +85,20 @@ def build_lbu_filter(entities=False, height=300):
 
     ss['entity_mapping'] = entity_mapping
 
+def build_fund_filter():
+    if "lbus" not in ss:
+        ss['lbus'] = build_lbu()
+
+    lbu_groups = ss['lbus']
+    
+    lbu_names = sorted([lbu.name for lbu_group in lbu_groups for lbu in lbu_group.lbus])
+    
+    st.selectbox('LBU', lbu_names, index=lbu_names.index('Hong Kong'), key='selected_lbu')
+    
+    fund_names = sorted([fund.name for lbu_group in lbu_groups for lbu in lbu_group.lbus if lbu.name == ss['selected_lbu'] for fund in lbu.funds])
+    
+    st.selectbox('Fund', fund_names, key='selected_fund')
+
 def build_date_filter(label: str, dates: list[datetime], default:datetime = None, key: str = 'selected_date', on_change = None):
     #if default == None:
      #   default = max(dates)
