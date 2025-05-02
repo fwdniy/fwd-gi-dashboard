@@ -14,7 +14,7 @@ from utils.interface.grid import AgGridBuilder, format_numbers, conditional_form
 menu('pages/activity_monitor.py')
 
 #Filter fields
-FILTER_COLUMNS = {'LBU Group': 'LBU_GROUP', 'Fund Code': 'FUND_CODE', 'Account Code': 'ACCOUNT_CODE', 'Final Rating': 'FINAL_RATING', 'Final Rating Letter': 'FINAL_RATING_LETTER', 'Country': 'COUNTRY_REPORT', 'Manager': 'MANAGER', 'Maturity Range': 'MATURITY_RANGE', 'FWD Asset Type': 'FWD_ASSET_TYPE', 'L2 Asset Type': 'L2_ASSET_TYPE', 'L3 Asset Type': 'L3_ASSET_TYPE', 'BBG Asset Type': 'BBG_ASSET_TYPE', 'Currency': 'CURRENCY', 'Security Name': 'SECURITY_NAME'}
+FILTER_COLUMNS = {'LBU Group': 'LBU_GROUP', 'Fund Code': 'FUND_CODE', 'Account Code': 'ACCOUNT_CODE', 'Final Rating': 'FINAL_RATING', 'Final Rating Letter': 'FINAL_RATING_LETTER', 'Country': 'COUNTRY_REPORT', 'Manager': 'MANAGER', 'Maturity Range': 'MATURITY_RANGE', 'FWD Asset Type': 'FWD_ASSET_TYPE', 'L1 Asset Type': 'L1_ASSET_TYPE', 'L2 Asset Type': 'L2_ASSET_TYPE', 'L3 Asset Type': 'L3_ASSET_TYPE', 'BBG Asset Type': 'BBG_ASSET_TYPE', 'Currency': 'CURRENCY', 'Security Name': 'SECURITY_NAME'}
 FILTER_VALUES = {'Net MV': 'NET_MV', 'Notional': 'NOTIONAL_USD', 'Duration': 'DURATION', 'WARF': 'WARF'}
 FILTER_VALUES_SUM = {'NET_MV': 1000000, 'NOTIONAL_USD': 1000000}
 FILTER_VALUES_WA = ['DURATION', 'WARF']
@@ -22,7 +22,7 @@ TRANSACTIONS_MODES = ['NET_MV', 'NOTIONAL_USD']
 
 # Query fields
 IDENTIFIER_COLUMNS = ['closing_date', 'position_id', 'security_name', 'bbgid_v2', 'lbu_group', 'lbu_code', 'fund_code', 'account_code']
-STATIC_COLUMNS = ['country_report', 'manager', 'fwd_asset_type', 'l2_asset_type', 'l3_asset_type', 'bbg_asset_type', 'currency', 'maturity', 'securitized_credit_type', 'sw_rec_crncy']
+STATIC_COLUMNS = ['country_report', 'manager', 'fwd_asset_type', 'l1_asset_type', 'l2_asset_type', 'l3_asset_type', 'bbg_asset_type', 'currency', 'maturity', 'securitized_credit_type', 'sw_rec_crncy']
 CHARACTERISTIC_COLUMNS = ['net_mv', 'duration', 'final_rating', 'final_rating_letter', 'maturity_range', 'mtge_factor', 'principal_factor', 'last_trade_date', 'position', 'unit', 'rate', 'warf']
 FORMULA_COLUMNS = {'currency_pair': 'IFF(sw_pay_crncy IS NULL OR sw_rec_crncy IS NULL, NULL, sw_pay_crncy || \'/\' || sw_rec_crncy)'}
 
@@ -293,6 +293,7 @@ def _patch_data(df, fx_df):
     # Apply L2 asset type to L3 asset type is blank
     df['L3_ASSET_TYPE'] = df.apply(lambda row: row['L2_ASSET_TYPE'] if row['L3_ASSET_TYPE'] == 'None' else row['L3_ASSET_TYPE'], axis=1)
     df['FWD_ASSET_TYPE'] = df.apply(lambda row: 'Cash' if row['BBG_ASSET_TYPE'] == 'Cash' else row['FWD_ASSET_TYPE'], axis=1)
+    df['FWD_ASSET_TYPE'] = df.apply(lambda row: row['L3_ASSET_TYPE'] if row['L1_ASSET_TYPE'] == 'Derivatives' else row['FWD_ASSET_TYPE'], axis=1)
     
     # Merge all PineBridge custodies under one
     df['MANAGER'] = df.apply(lambda row: 'Pinebridge' if 'Pinebridge' in row['MANAGER'] else row['MANAGER'], axis=1)
@@ -827,7 +828,8 @@ bar.progress(60, text="Computing values...")
 build_value_columns()
 bar.progress(70, text="Building grid...")
 build_grid()
-st.write('_Disclaimer: the development of this page is still underway. Please take the data with a grain of salt... The page may freeze if there are too many datapoints, we are looking to deploy this soon on the FWD environment._')
+st.write('The stated FWD asset type is overriden, BBG_ASSET_TYPE = "Cash" will be assigned to "Cash" FWD Asset Type, L1_ASSET_TYPE = "Derivatives" will be using the actual L3 Asset Type.')
+st.write('_The page may freeze if there are too many datapoints, to solve the issue close the tab and reopen._')
 st.write('')
 bar.progress(80, text="Plotting analysis...")
 build_analysis()
