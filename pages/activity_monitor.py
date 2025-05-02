@@ -739,7 +739,7 @@ def build_analysis():
     
     #region Build charts
         
-    analysis_columns = ['SAA_GROUP', 'FUND_CODE', 'FINAL_RATING_LETTER', 'COUNTRY_REPORT', 'MANAGER', 'MATURITY_RANGE', 'CURRENCY']
+    analysis_columns = ['SAA_GROUP', 'FUND_CODE', 'FINAL_RATING_LETTER', 'COUNTRY_REPORT', 'MANAGER', 'MATURITY_RANGE', 'CURRENCY', 'L3_ASSET_TYPE']
     
     if merged_df['BBG_ASSET_TYPE'].isin(['Foreign Exchange Forward']).any():
         analysis_columns.append('CURRENCY_PAIR')
