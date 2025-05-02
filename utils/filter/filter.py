@@ -125,7 +125,7 @@ def build_date_filter_buttons(label: str, dates: list[datetime], default: dateti
         build_date_filter(label, dates, default=None, key=key)
         return
 
-    if ss[key + '_state']:
+    if ss[key + '_state'] and key + '_override' in ss:
         ss[key] = pill_dates[ss[key + '_override']]
         
     def reset_pills():
