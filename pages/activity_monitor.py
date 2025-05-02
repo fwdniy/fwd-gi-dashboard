@@ -54,7 +54,7 @@ def build_filters():
         build_date_filter_buttons('Valuation Date', dates, key='selected_date')
         build_date_filter_buttons('Comparison Date', dates, key='selected_comparison_date', date=ss['selected_date'])
         
-        build_multi_select_filter('Columns', FILTER_COLUMNS, 'selected_columns', ['LBU Group', 'L3 Asset Type'], True)
+        build_multi_select_filter('Columns', FILTER_COLUMNS, 'selected_columns', ['LBU Group', 'FWD Asset Type'], True)
         build_multi_select_filter('Values', FILTER_VALUES, 'selected_values', ['Notional', 'Net MV'], True)
         
         if all(item in ss['selected_values_converted'] for item in TRANSACTIONS_MODES):
@@ -641,7 +641,7 @@ def build_grid():
             value_columns.append(column['field'])
     
     grid_df = df.groupby(selected_columns_converted)[value_columns + [item for sublist in ss.transaction_column_headers.values() for item in sublist]].sum().reset_index()
-    total_df = grid_df.groupby('L3_ASSET_TYPE')[value_columns + [item for sublist in ss.transaction_column_headers.values() for item in sublist]].sum().reset_index()
+    total_df = grid_df.groupby('FWD_ASSET_TYPE')[value_columns + [item for sublist in ss.transaction_column_headers.values() for item in sublist]].sum().reset_index()
     total_df['LBU_GROUP'] = 'Total'
     
     grid_df = pd.concat([grid_df, total_df], axis=0)
