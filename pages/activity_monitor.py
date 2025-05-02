@@ -292,6 +292,7 @@ def _patch_data(df, fx_df):
     
     # Apply L2 asset type to L3 asset type is blank
     df['L3_ASSET_TYPE'] = df.apply(lambda row: row['L2_ASSET_TYPE'] if row['L3_ASSET_TYPE'] == 'None' else row['L3_ASSET_TYPE'], axis=1)
+    df['FWD_ASSET_TYPE'] = df.apply(lambda row: 'Cash' if row['BBG_ASSET_TYPE'] == 'Cash' else row['FWD_ASSET_TYPE'], axis=1)
     
     # Merge all PineBridge custodies under one
     df['MANAGER'] = df.apply(lambda row: 'Pinebridge' if 'Pinebridge' in row['MANAGER'] else row['MANAGER'], axis=1)
