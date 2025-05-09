@@ -292,8 +292,12 @@ def _patch_data(df, fx_df):
     
     # Apply L2 asset type to L3 asset type is blank
     df['L3_ASSET_TYPE'] = df.apply(lambda row: row['L2_ASSET_TYPE'] if row['L3_ASSET_TYPE'] == 'None' else row['L3_ASSET_TYPE'], axis=1)
+    # Send cash to cash account
     df['FWD_ASSET_TYPE'] = df.apply(lambda row: 'Cash' if row['BBG_ASSET_TYPE'] == 'Cash' else row['FWD_ASSET_TYPE'], axis=1)
+    # Use L3 asset type for derivatives
     df['FWD_ASSET_TYPE'] = df.apply(lambda row: row['L3_ASSET_TYPE'] if row['L1_ASSET_TYPE'] == 'Derivatives' else row['FWD_ASSET_TYPE'], axis=1)
+    # Send interim T bills to cash
+    df['FWD_ASSET_TYPE'] = df.apply(lambda row: 'Cash' if (row['BBG_ASSET_TYPE'] == 'Treasury' and row['FWD_ASSET_TYPE'] != 'Sovereign Bonds') else row['FWD_ASSET_TYPE'], axis=1)
     
     # Merge all PineBridge custodies under one
     df['MANAGER'] = df.apply(lambda row: 'Pinebridge' if 'Pinebridge' in row['MANAGER'] else row['MANAGER'], axis=1)
