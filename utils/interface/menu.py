@@ -25,8 +25,8 @@ def authenticated_menu(page_name):
         admin = ss['admin']
         group = permissions == 'Group'
 
-        pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos", "pages/activity_monitor.py": "Activity Monitor", "pages/cashflow_builder.py": "Cashflow Builder" },
-                 "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation"},
+        pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos", "pages/activity_monitor.py": "Activity Monitor" },
+                 "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation", "pages/almatcher.py": "ALMatcher"},
                  "Admin": {"pages/users.py": "Users", "pages/lbu_manager.py": "LBU Manager"}}
         
         beta_pages = {"Group": {},
