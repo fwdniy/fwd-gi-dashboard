@@ -16,6 +16,13 @@ def menu(page_name):
     authenticated_menu(page_name)
 
     add_login_name()
+    
+    if 'previous_page' in ss and ss.previous_page != page_name:
+        ss.reset_variables = True
+    else:
+        ss.reset_variables = False
+    
+    ss.previous_page = page_name
 
 def authenticated_menu(page_name):
     with st.sidebar:
@@ -26,7 +33,7 @@ def authenticated_menu(page_name):
         group = permissions == 'Group'
 
         pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos", "pages/activity_monitor.py": "Activity Monitor" },
-                 "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation", "pages/almatcher.py": "ALMatcher"},
+                 "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation", "pages/projector.py": "Projector"},
                  "Admin": {"pages/users.py": "Users", "pages/lbu_manager.py": "LBU Manager"}}
         
         beta_pages = {"Group": {"pages/cashflow_builder.py": "Cashflow Builder"},

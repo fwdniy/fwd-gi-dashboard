@@ -12,7 +12,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from utils.interface.download import create_download_button
 
-menu('pages/almatcher.py')
+menu('pages/projector.py')
         
 def load_data(bar):        
     (cf_df, pos_df) = _get_data(ss.selected_date)
@@ -55,7 +55,7 @@ def _clean_pos(pos_df):
         st.error('No data available for the selected fund.')
         st.stop()
     
-    with st.expander('Field Filters', True):
+    with st.expander('Field Filters'):
         remove_securities = _build_column_filter('Securities', pos_df_filtered['SECURITY_NAME'].unique(), 'selected_securities', default_skip_securities)
         remove_bbg_asset_types = _build_column_filter('BBG Asset Type', pos_df_filtered['BBG_ASSET_TYPE'].unique(), 'selected_bbg_asset_types', default_remove_bbg_asset_types)
         remove_fwd_asset_types = _build_column_filter('FWD Asset Type', pos_df_filtered['FWD_ASSET_TYPE'].unique(), 'selected_fwd_asset_types', default_remove_fwd_asset_types)
@@ -182,17 +182,39 @@ def _build_liability_groups_filter():
     
     groups = list(liab_df['GROUP_NAME'].unique())
     
-    group = st.pills('Liability Groups', groups, default=groups[0], key='selected_liability_group')
+    if len(groups) == 0:
+        st.error('No liabilities found for provided date')
+        st.run()
+        
+    name_mapping = {'Trad': 'Trad Life', 'Max Focus': 'MFx', 'Wealth ICON': 'WIx'}
+    groups_label = [name_mapping[group] if group in name_mapping else group for group in groups]
     
-    ss.selected_funds = _get_saa_groups()
+    st.pills('Liability Groups', groups_label, default=groups_label[0], key='selected_liability_group_label')
+    
+    selected_group = ss.selected_liability_group = [key for key, value in name_mapping.items() if value == ss.selected_liability_group_label][0] if ss.selected_liability_group_label in name_mapping.values() else ss.selected_liability_group_label
+    
+    ss.selected_funds = _get_saa_groups(selected_group)
 
-def _get_saa_groups():
-    funds_df = query(f"SELECT short_name FROM supp.fund WHERE saa_group = '{ss.selected_liability_group}';")
+def _build_liability_options_filter():
+    st.pills('Cashflow Options', ['Premium Cashflows', 'Non-Guaranteed Liabilities'], default=None, key='selected_liability_options', selection_mode='multi')
+    
+    if 'Premium Cashflows' in ss.selected_liability_options:
+        ss.premium_cf = True
+    else:
+        ss.premium_cf = False
+    
+    if 'Non-Guaranteed Liabilities' in ss.selected_liability_options:
+        ss.ng_liab_cf = True
+    else:
+        ss.ng_liab_cf = False
+
+def _get_saa_groups(selected_group):
+    funds_df = query(f"SELECT short_name FROM supp.fund WHERE saa_group = '{selected_group}';")
     
     return funds_df['SHORT_NAME'].tolist()
 
 def _get_liabilities():    
-    liab_df = ss["liab_df"] = query(f"SELECT group_name, year, value FROM liability_profile.hk_liabilities WHERE as_of_date = (SELECT max(as_of_date) AS max_date FROM liability_profile.hk_liabilities WHERE as_of_date <= '{ss.selected_date}');")
+    liab_df = ss["liab_df"] = query(f"SELECT group_name, year, guaranteed_cf, non_guaranteed_cf, premium_cf FROM liability_profile.hk_liabilities WHERE as_of_date = (SELECT max(as_of_date) AS max_date FROM liability_profile.hk_liabilities WHERE as_of_date <= '{ss.selected_date}');")
     
     return liab_df
 
@@ -206,11 +228,12 @@ def build_filters():
         build_date_filter_buttons('Asset Date', dates, key='selected_date')
         build_date_filter_buttons('Liability Date', dates, 'MTD', key='selected_comparison_date')
         _build_liability_groups_filter()
+        _build_liability_options_filter()
     
     if ss.selected_funds == []:
         st.error('Please select at least one fund')
         st.stop()
-
+        
 def build_charts(bar, bonds, df):
     bar.progress(90, "Building asset flows chart...")
     _build_asset_flows(df)
@@ -278,22 +301,42 @@ def _build_asset_flows(df):
     st.plotly_chart(fig)
 
 def build_alm_chart(df):
-    liab_df = ss.liab_df
-    liab_df = liab_df[liab_df['GROUP_NAME'] == ss.selected_liability_group]
-    liab_df = liab_df[['YEAR', 'VALUE']]
-    liab_df['MODE'] = 'liab'
+    g_liab_df = ss.liab_df
+    g_liab_df = g_liab_df[g_liab_df['GROUP_NAME'] == ss.selected_liability_group]
+    g_liab_df = g_liab_df[['YEAR', 'GUARANTEED_CF']]
+    g_liab_df = g_liab_df.rename(columns={'GUARANTEED_CF': 'VALUE'})
+    g_liab_df['MODE'] = 'Guaranteed Liabilities'
     
+    ng_liab_df = ss.liab_df
+    ng_liab_df = ng_liab_df[ng_liab_df['GROUP_NAME'] == ss.selected_liability_group]
+    ng_liab_df = ng_liab_df[['YEAR', 'NON_GUARANTEED_CF']]
+    ng_liab_df = ng_liab_df.rename(columns={'NON_GUARANTEED_CF': 'VALUE'})
+    ng_liab_df['MODE'] = 'Non Guaranteed Liabilities'
+    
+    premium_df = ss.liab_df
+    premium_df = premium_df[premium_df['GROUP_NAME'] == ss.selected_liability_group]
+    premium_df = premium_df[['YEAR', 'PREMIUM_CF']]
+    premium_df = premium_df.rename(columns={'PREMIUM_CF': 'VALUE'})
+    premium_df['MODE'] = 'Premium Cashflows'
+        
     asset_df = df.groupby(['YEAR'])['VALUE'].sum().reset_index()
     asset_df['VALUE'] = asset_df['VALUE'] / 1000000
-    asset_df['MODE'] = 'asset'
+    asset_df['MODE'] = 'Asset Cashflows'
     
-    al_df = pd.concat([liab_df, asset_df], ignore_index=True)
+    dfs = [g_liab_df, asset_df]
     
-    color_discrete_map = {'asset': '#F3BB90', 'liab': '#EDEFF0'}
+    if ss.premium_cf:
+        dfs.append(premium_df)
+    if ss.ng_liab_cf:
+        dfs.append(ng_liab_df)
+    
+    al_df = pd.concat(dfs, ignore_index=True)
+    
+    color_discrete_map = {'Asset Cashflows': '#F3BB90', 'Guaranteed Liabilities': '#EDEFF0', 'Premium Cashflows': '#B5E6A2', 'Non Guaranteed Liabilities': '#F2CEEF'}
 
     fig = px.bar(al_df, x='YEAR', y='VALUE', color='MODE', color_discrete_map=color_discrete_map)
     
-    net_values = pd.merge(asset_df, liab_df, on='YEAR', how='outer', suffixes=('_asset', '_liab'))
+    net_values = pd.merge(asset_df, g_liab_df, on='YEAR', how='outer', suffixes=('_asset', '_liab'))
     net_values.fillna(0, inplace=True)
     net_values['NET_VALUE'] = net_values['VALUE_asset'] + net_values['VALUE_liab']
 
@@ -304,7 +347,10 @@ def build_alm_chart(df):
         y=net_values['NET_VALUE'],
         mode='markers',
         name='Net Value',
-        marker=dict(color='red', size=10, symbol=141)
+        marker=dict(color='#CC0000', size=10, symbol=141, line=dict(
+                color='#CC0000',
+                width=3
+            ))
     ))
     
     fig.add_trace(go.Scatter(
@@ -312,14 +358,13 @@ def build_alm_chart(df):
         y=net_values['CUMULATIVE_NET'],
         mode='lines',
         name='Cumulative Net Value',
-        line=dict(color='red', width=2, dash='dash')
+        line=dict(color='#CC0000', width=2, dash='dash')
     ))
     
     st.plotly_chart(fig)
     
     return net_values
     
-
 build_filters()
 
 bar = st.progress(0, text="Getting data..")
