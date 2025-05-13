@@ -301,44 +301,43 @@ def _build_asset_flows(df):
     st.plotly_chart(fig)
 
 def build_alm_chart(df):
-    g_liab_df = ss.liab_df
-    g_liab_df = g_liab_df[g_liab_df['GROUP_NAME'] == ss.selected_liability_group]
-    g_liab_df = g_liab_df[['YEAR', 'GUARANTEED_CF']]
-    g_liab_df = g_liab_df.rename(columns={'GUARANTEED_CF': 'VALUE'})
-    g_liab_df['MODE'] = 'Guaranteed Liabilities'
-    
-    ng_liab_df = ss.liab_df
-    ng_liab_df = ng_liab_df[ng_liab_df['GROUP_NAME'] == ss.selected_liability_group]
-    ng_liab_df = ng_liab_df[['YEAR', 'NON_GUARANTEED_CF']]
-    ng_liab_df = ng_liab_df.rename(columns={'NON_GUARANTEED_CF': 'VALUE'})
-    ng_liab_df['MODE'] = 'Non Guaranteed Liabilities'
-    
-    premium_df = ss.liab_df
-    premium_df = premium_df[premium_df['GROUP_NAME'] == ss.selected_liability_group]
-    premium_df = premium_df[['YEAR', 'PREMIUM_CF']]
-    premium_df = premium_df.rename(columns={'PREMIUM_CF': 'VALUE'})
-    premium_df['MODE'] = 'Premium Cashflows'
-        
-    asset_df = df.groupby(['YEAR'])['VALUE'].sum().reset_index()
-    asset_df['VALUE'] = asset_df['VALUE'] / 1000000
-    asset_df['MODE'] = 'Asset Cashflows'
-    
-    dfs = [g_liab_df, asset_df]
+    liab_dict = {'GUARANTEED_CF': 'Guaranteed Liabilities', 'NON_GUARANTEED_CF': 'Non Guaranteed Liabilities', 'PREMIUM_CF': 'Premium Cashflows'}
+    liab_cols = ['GUARANTEED_CF']
     
     if ss.premium_cf:
-        dfs.append(premium_df)
+        liab_cols.append('PREMIUM_CF')
     if ss.ng_liab_cf:
-        dfs.append(ng_liab_df)
+        liab_cols.append('NON_GUARANTEED_CF')
     
-    al_df = pd.concat(dfs, ignore_index=True)
+    for column in liab_cols:
+        temp_df = ss.liab_df[ss.liab_df['GROUP_NAME'] == ss.selected_liability_group]
+        temp_df = temp_df[['YEAR', column]]
+        temp_df = temp_df.rename(columns={column: 'VALUE'})
+        temp_df['MODE'] = liab_dict[column]
+        
+        if liab_cols.index(column) == 0:
+            liab_df = temp_df
+        else:
+            liab_df = pd.concat([liab_df, temp_df], ignore_index=True)
+    
+    asset_df = df.groupby(['YEAR'])['VALUE'].sum().reset_index()
+    asset_df['VALUE'] = asset_df['VALUE'] / 1000000
+    asset_df['MODE'] = 'Asset Cashflows'    
+    
+    al_df = pd.concat([liab_df, asset_df], ignore_index=True)
+    
+    net_values = al_df.pivot(index='YEAR', columns='MODE', values='VALUE').reset_index()
+    st.write(net_values)
     
     color_discrete_map = {'Asset Cashflows': '#F3BB90', 'Guaranteed Liabilities': '#EDEFF0', 'Premium Cashflows': '#B5E6A2', 'Non Guaranteed Liabilities': '#F2CEEF'}
 
     fig = px.bar(al_df, x='YEAR', y='VALUE', color='MODE', color_discrete_map=color_discrete_map)
     
-    net_values = pd.merge(asset_df, g_liab_df, on='YEAR', how='outer', suffixes=('_asset', '_liab'))
     net_values.fillna(0, inplace=True)
-    net_values['NET_VALUE'] = net_values['VALUE_asset'] + net_values['VALUE_liab']
+    net_values['NET_VALUE'] = net_values['Asset Cashflows']
+    
+    for column in liab_cols:
+        net_values['NET_VALUE'] = net_values['NET_VALUE'] + net_values[liab_dict[column]]
 
     net_values['CUMULATIVE_NET'] = net_values['NET_VALUE'].cumsum()
     
