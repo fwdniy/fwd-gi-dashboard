@@ -106,6 +106,9 @@ def build_date_filter(label: str, dates: list[datetime], default:datetime = None
     st.date_input(label, default, min(dates), max(dates), key, on_change=on_change)
 
 def build_date_filter_buttons(label: str, dates: list[datetime], default: datetime = None, key: str = 'selected_date', date: datetime = None, pill_dates: list[datetime] = None):
+    if ss.reset_variables:
+        ss.pop(key + '_override')
+    
     if date == None:
         date = datetime.now().date()
         pill_dates = {'Today': max(dates).date(), 'YTD': get_ytd(date, dates), 'QTD': get_qtd(date, dates), 'MTD': get_mtd(date, dates)}
