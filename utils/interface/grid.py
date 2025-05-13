@@ -428,4 +428,4 @@ class AgGridBuilder:
             go["onFirstDataRendered"] = on_first_data_rendered
         
         self.go = go
-        self.grid = AgGrid(self.df, gridOptions=go, height=height, themITe='streamlit', allow_unsafe_jscode=True, custom_css=self.custom_css, reload_data=reload_data, update_on=update_on, update_mode=update_mode)
+        self.grid = AgGrid(self.df, gridOptions=go, height=height, theme='streamlit', allow_unsafe_jscode=True, custom_css=self.custom_css, reload_data=reload_data, update_on=update_on, update_mode=update_mode, enable_enterprise_modules=True)
