@@ -21,12 +21,12 @@ def get_asset_allocation(current_date, comparison_date) -> pd.DataFrame:
     
     query_string: str = f"SELECT * FROM asset_allocation_new WHERE closing_date IN ('{current_date_string}', '{comparison_date_string}');"
     
-    if 'asset_allocation_sql' in ss or query_string == ss.asset_allocation_sql:
+    if 'asset_allocation_sql' in ss and query_string == ss.asset_allocation_sql:
         return ss.asset_allocation
     
     df: pd.DataFrame = query(query_string)
     
-    ss['asset_allocation_sql']
+    ss['asset_allocation_sql'] = query_string
     ss['asset_allocation'] = df
     
     return df
