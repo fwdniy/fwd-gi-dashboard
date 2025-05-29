@@ -37,6 +37,10 @@ with st.spinner('Loading your data'):
     df = df[df['FUND_CODE'].isin(fund_codes)]
     df_current = df[(df['CLOSING_DATE'].dt.date == current_date) & (df['LEVEL'] <= level)]
     df_compare = df[(df['CLOSING_DATE'].dt.date == comparison_date) & (df['LEVEL'] <= level)]
+    
+    if len(df_current) == 0 or len(df_compare) == 0:
+        st.error('This fund has no assets for the selected dates!')
+        st.stop()
 
     group_columns = ['OUTPUT_ORDER', 'LEVEL', 'ASSET_TYPE']
     other_columns = [col for col in df_current.columns if col not in group_columns and not pd.api.types.is_datetime64_any_dtype(df_current[col]) and not pd.api.types.is_string_dtype(df_current[col])]
