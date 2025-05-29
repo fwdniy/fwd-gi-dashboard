@@ -32,7 +32,7 @@ if len(fund_codes) == 0:
     st.stop()
 
 with st.spinner('Loading your data'):
-    df = get_asset_allocation()
+    df = get_asset_allocation(current_date, comparison_date)
     
     df = df[df['FUND_CODE'].isin(fund_codes)]
     df_current = df[(df['CLOSING_DATE'].dt.date == current_date) & (df['LEVEL'] <= level)]
