@@ -15,13 +15,18 @@ def get_funnelweb_dates() -> list[datetime]:
     
     return dates
 
-def get_asset_allocation() -> pd.DataFrame:
-    if 'asset_allocation' in ss:
-        return ss['asset_allocation']
+def get_asset_allocation(current_date, comparison_date) -> pd.DataFrame:    
+    current_date_string = current_date.strftime('%Y-%m-%d')
+    comparison_date_string = comparison_date.strftime('%Y-%m-%d')
     
-    query_string: str = 'SELECT * FROM asset_allocation_new'
+    query_string: str = f"SELECT * FROM asset_allocation_new WHERE closing_date IN ('{current_date_string}', '{comparison_date_string}');"
+    
+    if query_string == ss.asset_allocation_sql:
+        return ss.asset_allocation
+    
     df: pd.DataFrame = query(query_string)
     
+    ss['asset_allocation_sql']
     ss['asset_allocation'] = df
     
     return df
