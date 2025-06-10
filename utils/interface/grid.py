@@ -1,8 +1,8 @@
 import streamlit as st
-from st_aggrid import AgGrid, GridOptionsBuilder, JsCode
+from st_aggrid import AgGrid, GridOptionsBuilder, JsCode, ColumnsAutoSizeMode
 import math
 
-def format_numbers(decimal_points = 2, divide_by = 1):
+def format_numbers(decimal_points = 2, divide_by = 1, percentage = False):
     number_formatting = """
             function(params) {
                 if (params.value == null) {
@@ -12,11 +12,16 @@ def format_numbers(decimal_points = 2, divide_by = 1):
                     if (value === 0) {
                         return '-';
                     }
-                    value = value.toLocaleString(undefined, { minimumFractionDigits: decimal_points, maximumFractionDigits: decimal_points });
+                    decimal_logic
                     return value;
                 }
             }
         """
+        
+    if not percentage:
+        number_formatting = number_formatting.replace('decimal_logic', 'value = value.toLocaleString(undefined, { minimumFractionDigits: decimal_points, maximumFractionDigits: decimal_points });')
+    else:
+        number_formatting = number_formatting.replace('decimal_logic', "value = value.toLocaleString(undefined, { style: 'percent', minimumFractionDigits: decimal_points, maximumFractionDigits: decimal_points });")
     
     number_formatting = number_formatting.replace('decimal_points', str(decimal_points)).replace('divide_by', str(divide_by))
 
@@ -226,16 +231,19 @@ class AgGridBuilder:
                 self.gb.configure_column(field=column, valueFormatter=value_formatter(), pinned=pinned, rowGroup=row_group, sort=sort, hide=hide, header_name=label, editable=editable, filter=False)
 
     def add_column(self, column, value_formatter=format_numbers, cell_style=conditional_formatting, cell_style_ranges=None, filter=False):
+        if callable(value_formatter):
+            value_formatter = format_numbers()
+        
         if cell_style == None and value_formatter == None:
             self.gb.configure_column(field=column, filter=False)
         elif cell_style == None:
-            self.gb.configure_column(field=column, valueFormatter=value_formatter(), filter=filter)
+            self.gb.configure_column(field=column, valueFormatter=value_formatter, filter=filter)
         elif type(cell_style) == dict and value_formatter == None:
             self.gb.configure_column(field=column, cellStyle=cell_style, filter=filter)
         elif cell_style_ranges == None:
-            self.gb.configure_column(field=column, valueFormatter=value_formatter(), cellStyle=cell_style(), filter=filter)
+            self.gb.configure_column(field=column, valueFormatter=value_formatter, cellStyle=cell_style(), filter=filter)
         else:
-            self.gb.configure_column(field=column, valueFormatter=value_formatter(), cellStyle=cell_style(cell_style_ranges[0], cell_style_ranges[1], cell_style_ranges[2]), filter=filter)
+            self.gb.configure_column(field=column, valueFormatter=value_formatter, cellStyle=cell_style(cell_style_ranges[0], cell_style_ranges[1], cell_style_ranges[2]), filter=filter)
         
     def set_pivot_column(self, column='CLOSING_DATE', comparator = None):
         if comparator != None:
