@@ -403,7 +403,7 @@ class AgGridBuilder:
     def add_button_column(self):
         self.gb.configure_column('ADD', cellRenderer=JsCode(AgGridBuilder.buttonString))
     
-    def show_grid(self, height: float = 630, reload_data: bool = False, update_on: list[str] = [], update_mode: str = 'MODEL_CHANGED', custom_functions: dict[str, str] = {}, column_order: list[str] = []):
+    def show_grid(self, height: float = 630, reload_data: bool = False, update_on: list[str] = [], update_mode: str = 'MODEL_CHANGED', custom_functions: dict[str, str] = {}, column_order: list[str] = [], autofit = True):
         go = self.gb.build()
         
         if column_order != []:
@@ -415,13 +415,14 @@ class AgGridBuilder:
             for key, value in custom_functions.items():
                 go[key] = value
         
-        autofit = JsCode("""
+        autofit_code = JsCode("""
         function onFirstDataRendered(params) {
             params.api.autoSizeAllColumns();
         }
         """)
         
-        go["onFirstDataRendered"] = autofit
+        if autofit:
+            go["onFirstDataRendered"] = autofit_code
         
         if self.charts != []:
             (on_first_data_rendered, height) = self.build_charts()
