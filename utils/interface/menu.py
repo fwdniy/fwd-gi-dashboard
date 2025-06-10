@@ -1,7 +1,8 @@
 import streamlit as st
 from utils.authenticate import authenticate
-from utils.snowflake.snowflake import query
+from utils.snowflake.snowflake import query, non_query
 from streamlit import session_state as ss
+from datetime import datetime
 
 def menu(page_name):
     apply_formatting()
@@ -12,6 +13,8 @@ def menu(page_name):
         st.stop()
 
     get_permissions()
+
+    add_activity(page_name)
 
     authenticated_menu(page_name)
 
@@ -132,3 +135,11 @@ def get_permissions(force=False):
     elif len(df) == 0:
         st.write(f'You have no permissions set... Please contact {st.secrets["admin"]["name"]} to get access!')
         st.stop()
+
+def add_activity(page_name):
+    if "ST_OAUTH_EMAIL" not in st.session_state:
+        return
+
+    query_string = f"INSERT INTO supp.streamlit_activity (timestamp, email, name, page) VALUES ('{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}', '{ss.ST_OAUTH_EMAIL}', '{page_name}');"
+    
+    non_query(query_string)
