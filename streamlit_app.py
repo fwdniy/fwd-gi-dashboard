@@ -13,8 +13,10 @@ st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["na
 st.write(f'Your permissions are set to {ss["permissions"]}.')
 
 with st.expander("Release Notes", True):
+    st.write("2025/06/10")
+    st.write("- Collateral Calculator: initial version released, for corporate bond CSAs with Bermuda only")
     st.write("2025/05/13")
-    st.write("- ALMatcher: Cashflow Builder changed to ALMatcher, liabilities introduced for limited portfolios")
+    st.write("- Projector: Cashflow Builder changed to Projector, liabilities introduced for limited portfolios")
     st.write("2025/04/17")
     st.write("- Cashflow Builder: initial version released")
     st.write("2025/04/14")

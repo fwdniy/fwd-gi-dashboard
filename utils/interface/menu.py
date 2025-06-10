@@ -36,7 +36,7 @@ def authenticated_menu(page_name):
         group = permissions == 'Group'
 
         pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos", "pages/activity_monitor.py": "Activity Monitor" },
-                 "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation", "pages/projector.py": "Projector"},
+                 "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation", "pages/projector.py": "Projector", "pages/collateral.py": "Collateral Calculator"},
                  "Admin": {"pages/users.py": "Users", "pages/lbu_manager.py": "LBU Manager"}}
         
         beta_pages = {"Group": {"pages/cashflow_builder.py": "Cashflow Builder"},
