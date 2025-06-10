@@ -138,10 +138,7 @@ def get_permissions(force=False):
 
 def add_activity(page_name):
     if "ST_OAUTH_EMAIL" not in st.session_state:
-        st.info('Logging activity failed...')
         return
-
-    st.info('Logging activity...')
     
     query_string = f"INSERT INTO supp.streamlit_activity (timestamp, email, name, page) VALUES ('{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}', '{ss.ST_OAUTH_EMAIL}', '{ss.nickname}', '{page_name}');"
     
