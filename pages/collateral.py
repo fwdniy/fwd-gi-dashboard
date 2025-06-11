@@ -91,7 +91,7 @@ def _get_valuation_percentage(date):
     if 'valuation_df' in ss:
         return ss.valuation_df
     
-    valuation_df = ss.valuation_df = query(f"WITH max_dates AS (SELECT counterparty, max(effective_date) AS max_date FROM supp.collateral_fund GROUP BY counterparty) SELECT v.counterparty, asset_type, rating_upper, rating_lower, tenor_upper, tenor_lower, percentage FROM supp.collateral_valuation v, max_dates d WHERE v.counterparty = d.counterparty AND v.effective_date = d.max_date AND v.effective_date <= '{date.strftime('%Y-%m-%d')}';")
+    valuation_df = ss.valuation_df = query(f"WITH max_dates AS (SELECT counterparty, max(effective_date) AS max_date FROM supp.collateral_fund GROUP BY counterparty) SELECT effective_date, v.counterparty, asset_type, rating_lower, rating_upper, tenor_lower, tenor_upper, percentage FROM supp.collateral_valuation v, max_dates d WHERE v.counterparty = d.counterparty AND v.effective_date = d.max_date AND v.effective_date <= '{date.strftime('%Y-%m-%d')}';")
     
     return valuation_df
 
@@ -210,25 +210,13 @@ def assign_valuation_percentage(df, valuation_df, cp_logic_df, rating_ladder, ra
     #region Prepare ratings
     
     filtered_valuation_df = valuation_df[(valuation_df['COUNTERPARTY'] == COUNTERPARTIES[ss.selected_cp[0]]) & valuation_df['ASSET_TYPE'].isin(ss.selected_asset_type)].copy()
-    filtered_valuation_df['RATING_UPPER_INDEX'] = filtered_valuation_df['RATING_UPPER'].map(rating_ladder)
     filtered_valuation_df['RATING_LOWER_INDEX'] = filtered_valuation_df['RATING_LOWER'].map(rating_ladder)
+    filtered_valuation_df['RATING_UPPER_INDEX'] = filtered_valuation_df['RATING_UPPER'].map(rating_ladder)
     
     rating_fields = _build_agency_rating_mapping(cp_logic_df, rating_mapping_df)
     
     #endregion
-        
-    #region Display Logic
-    
-    with st.expander('Counterparty Logic'):
-        grid = AgGridBuilder(cp_logic_df, min_width=200)
-        grid.show_grid(height=300, autofit=False)
-    
-    with st.expander("Counterparty Valuation Percentage"):
-        grid = AgGridBuilder(filtered_valuation_df, min_width=200)
-        grid.show_grid(height=300, autofit=False)
-        
-    #endregion
-    
+            
     df['VALUATION_PERCENTAGE'] = None
     df['RATING'] = None
     
@@ -292,7 +280,7 @@ def assign_valuation_percentage(df, valuation_df, cp_logic_df, rating_ladder, ra
     # Filter out non eligible bonds
     df = df[~df['VALUATION_PERCENTAGE'].isna()]
     
-    return df
+    return df, filtered_valuation_df
 
 def _build_agency_rating_mapping(cp_logic_df, rating_mapping_df):
     logic_fields = list(cp_logic_df['FIELD'])
@@ -384,7 +372,23 @@ def _filter_dataframe(row, filter_df):
         
     return filter_df
 
-def build_grid(df, height):
+def build_grid(df, cp_logic_df, filtered_valuation_df):
+    logic_height = 300
+    result_height = 600
+    
+    #region Display Logic
+    
+    with st.expander('Counterparty Logic'):
+        grid = AgGridBuilder(cp_logic_df, min_width=200)
+        grid.show_grid(height=logic_height, autofit=False)
+    
+    with st.expander("Counterparty Valuation Percentage"):
+        grid = AgGridBuilder(filtered_valuation_df, min_width=200)
+        grid.add_column('PERCENTAGE', value_formatter=format_numbers(1, percentage=True), cell_style=None)
+        grid.show_grid(height=logic_height, autofit=False)
+        
+    #endregion
+    
     st.write(f'Total positions: {len(df)}')
     st.write(f"Total eligible collateral MV: ${df['COLLATERAL_MV'].sum() / 1000000:,.2f}mn")
     
@@ -398,7 +402,7 @@ def build_grid(df, height):
     grid.add_column(RESULT_FIELDS['PLEDGE_POS'], value_formatter=format_numbers(0), cell_style=None)
     grid.add_column(RESULT_FIELDS[TENOR_FIELD], value_formatter=format_numbers(1), cell_style=None)
     
-    grid.show_grid(height=height)
+    grid.show_grid(height=result_height)
 
 #endregion
 
@@ -408,5 +412,5 @@ cp_logic_df, selected_asset_type, cp_funds_df, funds_df = get_selection(logic_df
 
 df = map_hk_code(df, fund_mapping_df)
 result_df = filter_eligible_bonds(df, cp_logic_df, selected_asset_type)
-result_df = assign_valuation_percentage(result_df, valuation_df, cp_logic_df, rating_ladder, rating_mapping_df)
-build_grid(result_df, 600)
+result_df, filtered_valuation_df = assign_valuation_percentage(result_df, valuation_df, cp_logic_df, rating_ladder, rating_mapping_df)
+build_grid(result_df, cp_logic_df, filtered_valuation_df)
