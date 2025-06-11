@@ -145,7 +145,7 @@ def add_activity(page_name):
     if 'page_name' in ss and page_name == ss.page_name:
         return
     
-    query_string = f"INSERT INTO supp.streamlit_activity (timestamp, email, name, page) VALUES ('{datetime.now(ZoneInfo("Asia/Hong_Kong")).strftime('%Y-%m-%d %H:%M:%S')}', '{ss.ST_OAUTH_EMAIL}', '{ss.nickname}', '{page_name}');"
+    query_string = f"INSERT INTO supp.streamlit_activity (timestamp, email, name, page) VALUES ('{datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y-%m-%d %H:%M:%S')}', '{ss.ST_OAUTH_EMAIL}', '{ss.nickname}', '{page_name}');"
     
     non_query(query_string)
     
