@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 def menu(page_name):
     apply_formatting()
-    #set_title(page_name)
+    
     auth = authenticate()
 
     if not auth:
@@ -148,3 +148,5 @@ def add_activity(page_name):
     query_string = f"INSERT INTO supp.streamlit_activity (timestamp, email, name, page) VALUES ('{datetime.now(ZoneInfo("Asia/Hong_Kong")).strftime('%Y-%m-%d %H:%M:%S')}', '{ss.ST_OAUTH_EMAIL}', '{ss.nickname}', '{page_name}');"
     
     non_query(query_string)
+    
+    ss.page_name = page_name
