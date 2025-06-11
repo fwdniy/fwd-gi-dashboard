@@ -322,6 +322,10 @@ def filter_eligible_bonds(df, cp_logic_df, selected_asset_type):
         else:
             result_df = pd.concat([result_df, filter_df], ignore_index=True)
     
+    if len(result_df) == 0:
+        st.warning('No eligible collateral for this selection!')
+        st.stop()
+    
     return result_df.reset_index(drop=True)
 
     #st.write(f'Pledged positions summary')
