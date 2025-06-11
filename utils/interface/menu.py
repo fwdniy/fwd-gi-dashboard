@@ -3,6 +3,8 @@ from utils.authenticate import authenticate
 from utils.snowflake.snowflake import query, non_query
 from streamlit import session_state as ss
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
 
 def menu(page_name):
     apply_formatting()
@@ -14,11 +16,11 @@ def menu(page_name):
 
     get_permissions()
 
-    add_activity(page_name)
-
     authenticated_menu(page_name)
 
     add_login_name()
+    
+    add_activity(page_name)
     
     if 'previous_page' in ss and ss.previous_page != page_name:
         ss.reset_variables = True
@@ -140,6 +142,9 @@ def add_activity(page_name):
     if "ST_OAUTH_EMAIL" not in st.session_state:
         return
     
-    query_string = f"INSERT INTO supp.streamlit_activity (timestamp, email, name, page) VALUES ('{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}', '{ss.ST_OAUTH_EMAIL}', '{ss.nickname}', '{page_name}');"
+    if 'page_name' in ss and page_name == ss.page_name:
+        return
+    
+    query_string = f"INSERT INTO supp.streamlit_activity (timestamp, email, name, page) VALUES ('{datetime.now(ZoneInfo("Asia/Hong_Kong")).strftime('%Y-%m-%d %H:%M:%S')}', '{ss.ST_OAUTH_EMAIL}', '{ss.nickname}', '{page_name}');"
     
     non_query(query_string)
