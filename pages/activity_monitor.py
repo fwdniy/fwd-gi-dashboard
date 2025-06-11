@@ -678,15 +678,8 @@ def build_grid():
         grid.gb.configure_column(key, children=value)
     
     grid.gb.configure_column('Transactions', children=ss.transaction_columns)
-    
-    onSelectionChanged = JsCode("""
-        function onSelectionChanged(event) {
-            const selectedRows = event.api.getSelectedRows();
-            console.log(selectedRows);
-        }
-        """)
-    
-    grid.show_grid(update_on=[('selectionChanged', 2000)], update_mode="NO_UPDATE", custom_functions={"onSelectionChanged": onSelectionChanged})
+        
+    grid.show_grid(update_on=[('selectionChanged', 2000)], update_mode="NO_UPDATE")
     
     ss.selected_rows = grid.grid['selected_rows']      
 
