@@ -198,6 +198,28 @@ def _get_funds(csa_funds_df, fund_mapping_df, selected_cp):
 
 #region Filter Eligible Corporate Bonds
 
+def show_data(df, fund_mapping_df, cp_logic_df, selected_asset_type, valuation_df, rating_ladder, rating_mapping_df):
+    previous_data_exists = 'previous_cp_logic' in ss and 'previous_valuation_df' in ss and 'previous_eligible_collateral_df' in ss
+        
+    if previous_data_exists and ss.previous_counterparty == ss.selected_cp and ss.previous_asset_type == ss.selected_asset_type and ss.previous_funds == ss.selected_funds:
+        result_df = ss.previous_eligible_collateral_df
+        cp_logic_df = ss.previous_cp_logic
+        filtered_valuation_df = ss.previous_valuation_df
+    else:
+        df = map_hk_code(df, fund_mapping_df)
+        result_df = filter_eligible_bonds(df, cp_logic_df, selected_asset_type)
+        result_df, filtered_valuation_df = assign_valuation_percentage(result_df, valuation_df, cp_logic_df, rating_ladder, rating_mapping_df)
+    
+    build_grid(result_df, cp_logic_df, filtered_valuation_df)
+    
+    ss.previous_counterparty = ss.selected_cp
+    ss.previous_asset_type = ss.selected_asset_type
+    ss.previous_funds = ss.selected_funds
+    ss.previous_cp_logic = cp_logic_df
+    ss.previous_valuation_df = filtered_valuation_df
+    ss.previous_eligible_collateral_df = result_df
+    
+
 def map_hk_code(df, fund_mapping_df):
     selected_funds = ss.selected_funds
     filtered_fund_mapping_df = fund_mapping_df[fund_mapping_df['SHORT_NAME'].isin(selected_funds)]
@@ -414,7 +436,4 @@ st.write('Currently only supporting corporate bond CSAs in Bermuda')
 df, logic_df, csa_funds_df, fund_mapping_df, valuation_df, rating_ladder, rating_mapping_df = get_data()
 cp_logic_df, selected_asset_type, cp_funds_df, funds_df = get_selection(logic_df, csa_funds_df, fund_mapping_df)
 
-df = map_hk_code(df, fund_mapping_df)
-result_df = filter_eligible_bonds(df, cp_logic_df, selected_asset_type)
-result_df, filtered_valuation_df = assign_valuation_percentage(result_df, valuation_df, cp_logic_df, rating_ladder, rating_mapping_df)
-build_grid(result_df, cp_logic_df, filtered_valuation_df)
+show_data(df, fund_mapping_df, cp_logic_df, selected_asset_type, valuation_df, rating_ladder, rating_mapping_df)
