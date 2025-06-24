@@ -177,7 +177,10 @@ def __build_sql(df, title, columns, func = None):
                 if datatype == 'str':
                     value = f"'{value}'"
                 elif datatype == 'date':
-                    value = value
+                    if value == '':
+                        value = 'null'
+                    else:
+                        value = f"'{value}'"
                 
                 values.append(value)
             
