@@ -3,7 +3,7 @@
     {"name": "NAME", "datatype": "str", "type": "compulsory", "definition": "the Bloomberg name used to identify the account"},
     {"name": "FUND_SHORT_NAME", "datatype": "str", "type": "compulsory", "definition": "the short name used to idenfity the fund associated with the account", "sql": "SELECT short_name FROM supp.fund;"},
     {"name": "MANAGER", "datatype": "str", "type": "compulsory", "definition": "the manager of the account", "sql": "SELECT name FROM supp.manager;"},
-    {"name": "ASSET_TYPE", "datatype": "str", "type": "compulsory", "definition": "the intended asset type of the account", "sql": "SELECT name FROM asset_type_fwd;"},
+    {"name": "ASSET_TYPE", "datatype": "str", "type": "compulsory", "definition": "the intended asset type of the account", "sql": "SELECT name FROM supp.asset_type_fwd;"},
     {"name": "AUTO_ADDED", "datatype": "bool", "type": "compulsory", "definition": "whether the account was automatically added using a program and needs to be verified by a human"},
     {"name": "DATE_ADDED", "datatype": "date", "type": "compulsory", "definition": "the date the account was added to the database"},
     {"name": "DESCRIPTION", "datatype": "str", "type": "optional", "definition": "the description for this account, usually just the asset type"},
