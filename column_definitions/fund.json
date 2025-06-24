@@ -9,6 +9,8 @@
     {"name": "SAA_GROUP", "datatype": "str", "type": "compulsory", "definition": "the saa group of the fund, used in TAA template for Hong Kong only"},
     {"name": "VFA", "datatype": "bool", "type": "compulsory", "definition": "whether the fund is using a variable fee approach (typically par = VFA and non-par = non-VFA, UL breaks the role and is non-par but VFA)"},
     {"name": "COMMENT", "datatype": "str", "type": "optional", "definition": "any additional comments"},
+    {"name": "CSA_NAME", "datatype": "str", "type": "optional", "definition": "Full name used wihtin CSAs"},
+    {"name": "HK_CODE", "datatype": "str", "type": "optional", "definition": "Fund code used locally in HK, also the Bloomberg AIM portfolio code and is found in AIM account codes"},
     {"name": "ALTERNATE_PAM_ACCOUNT", "datatype": "str", "type": "legacy", "definition": "deprecated"},
     {"name": "PAM_ACCOUNT", "datatype": "str", "type": "legacy", "definition": "deprecated"},
     {"name": "BBG_ACCOUNT", "datatype": "str", "type": "legacy", "definition": "deprecated"},
