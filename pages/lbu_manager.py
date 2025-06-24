@@ -156,9 +156,9 @@ def __upload_data(title, columns, func = None):
 def __build_sql(df, title, columns, func = None):
     if st.button(f'Build {title} SQL'):
         df_columns = list(df.columns)
-        df_columns_string = "', '".join(df_columns)
+        df_columns_string = ", ".join(df_columns)
         
-        sql = f'INSERT INTO supp.{title.lower()} (\'{df_columns_string}\') VALUES '
+        sql = f'INSERT INTO supp.{title.lower()} ({df_columns_string}) VALUES '
         
         datatypes = {column.name: column.datatype for column in columns}
         
@@ -276,10 +276,9 @@ def __add_to_hk_fund(df):
     if len(hk_df) == 0:
         return
     
-    funds = "', '".join(hk_df['SHORT_NAME'])
-    sql = f'INSERT INTO supp.hk_fund (fund) VALUES (\'{funds}\');'
+    funds = "'), ('".join(hk_df['SHORT_NAME'])
+    sql = f"INSERT INTO supp.hk_fund (fund) VALUES ('{funds}');"
     st.write(sql)
-    
 
 (lbu_df, fund_df, saa_df, saa_alloc_df, account_df, fwd_asset_type_df, hk_asset_type_df) = ss['lbu_data'] = get_data()
 
