@@ -338,6 +338,7 @@ def build_alm_chart(df):
     asset_df['MODE'] = 'Asset Cashflows'    
     
     al_df = pd.concat([liab_df, asset_df], ignore_index=True)
+    al_df = al_df.sort_values(by='YEAR')
     
     net_values = al_df.pivot(index='YEAR', columns='MODE', values='VALUE').reset_index()
     st.write(net_values)
