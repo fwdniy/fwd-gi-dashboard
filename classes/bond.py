@@ -42,6 +42,9 @@ class Bond:
         self.payment = self.rate / self.freq if self.freq != 0 else 0
         self.notional = self.unit * self.position * self.mortgage_fac * self.principal_fac * self.fx_rate
         
+        if self.notional / row['NET_MV'] > 100:
+            self.notional /= 1000
+        
         self.cashflow = self._compute_payment_details(cf_df)
         self.cashflow = self._apply_notional()
     
