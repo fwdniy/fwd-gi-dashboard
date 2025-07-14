@@ -51,10 +51,7 @@ class Bond:
     def _compute_payment_details(self, df):        
         cashflows = []
         
-        self.max_date = self.maturity if pd.isna(self.call_date) else self.call_date
-        
-        if self.max_date != self.effective_maturity:
-            return
+        self.max_date = self.effective_maturity
         
         # Add maturity payment
         cashflows.append(Cashflow(self.max_date, self._calculate_principal_amount()))
