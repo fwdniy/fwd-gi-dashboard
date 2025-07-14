@@ -411,7 +411,7 @@ class AgGridBuilder:
     def add_button_column(self):
         self.gb.configure_column('ADD', cellRenderer=JsCode(AgGridBuilder.buttonString))
     
-    def show_grid(self, height: float = 630, reload_data: bool = False, update_on: list[str] = [], update_mode: str = 'MODEL_CHANGED', custom_functions: dict[str, str] = {}, column_order: list[str] = [], autofit = True):
+    def show_grid(self, height: float = 630, reload_data: bool = False, update_on: list[str] = [], update_mode: str = 'MODEL_CHANGED', custom_functions: dict[str, str] = {}, column_order: list[str] = [], autofit = True, grid_name: str = None):
         go = self.gb.build()
         
         if column_order != []:
@@ -437,4 +437,4 @@ class AgGridBuilder:
             go["onFirstDataRendered"] = on_first_data_rendered
         
         self.go = go
-        self.grid = AgGrid(self.df, gridOptions=go, height=height, theme='streamlit', allow_unsafe_jscode=True, custom_css=self.custom_css, reload_data=reload_data, update_on=update_on, update_mode=update_mode, enable_enterprise_modules=True)
+        self.grid = AgGrid(self.df, key=grid_name, gridOptions=go, height=height, theme='streamlit', allow_unsafe_jscode=True, custom_css=self.custom_css, reload_data=reload_data, update_on=update_on, update_mode=update_mode, enable_enterprise_modules=True)

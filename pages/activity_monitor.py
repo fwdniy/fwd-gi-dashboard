@@ -679,7 +679,7 @@ def build_grid():
     
     grid.gb.configure_column('Transactions', children=ss.transaction_columns)
         
-    grid.show_grid(update_on=[('selectionChanged', 2000)], update_mode="NO_UPDATE")
+    grid.show_grid(update_on=[('selectionChanged', 2000)], update_mode="NO_UPDATE", grid_name='activity_grid')
     
     ss.selected_rows = grid.grid['selected_rows']      
 
@@ -758,15 +758,15 @@ def build_analysis():
     with tab1:
         grid = AgGridBuilder(merged_df, min_width=100)
         grid.add_chart('stackedBar', analysis_columns, transaction_column_headers['Net Sales'] + transaction_column_headers['Net Purchases'], ' Net Purchases / Sales')
-        grid.show_grid(update_mode='NO_UPDATE')
+        grid.show_grid(update_mode='NO_UPDATE', grid_name='net_transactions')
     with tab2:
         grid = AgGridBuilder(merged_df, min_width=100)
         grid.add_chart('stackedBar', analysis_columns, transaction_column_headers['Net Purchases'], ' Net Purchases')
-        grid.show_grid(update_mode='NO_UPDATE')
+        grid.show_grid(update_mode='NO_UPDATE', grid_name='net_purchases')
     with tab3:
         grid = AgGridBuilder(merged_df, min_width=100)
         grid.add_chart('stackedBar', analysis_columns, transaction_column_headers['Net Sales'], ' Net Sales', True)
-        grid.show_grid(update_mode='NO_UPDATE')
+        grid.show_grid(update_mode='NO_UPDATE', grid_name='net_sales')
     
     #endregion
 
