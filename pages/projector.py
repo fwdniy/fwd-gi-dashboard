@@ -24,7 +24,7 @@ def load_data(bar):
     bonds = _build_bonds(bar, pos_df_filtered, cf_df, remove_securities)
     
     bar.progress(80, "Aggregating cashflows...")
-    cashflow_df = _build_cashflow_df(bonds)    
+    cashflow_df = _build_cashflow_df(bonds)
     
     return (bonds, cashflow_df)
 
@@ -44,6 +44,9 @@ def _get_data(date):
     return (cf_df, pos_df)
 
 def _clean_pos(pos_df):
+    if 'previous_selected_date' in ss and ss.selected_date == ss.previous_selected_date and 'pos_df_filtered' in ss:
+        return (ss.pos_df_filtered, ss.remove_securities)
+    
     default_skip_securities = ['.APPIS 0 01/30/2125 8999']
     default_remove_bbg_asset_types = ['Repo Liability', 'Bond Option']
     default_remove_fwd_asset_types = ['Listed Equity - Local', 'Listed Equity - International', 'Liability hedging assets']
@@ -64,13 +67,17 @@ def _clean_pos(pos_df):
     pos_df_filtered = pos_df_filtered[~pos_df_filtered['FWD_ASSET_TYPE'].isin(remove_fwd_asset_types)]
     pos_df_filtered['COUPON_RATE'] = pos_df_filtered.apply(lambda row: 6.0 if row['COUPON_RATE'] == 0.0 and row['BBG_ASSET_TYPE'] == 'Mortgage Backed Security' else row['COUPON_RATE'], axis=1)
     pos_df_filtered = pos_df_filtered.reset_index(drop=True)
-        
+    
+    ss.pos_df_filtered = pos_df_filtered
+    ss.remove_securities = remove_securities
+    
     return (pos_df_filtered, remove_securities)
 
 def _build_cashflow_df(bonds):
     group_columns = ['FUND_CODE', 'FWD_ASSET_TYPE', 'YEAR']
     value_columns = ['VALUE']
-    columns = group_columns + value_columns    
+    information_columns = ['SECURITY_NAME']
+    columns = group_columns + value_columns + information_columns
     
     rows = []          
     
@@ -80,7 +87,8 @@ def _build_cashflow_df(bonds):
                 'FUND_CODE': bond.fund_code,
                 'FWD_ASSET_TYPE': bond.fwd_asset_type,
                 'YEAR': cashflow.year,
-                'VALUE': cashflow.payment
+                'VALUE': cashflow.payment,
+                'SECURITY_NAME': bond.security_name
             })
         
     df = pd.DataFrame(rows, columns=columns)
@@ -100,6 +108,9 @@ def _build_bonds(bar, pos_df, cf_df, remove_securities):
     """
     Build a list of Bond objects with the cashflow data
     """
+    if 'previous_selected_date' in ss and ss.selected_date == ss.previous_selected_date and 'alm_bonds' in ss:
+        return ss.alm_bonds
+    
     bonds = []
     cf_bbgids = cf_df['BBGID'].unique()
     cf_dict = {bbgid: cf_df[cf_df['BBGID'] == bbgid] for bbgid in cf_bbgids}
@@ -117,6 +128,8 @@ def _build_bonds(bar, pos_df, cf_df, remove_securities):
         
         if index % 100 == 0 or index == len(pos_df) - 1:
             bar.progress(int(10 + (index / len(pos_df) * 70)), "Building cashflows...")
+    
+    ss.alm_bonds = bonds
     
     return bonds
 
