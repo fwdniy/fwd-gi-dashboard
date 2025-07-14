@@ -5,6 +5,14 @@ from streamlit import session_state as ss
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+PROD_PAGES = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos", "pages/activity_monitor.py": "Activity Monitor" },
+                "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation", "pages/projector.py": "Projector", "pages/collateral.py": "Collateral Calculator"},
+                "Admin": {"pages/users.py": "Users", "pages/lbu_manager.py": "LBU Manager"}}
+    
+DEV_PAGES = {"Group": {"pages/cashflow_builder.py": "Cashflow Builder"},
+                "Admin": {}}
+
+PAGE_PERMS = {"Group": "Group", "Hong Kong": "HK", "Admin": "Admin"}
 
 def menu(page_name):
     apply_formatting()
@@ -36,20 +44,11 @@ def authenticated_menu(page_name):
         permissions = ss['permissions']
         admin = ss['admin']
         group = permissions == 'Group'
-
-        pages = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/pivot.py": "Funnelweb Pivot Table", "pages/curves.py": "Curves", "pages/repo.py": "Repos", "pages/activity_monitor.py": "Activity Monitor" },
-                 "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation", "pages/projector.py": "Projector", "pages/collateral.py": "Collateral Calculator"},
-                 "Admin": {"pages/users.py": "Users", "pages/lbu_manager.py": "LBU Manager"}}
-        
-        beta_pages = {"Group": {"pages/cashflow_builder.py": "Cashflow Builder"},
-                      "Admin": {}}
-
-        page_permissions = {"Group": "Group", "Hong Kong": "HK", "Admin": "Admin"}
         
         verified = False
 
-        for key, value in pages.items():
-            permission = page_permissions[key]
+        for key, value in PROD_PAGES.items():
+            permission = PAGE_PERMS[key]
 
             if permission not in permissions and not group or key == "Admin" and not admin:
                 continue
@@ -61,8 +60,8 @@ def authenticated_menu(page_name):
                     if key2 == page_name:
                         verified = True
                         
-                if "fwdoauth" not in st.secrets and key in beta_pages.keys():
-                    for key2, value2 in beta_pages[key].items():
+                if "fwdoauth" not in st.secrets and key in DEV_PAGES.keys():
+                    for key2, value2 in DEV_PAGES[key].items():
                         st.page_link(key2, label=value2)
 
                         if key2 == page_name:
