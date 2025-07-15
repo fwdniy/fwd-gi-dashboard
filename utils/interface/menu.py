@@ -59,13 +59,13 @@ def authenticated_menu(page_name):
 
                     if key2 == page_name:
                         verified = True
-                        
-                if key in DEV_PAGES.keys():
-                    for key2, value2 in DEV_PAGES[key].items():
-                        st.page_link(key2, label=f'{value2} (Beta)')
+        
+        if admin:
+            for key, value in DEV_PAGES.items():
+                st.page_link(key2, label=f'{value2} (Beta)')
 
-                        if key2 == page_name:
-                            verified = True
+                if key2 == page_name:
+                    verified = True
 
     if not verified and page_name != "streamlit_app.py":
         st.write("You are not authorized to view this page!")
