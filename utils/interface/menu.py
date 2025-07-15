@@ -61,6 +61,7 @@ def authenticated_menu(page_name):
                         verified = True
         
         if admin:
+            st.write(DEV_PAGES.items())
             with st.expander('Beta', True):
                 for key, value in DEV_PAGES.items():
                     for key2, value2 in value.items():
