@@ -9,7 +9,7 @@ PROD_PAGES = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/
                 "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation", "pages/projector.py": "Projector", "pages/collateral.py": "Collateral Calculator"},
                 "Admin": {"pages/users.py": "Users", "pages/lbu_manager.py": "LBU Manager"}}
     
-DEV_PAGES = {"Group": {"pages/cashflow_builder.py": "Cashflow Builder"},
+DEV_PAGES = {"Group": {"pages/cashflow_builder.py": "Cashflow Builder", "pages/activity_monitor_new.py": "Activity Monitor"},
                 "Admin": {}}
 
 PAGE_PERMS = {"Group": "Group", "Hong Kong": "HK", "Admin": "Admin"}
@@ -59,10 +59,12 @@ def authenticated_menu(page_name):
 
                     if key2 == page_name:
                         verified = True
-                        
-                if "fwdoauth" not in st.secrets and key in DEV_PAGES.keys():
-                    for key2, value2 in DEV_PAGES[key].items():
-                        st.page_link(key2, label=value2)
+        
+        if admin:
+            with st.expander('Beta', True):
+                for key, value in DEV_PAGES.items():
+                    for key2, value2 in value.items():
+                        st.page_link(key2, label=f'{value2} (Beta)')
 
                         if key2 == page_name:
                             verified = True
@@ -70,16 +72,6 @@ def authenticated_menu(page_name):
     if not verified and page_name != "streamlit_app.py":
         st.write("You are not authorized to view this page!")
         st.stop()
-
-def set_title(page_name):
-    '''st.markdown(r"""
-        <style>
-            div[data-testid="stDecoration"]::after {
-                content: '""" + page_name + r"""';
-                display: block;
-            }
-        </style>
-        """, unsafe_allow_html=True)'''
 
 def add_login_name():
     if "ST_OAUTH_EMAIL" not in st.session_state:

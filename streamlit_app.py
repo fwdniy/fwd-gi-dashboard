@@ -6,11 +6,12 @@ from streamlit import session_state as ss
 menu('streamlit_app.py')
 
 streamlit_js_eval(js_expressions="window.innerWidth", key='SCR')
+admin_string = " and Admin" if ss["admin"] else ""
 
 st.write(f'# Stilson Dashboard')
 st.write(f'## Welcome {ss["nickname"]}! 👋')
 st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["name"]} via Teams or email ({st.secrets["admin"]["email"]})')
-st.write(f'Your permissions are set to {ss["permissions"]}.')
+st.write(f'Your permissions are set to {ss["permissions"]}{admin_string}.')
 
 with st.expander("Release Notes", True):
     st.write("2025/06/10")
