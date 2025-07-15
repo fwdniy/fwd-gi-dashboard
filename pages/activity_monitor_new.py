@@ -17,12 +17,3 @@ IDENTIFIER_COLUMNS = ['closing_date', 'position_id', 'security_name', 'bbgid_v2'
 STATIC_COLUMNS = ['country_report', 'manager', 'fwd_asset_type', 'l1_asset_type', 'l2_asset_type', 'l3_asset_type', 'bbg_asset_type', 'currency', 'maturity', 'securitized_credit_type', 'sw_rec_crncy']
 CHARACTERISTIC_COLUMNS = ['net_mv', 'duration', 'final_rating', 'final_rating_letter', 'maturity_range', 'mtge_factor', 'principal_factor', 'last_trade_date', 'position', 'unit', 'rate', 'warf']
 FORMULA_COLUMNS = {'currency_pair': 'IFF(sw_pay_crncy IS NULL OR sw_rec_crncy IS NULL, NULL, sw_pay_crncy || \'/\' || sw_rec_crncy)'}
-
-if not st.user.is_logged_in:
-    st.header("Log in:")
-    if st.button("Okta"):
-        st.login("okta")
-else:
-    if st.button("Log out"):
-        st.logout()
-    st.write(f"Hello, {st.user.name}!")
