@@ -9,7 +9,7 @@ PROD_PAGES = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/
                 "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation", "pages/projector.py": "Projector", "pages/collateral.py": "Collateral Calculator"},
                 "Admin": {"pages/users.py": "Users", "pages/lbu_manager.py": "LBU Manager"}}
     
-DEV_PAGES = {"Group": {"pages/cashflow_builder.py": "Cashflow Builder"},
+DEV_PAGES = {"Group": {"pages/cashflow_builder.py": "Cashflow Builder", "pages/activity_monitor_new.py": "Activity Monitor (new)"},
                 "Admin": {}}
 
 PAGE_PERMS = {"Group": "Group", "Hong Kong": "HK", "Admin": "Admin"}
