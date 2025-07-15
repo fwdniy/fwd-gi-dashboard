@@ -61,7 +61,6 @@ def authenticated_menu(page_name):
                         verified = True
         
         if admin:
-            st.write(DEV_PAGES.items())
             with st.expander('Beta', True):
                 for key, value in DEV_PAGES.items():
                     for key2, value2 in value.items():
@@ -73,16 +72,6 @@ def authenticated_menu(page_name):
     if not verified and page_name != "streamlit_app.py":
         st.write("You are not authorized to view this page!")
         st.stop()
-
-def set_title(page_name):
-    '''st.markdown(r"""
-        <style>
-            div[data-testid="stDecoration"]::after {
-                content: '""" + page_name + r"""';
-                display: block;
-            }
-        </style>
-        """, unsafe_allow_html=True)'''
 
 def add_login_name():
     if "ST_OAUTH_EMAIL" not in st.session_state:
