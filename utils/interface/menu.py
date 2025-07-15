@@ -60,9 +60,9 @@ def authenticated_menu(page_name):
                     if key2 == page_name:
                         verified = True
                         
-                if "fwdoauth" not in st.secrets and key in DEV_PAGES.keys():
+                if key in DEV_PAGES.keys():
                     for key2, value2 in DEV_PAGES[key].items():
-                        st.page_link(key2, label=value2)
+                        st.page_link(key2, label=f'{value2} (Beta)')
 
                         if key2 == page_name:
                             verified = True
