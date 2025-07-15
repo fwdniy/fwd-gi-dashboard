@@ -9,7 +9,7 @@ PROD_PAGES = {"Group": {"pages/asset_allocation.py": "Asset Allocation", "pages/
                 "Hong Kong": {"pages/hk_asset_allocation.py": "Asset Allocation", "pages/projector.py": "Projector", "pages/collateral.py": "Collateral Calculator"},
                 "Admin": {"pages/users.py": "Users", "pages/lbu_manager.py": "LBU Manager"}}
     
-DEV_PAGES = {"Group": {"pages/cashflow_builder.py": "Cashflow Builder", "pages/activity_monitor_new.py": "Activity Monitor (new)"},
+DEV_PAGES = {"Group": {"pages/cashflow_builder.py": "Cashflow Builder", "pages/activity_monitor_new.py": "Activity Monitor"},
                 "Admin": {}}
 
 PAGE_PERMS = {"Group": "Group", "Hong Kong": "HK", "Admin": "Admin"}
@@ -61,11 +61,13 @@ def authenticated_menu(page_name):
                         verified = True
         
         if admin:
-            for key, value in DEV_PAGES.items():
-                st.page_link(key2, label=f'{value2} (Beta)')
+            with st.expander('Beta', True):
+                for key, value in DEV_PAGES.items():
+                    for key2, value2 in value.items():
+                        st.page_link(key2, label=f'{value2} (Beta)')
 
-                if key2 == page_name:
-                    verified = True
+                        if key2 == page_name:
+                            verified = True
 
     if not verified and page_name != "streamlit_app.py":
         st.write("You are not authorized to view this page!")
