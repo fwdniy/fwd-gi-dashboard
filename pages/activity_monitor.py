@@ -249,7 +249,8 @@ def _build_sql():
     {notional_usd_case_sql} 
     FROM funnel.funnelweb AS fw
     LEFT JOIN fx_rates AS f1 ON fw.currency = f1.fx
-    WHERE closing_date IN (\'{start_date}\', \'{end_date}\')
+    WHERE closing_date IN (\'{start_date}\', \'{end_date}\') 
+    AND bbg_asset_type != 'Repo Liability'
     ORDER BY closing_date;"""
     
     return sql
