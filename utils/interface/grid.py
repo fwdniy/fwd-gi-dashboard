@@ -197,7 +197,7 @@ class AgGridBuilder:
         self.gb = gb
         self.charts = []
 
-    def add_options(self, pivot_total=None, group_total='top', group_open=False, remove_pivot_headers=False, pivot_mode=True, group_expanded=-1, cell_value_change=None, pinned_top=None, group_display_type=None, row_selection=None, header_name=None):
+    def add_options(self, pivot_total=None, group_total='top', group_open=False, remove_pivot_headers=False, pivot_mode=True, group_expanded=-1, cell_value_change=None, pinned_top=None, group_display_type=None, row_selection={}, header_name=None):
         #pivotRowTotals='left'
         #onCellValueChanged='onCellValueChanged'
         #groupDisplayType="multipleColumns"
