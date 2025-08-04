@@ -300,6 +300,8 @@ class AgGridBuilder:
                                         }
                                     },
                                 },
+                            },
+                            bar : {
                                 series: {
                                     label: {
                                         enabled: true,
@@ -321,7 +323,7 @@ class AgGridBuilder:
                                         padding: 10,
                                         color: 'black',
                                     },
-                                },
+                                }
                             }
                         },
                         chartContainer: document.querySelector("#chart{count}"),"""
