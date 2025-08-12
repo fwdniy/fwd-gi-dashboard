@@ -15,16 +15,21 @@ from utils.interface.download import create_download_button
 menu('pages/projector.py')
         
 def load_data(bar):        
+    if 'previous_funds' not in ss:
+        ss.previous_funds = []
+    
     (cf_df, pos_df) = _get_data(ss.selected_date)
     bar.progress(5, "Filtering securities...")
     
     (pos_df_filtered, remove_securities) = _clean_pos(pos_df)
-        
+    
     bar.progress(10, "Building cashflows...")
     bonds = _build_bonds(bar, pos_df_filtered, cf_df, remove_securities)
     
     bar.progress(80, "Aggregating cashflows...")
     cashflow_df = _build_cashflow_df(bonds)
+    
+    ss.previous_funds = ss.selected_funds
     
     return (bonds, cashflow_df)
 
@@ -44,7 +49,7 @@ def _get_data(date):
     return (cf_df, pos_df)
 
 def _clean_pos(pos_df):
-    if 'previous_selected_date' in ss and ss.selected_date == ss.previous_selected_date and 'pos_df_filtered' in ss:
+    if 'previous_selected_date' in ss and ss.selected_date == ss.previous_selected_date and 'pos_df_filtered' in ss and ss.selected_funds == ss.previous_funds:
         return (ss.pos_df_filtered, ss.remove_securities)
     
     default_skip_securities = ['.APPIS 0 01/30/2125 8999']
@@ -79,7 +84,7 @@ def _build_cashflow_df(bonds):
     information_columns = ['SECURITY_NAME']
     columns = group_columns + value_columns + information_columns
     
-    rows = []          
+    rows = []
     
     for i, bond in enumerate(bonds):
         for cashflow in bond.cashflow:
@@ -108,7 +113,7 @@ def _build_bonds(bar, pos_df, cf_df, remove_securities):
     """
     Build a list of Bond objects with the cashflow data
     """
-    if 'previous_selected_date' in ss and ss.selected_date == ss.previous_selected_date and 'alm_bonds' in ss:
+    if 'previous_selected_date' in ss and ss.selected_date == ss.previous_selected_date and 'alm_bonds' in ss and ss.selected_funds == ss.previous_funds:
         return ss.alm_bonds
     
     bonds = []
@@ -198,15 +203,12 @@ def _build_liability_groups_filter():
     if len(groups) == 0:
         st.error('No liabilities found for provided date')
         st.run()
-        
-    name_mapping = {'Trad': 'Trad Life', 'Max Focus': 'MFx', 'Wealth ICON': 'WIx'}
-    groups_label = [name_mapping[group] if group in name_mapping else group for group in groups]
+            
+    st.pills('Liability Groups', groups, default=groups[0], key='selected_liability_group_label')
     
-    st.pills('Liability Groups', groups_label, default=groups_label[0], key='selected_liability_group_label')
+    selected_group = ss.selected_liability_group = [ss.selected_liability_group_label][0]
     
-    selected_group = ss.selected_liability_group = [key for key, value in name_mapping.items() if value == ss.selected_liability_group_label][0] if ss.selected_liability_group_label in name_mapping.values() else ss.selected_liability_group_label
-    
-    ss.selected_funds = _get_saa_groups(selected_group)
+    ss.selected_funds = _get_cashflow_name(selected_group)
 
 def _build_liability_options_filter():
     st.pills('Cashflow Options', ['Premium Cashflows', 'Non-Guaranteed Liabilities'], default=None, key='selected_liability_options', selection_mode='multi')
@@ -221,13 +223,13 @@ def _build_liability_options_filter():
     else:
         ss.ng_liab_cf = False
 
-def _get_saa_groups(selected_group):
-    funds_df = query(f"SELECT short_name FROM supp.fund WHERE saa_group = '{selected_group}';")
+def _get_cashflow_name(selected_group):
+    funds_df = query(f"SELECT short_name FROM supp.fund WHERE cashflow_name = '{selected_group}';")
     
     return funds_df['SHORT_NAME'].tolist()
 
 def _get_liabilities():    
-    liab_df = ss["liab_df"] = query(f"SELECT group_name, year, guaranteed_cf, non_guaranteed_cf, premium_cf FROM liability_profile.hk_liabilities WHERE as_of_date = (SELECT max(as_of_date) AS max_date FROM liability_profile.hk_liabilities WHERE as_of_date <= '{ss.selected_date}');")
+    liab_df = ss["liab_df"] = query(f"SELECT group_name, year, value, mode FROM liability_profile.hk_liabilities WHERE as_of_date = (SELECT max(as_of_date) AS max_date FROM liability_profile.hk_liabilities WHERE as_of_date <= '{ss.selected_date}');")
     
     return liab_df
 
@@ -314,18 +316,17 @@ def _build_asset_flows(df):
     st.plotly_chart(fig)
 
 def build_alm_chart(df):
-    liab_dict = {'GUARANTEED_CF': 'Guaranteed Liabilities', 'NON_GUARANTEED_CF': 'Non Guaranteed Liabilities', 'PREMIUM_CF': 'Premium Cashflows'}
-    liab_cols = ['GUARANTEED_CF']
+    liab_dict = {'Guaranteed': 'Guaranteed Liabilities', 'Non-Guaranteed': 'Non Guaranteed Liabilities', 'Premium': 'Premium Cashflows'}
+    liab_cols = ['Guaranteed']
     
     if ss.premium_cf:
-        liab_cols.append('PREMIUM_CF')
+        liab_cols.append('Premium')
     if ss.ng_liab_cf:
-        liab_cols.append('NON_GUARANTEED_CF')
+        liab_cols.append('Non-Guaranteed')
     
     for column in liab_cols:
-        temp_df = ss.liab_df[ss.liab_df['GROUP_NAME'] == ss.selected_liability_group]
-        temp_df = temp_df[['YEAR', column]]
-        temp_df = temp_df.rename(columns={column: 'VALUE'})
+        temp_df = ss.liab_df[(ss.liab_df['GROUP_NAME'] == ss.selected_liability_group) & (ss.liab_df['MODE'] == column) & (ss.liab_df['YEAR'] <= 50)]
+        temp_df = temp_df[['YEAR', 'VALUE']]
         temp_df['MODE'] = liab_dict[column]
         
         if liab_cols.index(column) == 0:
@@ -333,7 +334,8 @@ def build_alm_chart(df):
         else:
             liab_df = pd.concat([liab_df, temp_df], ignore_index=True)
     
-    asset_df = df.groupby(['YEAR'])['VALUE'].sum().reset_index()
+    asset_df = df[df['FUND_CODE'].isin(ss.selected_funds)]
+    asset_df = asset_df.groupby(['YEAR'])['VALUE'].sum().reset_index()
     asset_df['VALUE'] = asset_df['VALUE'] / 1000000
     asset_df['MODE'] = 'Asset Cashflows'    
     
@@ -351,7 +353,8 @@ def build_alm_chart(df):
     net_values['NET_VALUE'] = net_values['Asset Cashflows']
     
     for column in liab_cols:
-        net_values['NET_VALUE'] = net_values['NET_VALUE'] + net_values[liab_dict[column]]
+        if liab_dict[column] in net_values.columns:
+            net_values['NET_VALUE'] = net_values['NET_VALUE'] + net_values[liab_dict[column]]
 
     net_values['CUMULATIVE_NET'] = net_values['NET_VALUE'].cumsum()
     
