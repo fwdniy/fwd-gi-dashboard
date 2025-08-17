@@ -27,11 +27,11 @@ def load_data(bar):
     bonds = _build_bonds(bar, pos_df_filtered, cf_df, remove_securities)
     
     bar.progress(80, "Aggregating cashflows...")
-    cashflow_df = _build_cashflow_df(bonds)
+    (cashflow_df, year_cashflow_df) = _build_cashflow_df(bonds)
     
     ss.previous_funds = ss.selected_funds
     
-    return (bonds, cashflow_df)
+    return (bonds, year_cashflow_df, cashflow_df)
 
 def _get_data(date):
     """
@@ -80,8 +80,8 @@ def _clean_pos(pos_df):
 
 def _build_cashflow_df(bonds):
     group_columns = ['FUND_CODE', 'FWD_ASSET_TYPE', 'YEAR']
-    value_columns = ['VALUE']
-    information_columns = ['SECURITY_NAME']
+    value_columns = ['VALUE', 'NOTIONAL', 'COUPON', 'FREQ']
+    information_columns = ['SECURITY_NAME', 'POSITION_ID']
     columns = group_columns + value_columns + information_columns
     
     rows = []
@@ -93,14 +93,18 @@ def _build_cashflow_df(bonds):
                 'FWD_ASSET_TYPE': bond.fwd_asset_type,
                 'YEAR': cashflow.year,
                 'VALUE': cashflow.payment,
-                'SECURITY_NAME': bond.security_name
+                'SECURITY_NAME': bond.security_name,
+                'POSITION_ID': bond.position_id,
+                'NOTIONAL': bond.notional,
+                'COUPON': bond.rate,
+                'FREQ': bond.freq
             })
         
     df = pd.DataFrame(rows, columns=columns)
-    df = df.sort_values(by='YEAR')
+    df = df.sort_values(by='YEAR')    
     group_df = df.groupby(group_columns).sum().reset_index()
     
-    return group_df
+    return (df, group_df)
 
 def _build_column_filter(label, data, key, default):
     default_values = [value for value in data if value in default]
@@ -384,7 +388,7 @@ def build_alm_chart(df):
 build_filters()
 
 bar = st.progress(0, text="Getting data..")
-(bonds, cashflow_df) = load_data(bar)
+(bonds, cashflow_df, bond_df) = load_data(bar)
 
 #build_charts(bar, bonds, cashflow_df)
 al_df = build_alm_chart(cashflow_df)
@@ -392,3 +396,4 @@ al_df = build_alm_chart(cashflow_df)
 bar.empty()
 
 create_download_button(al_df, 'asset_liability', 'Download Asset Liability Data', True)
+create_download_button(bond_df, 'asset_cashflow', 'Download Security Cashflow Data', True)
