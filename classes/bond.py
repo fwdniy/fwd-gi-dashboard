@@ -1,6 +1,7 @@
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 from streamlit import session_state as ss
+import streamlit as st
 import math
 
 class Bond:
@@ -53,6 +54,13 @@ class Bond:
         
         self.max_date = self.effective_maturity
         
+        if self.bbgid == "COPPFXJBE76":
+            print()
+                        
+        if pd.isna(self.max_date):
+            st.warning(f"Effective Maturity missing for {self.security_name} ({self.isin})")
+            return cashflows
+            
         # Add maturity payment
         cashflows.append(Cashflow(self.max_date, self._calculate_principal_amount()))
         
