@@ -104,7 +104,7 @@ with spot:
 
         #region Finalize Functions
 
-        create_download_button(df, 'curve_spot_rates', 'Download Curve Data', True)
+        create_download_button(df, 'curve_spot_rates', 'Curve Data', True)
 
         st.pills('Remove curve', selected_curves.keys(), key='remove_curve')
 
@@ -170,6 +170,6 @@ with forward:
         grid.add_columns([tenor_mapping[tenor] for tenor in tenors], False)
         grid.show_grid((len(df) + 1) * 30)
 
-        create_download_button(df, 'forward_rates', 'Download Forward Data', True)
+        create_download_button(df, 'forward_rates', 'Forward Data', True)
     
     build_table()

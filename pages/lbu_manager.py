@@ -128,7 +128,7 @@ def __build_definitions_expander(title, columns):
 
 def __download_template(title, columns):
     df = pd.DataFrame(columns=[column.name for column in columns if column.type != 'legacy' and column.type != 'automatic'])
-    create_download_button(df, f'{title.lower()}_template', f'Download {title} template')
+    create_download_button(df, f'{title.lower()}_template', f'{title} template')
 
 def __upload_data(title, columns, func = None):
     
