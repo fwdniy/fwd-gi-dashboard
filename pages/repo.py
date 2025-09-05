@@ -57,7 +57,7 @@ def load_data():
     
     st.pills('L3 Asset Type', ['Split', 'Unsplit'], key='l3_asset_type_split')
     
-    if ss['l3_asset_type_split'] == 'Split':
+    if ss['l3_asset_type_split'] == 'Unsplit':
         facet_col = None
     
     fig = px.bar(chart_df, x='ISSUER', y='NET_MV', color='CLOSING_DATE', barmode='group', facet_col=facet_col,
