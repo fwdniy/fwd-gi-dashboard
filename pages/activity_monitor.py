@@ -682,7 +682,7 @@ def build_grid():
         
     grid.show_grid(update_on=[('selectionChanged', 2000)], update_mode="NO_UPDATE", grid_name='activity_grid')
     
-    ss.selected_rows = grid.grid['selected_rows']      
+    ss.selected_rows = grid.grid['selected_rows']
 
 def build_analysis():        
     st.write('Select checkboxes to show details below. Loading may take some time...')
