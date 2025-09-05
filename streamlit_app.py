@@ -14,6 +14,8 @@ st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["na
 st.write(f'Your permissions are set to {ss["permissions"]}{admin_string}.')
 
 with st.expander("Release Notes", True):
+    st.write("2025/08/12")
+    st.write("- Projector: Updated with 2Q25 liabilities numbers from HK Actuarial")
     st.write("2025/06/10")
     st.write("- Collateral Calculator: initial version released, for corporate bond CSAs with Bermuda only")
     st.write("2025/05/13")
