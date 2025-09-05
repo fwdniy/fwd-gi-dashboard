@@ -20,12 +20,14 @@ class Bond:
         self.position_id = row['POSITION_ID']
         self.lbu_code = row['LBU_CODE']
         self.fund_code = row['FUND_CODE']
+        self.bbg_asset_type = row['BBG_ASSET_TYPE']
         self.fwd_asset_type = row['FWD_ASSET_TYPE']
         self.account_code = row['ACCOUNT_CODE']
         self.security_name = row['SECURITY_NAME']
         self.isin = row['ISIN']
         self.bbgid = row['BBGID_V2']
         self.effective_maturity = row['EFFECTIVE_MATURITY']
+        self.time_until_maturity = row['TIME_UNTIL_MATURITY']
         self.maturity = row['MATURITY']
         self.call_date = row['NEXT_CALL_DATE']
         self.rate = row['COUPON_RATE']
@@ -53,9 +55,6 @@ class Bond:
         cashflows = []
         
         self.max_date = self.effective_maturity
-        
-        if self.bbgid == "COPPFXJBE76":
-            print()
                         
         if pd.isna(self.max_date):
             st.warning(f"Effective Maturity missing for {self.security_name} ({self.isin})")
@@ -64,7 +63,7 @@ class Bond:
         # Add maturity payment
         cashflows.append(Cashflow(self.max_date, self._calculate_principal_amount()))
         
-        # Exit if Zero Coupon
+        # Exit with just principal if Zero Coupon
         if self.freq == 0:
             return cashflows
         
