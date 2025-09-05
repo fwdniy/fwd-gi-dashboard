@@ -4,13 +4,13 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 from utils.snowflake.funnelweb import get_funnelweb_dates
-from utils.filter.filter import build_lbu_filter, build_date_filter_buttons, build_multi_select_filter, build_fund_filter
+from utils.filter.filter import build_date_filter_buttons, build_multi_select_filter
 import streamlit as st
 from streamlit import session_state as ss
 from utils.interface.menu import menu
 import plotly.express as px
 import plotly.graph_objects as go
-from utils.interface.download import create_download_button
+from utils.interface.grid import AgGridBuilder, format_numbers, conditional_formatting
 
 menu('pages/projector.py')
         
@@ -21,10 +21,10 @@ def load_data(bar):
     (cf_df, pos_df) = _get_data(ss.selected_date)
     bar.progress(5, "Filtering securities...")
     
-    (pos_df_filtered, remove_securities) = _clean_pos(pos_df)
-    
     bar.progress(10, "Building cashflows...")
-    bonds = _build_bonds(bar, pos_df_filtered, cf_df, remove_securities)
+    bonds = _build_bonds(bar, pos_df, cf_df)
+    
+    bonds = _clean_pos(bonds, cf_df)
     
     bar.progress(80, "Aggregating cashflows...")
     (cashflow_df, year_cashflow_df) = _build_cashflow_df(bonds)
@@ -35,54 +35,54 @@ def load_data(bar):
 
 def _get_data(date):
     """
-    Gets cashflow dates and positional data from snowflake
+    Gets cashflow dates and all positional data from snowflake
     """
 
     if 'previous_selected_date' in ss and ss.selected_date == ss.previous_selected_date and 'cashflow_df' in ss:
         return (ss.cashflow_df, ss.pos_df)
     
     cf_df = ss['cashflow_df'] = query(f"SELECT bbgid, category, value FROM supp.cashflow_dates WHERE valuation_date = '{date}';")
-    pos_df = ss['pos_df'] = query(f"SELECT closing_date, position_id, lbu_code, fund_code, fwd_asset_type, account_code, bbg_asset_type, security_name, bbgid_v2, isin, effective_maturity, maturity, next_call_date, coupon_rate, coupnfreq, position, unit, mtge_factor, principal_factor, redemption_value, next_call_price, currency, fx_rate, net_mv FROM funnel.funnelweb WHERE closing_date = '{date}' AND lbu_group = 'HK' AND is_bbg_fi = TRUE;")
+    pos_df = ss['pos_df'] = query(f"SELECT closing_date, position_id, lbu_code, fund_code, fwd_asset_type, account_code, bbg_asset_type, security_name, bbgid_v2, isin, effective_maturity, maturity, next_call_date, coupon_rate, coupnfreq, position, unit, mtge_factor, principal_factor, redemption_value, next_call_price, currency, fx_rate, net_mv, time_until_maturity FROM funnel.funnelweb WHERE closing_date = '{date}' AND lbu_group = 'HK' AND is_bbg_fi = TRUE;")
     
     ss.previous_selected_date = ss.selected_date
+    ss.pos_df = pos_df
+    ss.cashflow_df = cf_df
 
     return (cf_df, pos_df)
 
-def _clean_pos(pos_df):
-    if 'previous_selected_date' in ss and ss.selected_date == ss.previous_selected_date and 'pos_df_filtered' in ss and ss.selected_funds == ss.previous_funds:
-        return (ss.pos_df_filtered, ss.remove_securities)
-    
-    default_skip_securities = ['.APPIS 0 01/30/2125 8999']
+def _clean_pos(bonds, cf_df):    
+    """
+    Cleans the positions based on user filters
+    """
+    default_skip_securities = []
     default_remove_bbg_asset_types = ['Repo Liability', 'Bond Option']
     default_remove_fwd_asset_types = ['Listed Equity - Local', 'Listed Equity - International', 'Liability hedging assets']
     
-    fund_code = ss.selected_funds
-    pos_df_filtered = pos_df[pos_df['FUND_CODE'].isin(fund_code)]
-    
-    if len(pos_df_filtered) == 0:
-        st.error('No data available for the selected fund.')
-        st.stop()
+    bond_names = list(set([bond.security_name for bond in bonds]))
+    bond_bbg_asset_types = list(set([bond.bbg_asset_type for bond in bonds]))
+    bond_fwd_asset_types = list(set([bond.fwd_asset_type for bond in bonds]))
     
     with st.expander('Field Filters'):
-        remove_securities = _build_column_filter('Securities', pos_df_filtered['SECURITY_NAME'].unique(), 'selected_securities', default_skip_securities)
-        remove_bbg_asset_types = _build_column_filter('BBG Asset Type', pos_df_filtered['BBG_ASSET_TYPE'].unique(), 'selected_bbg_asset_types', default_remove_bbg_asset_types)
-        remove_fwd_asset_types = _build_column_filter('FWD Asset Type', pos_df_filtered['FWD_ASSET_TYPE'].unique(), 'selected_fwd_asset_types', default_remove_fwd_asset_types)
+        st.write('All filters below here are excluding the selections...')
+        remove_securities = _build_column_filter('Securities', bond_names, 'selected_securities', default_skip_securities)
+        remove_bbg_asset_types = _build_column_filter('BBG Asset Type', bond_bbg_asset_types, 'selected_bbg_asset_types', default_remove_bbg_asset_types)
+        remove_fwd_asset_types = _build_column_filter('FWD Asset Type', bond_fwd_asset_types, 'selected_fwd_asset_types', default_remove_fwd_asset_types)
     
-    pos_df_filtered = pos_df_filtered[~pos_df_filtered['BBG_ASSET_TYPE'].isin(remove_bbg_asset_types)]
-    pos_df_filtered = pos_df_filtered[~pos_df_filtered['FWD_ASSET_TYPE'].isin(remove_fwd_asset_types)]
-    pos_df_filtered['COUPON_RATE'] = pos_df_filtered.apply(lambda row: 6.0 if row['COUPON_RATE'] == 0.0 and row['BBG_ASSET_TYPE'] == 'Mortgage Backed Security' else row['COUPON_RATE'], axis=1)
-    pos_df_filtered = pos_df_filtered.reset_index(drop=True)
+    filtered_bonds = []
     
-    ss.pos_df_filtered = pos_df_filtered
-    ss.remove_securities = remove_securities
+    for bond in bonds:
+        if bond.bbg_asset_type in remove_bbg_asset_types or bond.fwd_asset_type in remove_fwd_asset_types or bond.security_name in remove_securities:
+            continue
+            
+        filtered_bonds.append(bond)
     
-    return (pos_df_filtered, remove_securities)
+    return filtered_bonds
 
 def _build_cashflow_df(bonds):
-    group_columns = ['FUND_CODE', 'FWD_ASSET_TYPE', 'YEAR']
-    value_columns = ['VALUE', 'NOTIONAL', 'COUPON', 'FREQ']
-    information_columns = ['SECURITY_NAME', 'POSITION_ID']
-    columns = group_columns + value_columns + information_columns
+    group_columns = ['YEAR', 'FUND_CODE', 'FWD_ASSET_TYPE']
+    information_columns = ['POSITION_ID', 'SECURITY_NAME', 'BBGID_V2']
+    value_columns = ['VALUE', 'NOTIONAL', 'COUPON', 'FREQ', 'TIME_UNTIL_MATURITY']
+    columns = group_columns + information_columns + value_columns
     
     rows = []
     
@@ -95,13 +95,15 @@ def _build_cashflow_df(bonds):
                 'VALUE': cashflow.payment,
                 'SECURITY_NAME': bond.security_name,
                 'POSITION_ID': bond.position_id,
+                'BBGID_V2': bond.bbgid,
                 'NOTIONAL': bond.notional,
                 'COUPON': bond.rate,
-                'FREQ': bond.freq
+                'FREQ': bond.freq,
+                'TIME_UNTIL_MATURITY': bond.time_until_maturity
             })
         
     df = pd.DataFrame(rows, columns=columns)
-    df = df.sort_values(by='YEAR')    
+    df = df.sort_values(by=['YEAR', 'VALUE'], ascending=[True, False])    
     group_df = df.groupby(group_columns).sum().reset_index()
     
     return (df, group_df)
@@ -113,27 +115,38 @@ def _build_column_filter(label, data, key, default):
     
     return remove_values
 
-def _build_bonds(bar, pos_df, cf_df, remove_securities):
+def _build_bonds(bar, pos_df, cf_df):
     """
     Build a list of Bond objects with the cashflow data
     """
     if 'previous_selected_date' in ss and ss.selected_date == ss.previous_selected_date and 'alm_bonds' in ss and ss.selected_funds == ss.previous_funds:
         return ss.alm_bonds
     
+    fund_codes = ss.selected_funds
+    
+    pos_df = pos_df[pos_df['FUND_CODE'].isin(fund_codes)].reset_index(drop=True)
+    
+    if len(pos_df) == 0:
+        st.error('No data available for the selected fund.')
+        st.stop()
+    
     bonds = []
     cf_bbgids = cf_df['BBGID'].unique()
     cf_dict = {bbgid: cf_df[cf_df['BBGID'] == bbgid] for bbgid in cf_bbgids}
 
-    for index, row in pos_df.iterrows():
-        if row['SECURITY_NAME'] in remove_securities:
-            continue
-        
+    for index, row in pos_df.iterrows():        
         bbgid = row['BBGID_V2']
             
         bond_cf_df = cf_dict.get(bbgid, pd.DataFrame())
         
         bond = Bond(row, bond_cf_df)
         bonds.append(bond)
+        
+        if bond.bbg_asset_type == 'Mortgage Backed Security' and bond.rate == 0.0:
+            bond.rate = 6.0
+            bond.payment = bond.rate / bond.freq if bond.freq != 0 else 0
+            bond.cashflow = bond._compute_payment_details(cf_df)
+            bond.cashflow = bond._apply_notional()
         
         if index % 100 == 0 or index == len(pos_df) - 1:
             bar.progress(int(10 + (index / len(pos_df) * 70)), "Building cashflows...")
@@ -319,6 +332,31 @@ def _build_asset_flows(df):
 
     st.plotly_chart(fig)
 
+def build_year_grid(df):
+    columns = list(df.columns)
+    values = [column for column in columns if column != 'YEAR']
+        
+    df = df.fillna(0)
+    grid = AgGridBuilder(df, min_width=100)
+    grid.gb.configure_grid_options(rowSelection={'mode': 'multiRow', 'groupSelects': 'filteredDescendants', 'checkboxLocation': 'autoGroupColumn', 'suppressRowClickSelection': False})
+    
+    for value in values:
+        grid.add_column(value, cell_style=None)
+        
+    grid.show_grid(height=320, update_on=[('selectionChanged', 2000)], update_mode="NO_UPDATE", grid_name='years_grid')
+        
+    ss.selected_rows = grid.grid['selected_rows']    
+
+def build_bond_grid(bond_df):
+    if ss.selected_rows is not None:
+        years = list(ss.selected_rows['YEAR'])
+        df = bond_df[bond_df['YEAR'].isin(years)]
+        
+        grid = AgGridBuilder(df, min_width=100)
+        grid.add_column('VALUE', cell_style=None)
+        grid.add_column('NOTIONAL', cell_style=None)
+        grid.show_grid()
+
 def build_alm_chart(df):
     liab_dict = {'Guaranteed': 'Guaranteed Liabilities', 'Non-Guaranteed': 'Non Guaranteed Liabilities', 'Premium': 'Premium Cashflows'}
     liab_cols = ['Guaranteed']
@@ -345,13 +383,11 @@ def build_alm_chart(df):
     
     al_df = pd.concat([liab_df, asset_df], ignore_index=True)
     al_df = al_df.sort_values(by='YEAR')
+    al_df = al_df[al_df['YEAR'] <= 50]
     
-    net_values = al_df.pivot(index='YEAR', columns='MODE', values='VALUE').reset_index()
-    st.write(net_values)
+    net_values = al_df.pivot(index='YEAR', columns='MODE', values='VALUE').reset_index()    
     
     color_discrete_map = {'Asset Cashflows': '#F3BB90', 'Guaranteed Liabilities': '#EDEFF0', 'Premium Cashflows': '#B5E6A2', 'Non Guaranteed Liabilities': '#F2CEEF'}
-
-    fig = px.bar(al_df, x='YEAR', y='VALUE', color='MODE', color_discrete_map=color_discrete_map)
     
     net_values.fillna(0, inplace=True)
     net_values['NET_VALUE'] = net_values['Asset Cashflows']
@@ -361,6 +397,14 @@ def build_alm_chart(df):
             net_values['NET_VALUE'] = net_values['NET_VALUE'] + net_values[liab_dict[column]]
 
     net_values['CUMULATIVE_NET'] = net_values['NET_VALUE'].cumsum()
+    
+    build_year_grid(net_values)
+    
+    fig = px.bar(al_df, x='YEAR', y='VALUE', color='MODE', color_discrete_map=color_discrete_map)
+    
+    alm_grid_options = st.columns(2)
+    with alm_grid_options[0]:
+        cumulative_value = st.checkbox('Cumulative Net Value', True)
     
     fig.add_trace(go.Scatter(
         x=net_values['YEAR'],
@@ -373,14 +417,15 @@ def build_alm_chart(df):
             ))
     ))
     
-    fig.add_trace(go.Scatter(
-        x=net_values['YEAR'],
-        y=net_values['CUMULATIVE_NET'],
-        mode='lines',
-        name='Cumulative Net Value',
-        line=dict(color='#CC0000', width=2, dash='dash')
-    ))
-    
+    if cumulative_value:
+        fig.add_trace(go.Scatter(
+            x=net_values['YEAR'],
+            y=net_values['CUMULATIVE_NET'],
+            mode='lines',
+            name='Cumulative Net Value',
+            line=dict(color='#CC0000', width=2, dash='dash')
+        ))
+        
     st.plotly_chart(fig)
     
     return net_values
@@ -393,7 +438,11 @@ bar = st.progress(0, text="Getting data..")
 #build_charts(bar, bonds, cashflow_df)
 al_df = build_alm_chart(cashflow_df)
 
+build_bond_grid(bond_df)
+
 bar.empty()
 
-create_download_button(al_df, 'asset_liability', 'Download Asset Liability Data', True)
-create_download_button(bond_df, 'asset_cashflow', 'Download Security Cashflow Data', True)
+st.write("This page is still in beta - cashflows are still basic and treat all bonds as fixed rate bonds with non-sinkable features. Workout dates are aligned with Funnelweb.")
+
+#create_download_button(al_df, 'asset_liability', 'Asset Liability Data', True)
+#create_download_button(bond_df, 'asset_cashflow', 'Security Cashflow Data', True)
