@@ -698,6 +698,10 @@ def build_analysis():
     
     #region Merge positions for start and end daate
     
+    if len(filtered_df) == 0:
+        st.warning("No transactions found for the selected filters and date range.")
+        return
+    
     start_df = filtered_df[filtered_df['CLOSING_DATE'] == ss.start_date_string]
     start_positions = start_df['POSITION_ID']
     end_df = filtered_df[filtered_df['CLOSING_DATE'] == ss.end_date_string]
