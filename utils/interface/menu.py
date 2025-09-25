@@ -43,7 +43,7 @@ def authenticated_menu(page_name):
 
         permissions = ss['permissions']
         admin = ss['admin']
-        group = permissions == 'Group'
+        group = 'Group' in permissions
         
         verified = False
 
@@ -123,7 +123,7 @@ def get_permissions(force=False):
 
     if len(df) == 1:
         ss['nickname'] = df.at[0, 'NAME']
-        ss['permissions'] = df.at[0, 'PERMISSIONS']
+        ss['permissions'] = df.at[0, 'PERMISSIONS'].split(';')
         ss['admin'] = df.at[0, 'ADMIN']
     elif len(df) == 0:
         st.write(f'You have no permissions set... Please contact {st.secrets["admin"]["name"]} to get access!')

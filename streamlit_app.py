@@ -11,7 +11,7 @@ admin_string = " and Admin" if ss["admin"] else ""
 st.write(f'# Stilson Dashboard')
 st.write(f'## Welcome {ss["nickname"]}! 👋')
 st.write(f'For any enhancements or bugs, please contact {st.secrets["admin"]["name"]} via Teams or email ({st.secrets["admin"]["email"]})')
-st.write(f'Your permissions are set to {ss["permissions"]}{admin_string}.')
+st.write(f'Your permissions are set to {" / ".join(ss["permissions"])}{admin_string}.')
 
 with st.expander("Release Notes", True):
     st.write("2025/08/12")
