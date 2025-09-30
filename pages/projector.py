@@ -358,13 +358,13 @@ def build_bond_grid(bond_df):
         grid.show_grid()
 
 def build_alm_chart(df):
-    liab_dict = {'Guaranteed': 'Guaranteed Liabilities', 'Non-Guaranteed': 'Non Guaranteed Liabilities', 'Premium': 'Premium Cashflows'}
-    liab_cols = ['Guaranteed']
+    liab_dict = {'Guaranteed Liabilities': 'Guaranteed Liabilities', 'Non-Guaranteed Liabilities': 'Non Guaranteed Liabilities', 'Premiums': 'Premium Cashflows'}
+    liab_cols = ['Guaranteed Liabilities']
     
     if ss.premium_cf:
-        liab_cols.append('Premium')
+        liab_cols.append('Premiums')
     if ss.ng_liab_cf:
-        liab_cols.append('Non-Guaranteed')
+        liab_cols.append('Non-Guaranteed Liabilities')
     
     for column in liab_cols:
         temp_df = ss.liab_df[(ss.liab_df['GROUP_NAME'] == ss.selected_liability_group) & (ss.liab_df['MODE'] == column) & (ss.liab_df['YEAR'] <= 50)]
