@@ -41,16 +41,16 @@ def authenticated_menu(page_name):
     with st.sidebar:
         st.page_link("streamlit_app.py", label="Home")
 
-        permissions = ss['permissions']
+        lbu = ss['lbu']
         admin = ss['admin']
-        group = 'Group' in permissions
+        group = lbu == 'Group'
         
         verified = False
 
         for key, value in PROD_PAGES.items():
             permission = PAGE_PERMS[key]
 
-            if permission not in permissions and not group or key == "Admin" and not admin:
+            if permission != lbu and not group or key == "Admin" and not admin:
                 continue
 
             with st.expander(key, True):
@@ -108,7 +108,7 @@ def apply_formatting():
 
 def get_permissions(force=False):
     if 'streamlit_permissions' not in ss or force:
-        query_string = 'SELECT id, email, name, permissions, admin FROM supp.streamlit_users;'
+        query_string = 'SELECT id, email, name, lbu, permissions, admin FROM supp.streamlit_users;'
         ss['streamlit_permissions'] = query(query_string)
 
     df = ss['streamlit_permissions']
@@ -124,6 +124,7 @@ def get_permissions(force=False):
     if len(df) == 1:
         ss['nickname'] = df.at[0, 'NAME']
         ss['permissions'] = df.at[0, 'PERMISSIONS'].split(';')
+        ss['lbu'] = df.at[0, 'LBU']
         ss['admin'] = df.at[0, 'ADMIN']
     elif len(df) == 0:
         st.write(f'You have no permissions set... Please contact {st.secrets["admin"]["name"]} to get access!')
