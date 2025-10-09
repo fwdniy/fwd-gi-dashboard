@@ -12,6 +12,7 @@ def authenticate_user():
             st.error("Unable to authenticate user. Please contact the administrator.")
         
         if not authenticated:
+            st.sidebar.empty()
             st.stop()
         
     _get_permissions()
