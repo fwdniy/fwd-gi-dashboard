@@ -5,13 +5,13 @@ import numpy as np
 import plotly.express as px
 from st_aggrid import AgGrid, GridOptionsBuilder, JsCode, GridUpdateMode
 
-from utils.interface.menu import menu
-from utils.filter.filter import build_multi_select_filter
-from utils.snowflake.snowflake import query
-from utils.interface.grid import AgGridBuilder, format_numbers, conditional_formatting
-from utils.filter.tree import build_tree_selectors
+from interface import initialize
+from interface.filters import build_multi_select_filter
+from grid import AgGridBuilder
+from interface.filters.tree import build_tree_filter
+from grid.formatting import format_numbers
 
-menu('pages/collateral.py')
+initialize()
 
 REPORT_FIELDS = ['POSITION_ID', 'FUND_CODE', 'ACCOUNT_CODE', 'SECURITY_NAME', 'BBGID_V2', 'ISIN', 'NET_MV', 'PLEDGE_POS', 'POSITION']
 COUNTERPARTIES = {'MS':'Morgan Stanley', 'Mizuho':'Mizuho', 'GS': 'Goldman Sachs'}
@@ -46,7 +46,7 @@ def _get_max_date():
     if 'max_date' in ss:
         return ss.max_date
     
-    max_date = query('SELECT max(closing_date) AS max_date FROM funnelweb;')['MAX_DATE'][0]
+    max_date = ss.snowflake.query('SELECT max(closing_date) AS max_date FROM funnelweb;')['MAX_DATE'][0]
     
     return max_date
 
@@ -58,7 +58,7 @@ def _get_collateral_logic(date):
     if 'logic_df' in ss:
         return ss.logic_df
     
-    logic_df = query(f"WITH max_dates AS (SELECT counterparty, max(effective_date) AS max_date FROM supp.collateral_logic GROUP BY counterparty) SELECT effective_date, l.counterparty, asset_type, field, datatype, logic, value FROM supp.collateral_logic l, max_dates d WHERE l.counterparty = d.counterparty AND l.effective_date = d.max_date AND l.effective_date <= '{date.strftime('%Y-%m-%d')}';")
+    logic_df = ss.snowflake.query(f"WITH max_dates AS (SELECT counterparty, max(effective_date) AS max_date FROM supp.collateral_logic GROUP BY counterparty) SELECT effective_date, l.counterparty, asset_type, field, datatype, logic, value FROM supp.collateral_logic l, max_dates d WHERE l.counterparty = d.counterparty AND l.effective_date = d.max_date AND l.effective_date <= '{date.strftime('%Y-%m-%d')}';")
     
     return logic_df
 
@@ -71,7 +71,7 @@ def _get_funnelweb_data(date, logic_df):
         return ss.funnelweb_collateral_df
     
     unique_fields = list(logic_df[logic_df['DATATYPE'] != 'Custom']['FIELD'].unique())
-    df = query(f"SELECT {' ,'.join(REPORT_FIELDS)}, {','.join(unique_fields)} FROM funnelweb WHERE closing_date = '{date.strftime('%Y-%m-%d')}' AND lbu_group = 'HK';")
+    df = ss.snowflake.query(f"SELECT {' ,'.join(REPORT_FIELDS)}, {','.join(unique_fields)} FROM funnelweb WHERE closing_date = '{date.strftime('%Y-%m-%d')}' AND lbu_group = 'HK';")
     
     return df
 
@@ -79,8 +79,8 @@ def _get_collateral_funds(date, df):
     if 'csa_funds_df' in ss and 'fund_mapping_df' in ss:
        return ss.csa_funds_df, ss.fund_mapping_df
     
-    csa_funds_df = ss.csa_funds_df = query(f"WITH max_dates AS (SELECT counterparty, max(effective_date) AS max_date FROM supp.collateral_fund GROUP BY counterparty) SELECT effective_date, f.counterparty, fund, minimum_transfer, rounding FROM supp.collateral_fund f, max_dates d WHERE f.counterparty = d.counterparty AND f.effective_date = d.max_date AND f.effective_date <= '{date.strftime('%Y-%m-%d')}';")
-    fund_mapping_df = query(f"SELECT short_name, hk_code, csa_name, sub_lbu FROM supp.fund f, supp.lbu l WHERE f.lbu = l.name AND bloomberg_name = 'HK';")
+    csa_funds_df = ss.csa_funds_df = ss.snowflake.query(f"WITH max_dates AS (SELECT counterparty, max(effective_date) AS max_date FROM supp.collateral_fund GROUP BY counterparty) SELECT effective_date, f.counterparty, fund, minimum_transfer, rounding FROM supp.collateral_fund f, max_dates d WHERE f.counterparty = d.counterparty AND f.effective_date = d.max_date AND f.effective_date <= '{date.strftime('%Y-%m-%d')}';")
+    fund_mapping_df = ss.snowflake.query(f"SELECT short_name, hk_code, csa_name, sub_lbu FROM supp.fund f, supp.lbu l WHERE f.lbu = l.name AND bloomberg_name = 'HK';")
     
     funds = list(df['FUND_CODE'].unique())
     fund_mapping_df = ss.fund_mapping_df = fund_mapping_df[fund_mapping_df['SHORT_NAME'].isin(funds)]
@@ -91,7 +91,7 @@ def _get_valuation_percentage(date):
     if 'valuation_df' in ss:
         return ss.valuation_df
     
-    valuation_df = ss.valuation_df = query(f"WITH max_dates AS (SELECT counterparty, max(effective_date) AS max_date FROM supp.collateral_fund GROUP BY counterparty) SELECT effective_date, v.counterparty, asset_type, rating_lower, rating_upper, tenor_lower, tenor_upper, percentage FROM supp.collateral_valuation v, max_dates d WHERE v.counterparty = d.counterparty AND v.effective_date = d.max_date AND v.effective_date <= '{date.strftime('%Y-%m-%d')}';")
+    valuation_df = ss.valuation_df = ss.snowflake.query(f"WITH max_dates AS (SELECT counterparty, max(effective_date) AS max_date FROM supp.collateral_fund GROUP BY counterparty) SELECT effective_date, v.counterparty, asset_type, rating_lower, rating_upper, tenor_lower, tenor_upper, percentage FROM supp.collateral_valuation v, max_dates d WHERE v.counterparty = d.counterparty AND v.effective_date = d.max_date AND v.effective_date <= '{date.strftime('%Y-%m-%d')}';")
     
     return valuation_df
 
@@ -99,8 +99,8 @@ def _get_rating_mapping():
     if 'rating_ladder' in ss and 'rating_mapping_df' in ss:
         return ss.rating_ladder, ss.rating_mapping_df
     
-    rating_mapping_df = ss.rating_mapping_df = query("SELECT agency, rating, equivalent_rating FROM supp.ratings_mapping;")
-    rating_ladder_df = query("SELECT rating, index FROM supp.ratings_ladder;")
+    rating_mapping_df = ss.rating_mapping_df = ss.snowflake.query("SELECT agency, rating, equivalent_rating FROM supp.ratings_mapping;")
+    rating_ladder_df = ss.snowflake.query("SELECT rating, index FROM supp.ratings_ladder;")
     
     rating_ladder = ss.rating_ladder = dict(zip(rating_ladder_df['RATING'], rating_ladder_df['INDEX']))
     
@@ -181,7 +181,7 @@ def _get_funds(csa_funds_df, fund_mapping_df, selected_cp):
         
     data[0]['children'] = children
     
-    build_tree_selectors('Funds', data, 'selected_csa_funds', checked, expanded, height=height)
+    build_tree_filter('Funds', data, 'selected_csa_funds', checked, expanded, height=height)
     
     if ss.selected_csa_funds == None:
         ss.selected_funds = fund_codes

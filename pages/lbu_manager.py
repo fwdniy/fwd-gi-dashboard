@@ -1,20 +1,13 @@
 import streamlit as st
 from streamlit import session_state as ss
 import pandas as pd
-import numpy as np
-import plotly.express as px
-from st_aggrid import AgGrid, GridOptionsBuilder, JsCode, GridUpdateMode
-import math
+from st_aggrid import JsCode
+from grid import AgGridBuilder
+from interface.menu import initialize
+from utils.json import read_json_columns
+from utils.download import create_download_button
 
-from utils.interface.menu import menu
-from utils.snowflake.funnelweb import get_funnelweb_dates
-from utils.filter.filter import build_lbu_filter, build_date_filter_buttons
-from utils.snowflake.snowflake import query
-from utils.interface.grid import AgGridBuilder, format_numbers, conditional_formatting
-from utils.snowflake.columns import read_json_columns
-from utils.interface.download import create_download_button
-
-menu('pages/lbu_manager.py')
+initialize()
 
 LBU_COLUMNS = read_json_columns('column_definitions/lbu.json')
 
@@ -48,7 +41,7 @@ def __refresh_data():
     return (lbu_df, fund_df, saa_df, saa_alloc_df, account_df, fwd_asset_type_df, hk_asset_type_df)
 
 def __get_table_data(table, columns):
-    df = query(f'SELECT * FROM {table} ORDER BY id;')
+    df = ss.snowflake.query(f'SELECT * FROM {table} ORDER BY id;')
     
     __check_column_definitions(df, table, columns)
     
@@ -205,13 +198,13 @@ def __check_columns(df, title, columns):
         if column.name not in df_columns and column.type == 'compulsory':
             missing_columns.append(column.name)
         elif column.sql != '' and column.split == '':
-            options = query(column.sql).iloc[:, 0]
+            options = ss.snowflake.query(column.sql).iloc[:, 0]
             not_in_options = df[~df[column.name].isin(options)]
             
             if len(not_in_options) > 0:
                 unknown_values[column.name] = list(not_in_options[column.name].unique())
         elif column.sql != '' and column.split != '':
-            options = list(query(column.sql).iloc[:, 0])
+            options = list(ss.snowflake.query(column.sql).iloc[:, 0])
             not_in_options = []
             
             for index, row in df.iterrows():
@@ -273,7 +266,7 @@ def __add_cell_editing_check():
     return JsCode(onCellEditingStopped)
 
 def __add_to_hk_fund(df):
-    options = query("SELECT name FROM supp.lbu WHERE lbu_group = 'HK';").iloc[:, 0]
+    options = ss.snowflake.query("SELECT name FROM supp.lbu WHERE lbu_group = 'HK';").iloc[:, 0]
     hk_df = df[df['LBU'].isin(options)]
     
     if len(hk_df) == 0:
