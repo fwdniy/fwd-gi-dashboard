@@ -14,7 +14,7 @@ def build_grid(df):
     grid = AgGridBuilder(df)
     group_columns = ['LBU_GROUP_NAME', 'LBU_CODE_NAME', group_column]
     
-    grid.add_options(group_total='bottom', row_selection={'mode': 'multiRow', 'groupSelects': 'filteredDescendants', 'checkboxLocation': 'autoGroupColumn', 'suppressRowClickSelection': False}, header_name=' / '.join(group_columns), group_expanded=0)
+    grid.add_options(group_total='bottom', header_name=' / '.join(group_columns), group_expanded=1)
     grid.add_columns(group_columns, None, sort='desc')
     grid.add_values(['NET_MV', 'FEE_MIL'], ['MV ($ mn)', 'Fee ($ k)'], max_width=120)
     
