@@ -20,7 +20,7 @@ def _set_debug_permissions():
     ss['nickname'] = ' to Debug Mode'
 
 def _check_sso_authentication():
-    return True
+    return False
 
 @st.cache_data(show_spinner=False)
 def get_user_permissions(force_reload=False):
