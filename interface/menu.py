@@ -50,6 +50,7 @@ def initialize():
     _initialize_snowflake()
     authenticate_user()
     _build_nav_bar(page_name)
+    add_login_name()
     
 def _initialize_snowflake():
     if 'snowflake' in ss:
@@ -62,8 +63,6 @@ def _apply_formatting():
         st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='assets/fwd_ico.png')
     except:
         pass
-    
-    add_login_name()
 
 def _build_nav_bar(page_name: str):
     with open("assets/style.css") as css:
