@@ -34,7 +34,7 @@ def _check_sso_authentication():
     unsafe_allow_html=True
     )
 
-    fwdoauth = st.secrets["fwdoauth"]
+    fwdoauth = st.secrets["oauth"]
     oauth2 = OAuth2Component(fwdoauth["client_id"], fwdoauth["client_secret"], fwdoauth["authorization_endpoint"], fwdoauth["token_endpoint"], None, None)
 
     if "ST_OAUTH" in ss:
