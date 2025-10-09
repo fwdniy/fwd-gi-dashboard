@@ -96,6 +96,7 @@ def _build_nav_bar(page_name: str):
                     if key2 == page_name:
                         verified = True
 
-    if not verified and page_name != "streamlit_app.py":
+    if True:
+    #if not verified and page_name != "streamlit_app.py":
         st.write("You are not authorized to view this page!")
         st.stop()
