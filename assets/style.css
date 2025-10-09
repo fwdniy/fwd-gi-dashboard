@@ -29,7 +29,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(> div[data-testid="element-c
     margin-bottom: 3.5px;
 }
 
-div[data-testid="stSidebarContent"] {
+div[class="st-emotion-cache-1p1m4ay e3g6aar0"] {
     display: flex;
 }
 
