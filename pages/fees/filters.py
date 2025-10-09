@@ -33,7 +33,7 @@ def build_month_end_filters():
     ss.selected_dates = selected_months
     
 def build_fees_filters(df):
-    lbus = df['LBU_CODE'].unique().tolist()
+    lbus = df['LBU_CODE_NAME'].unique().tolist()
     managers = df['MANAGER'].unique().tolist()
     asset_types = df['ASSET_TYPE'].unique().tolist()
     
@@ -41,7 +41,7 @@ def build_fees_filters(df):
     managers = st.multiselect('Manager', managers, default=managers, key='selected_manager')
     asset_types = st.multiselect('Asset Type', asset_types, default=asset_types, key='selected_asset_type')
 
-    filtered_df = df[(df['LBU_CODE'].isin(lbus)) & (df['MANAGER'].isin(managers)) & (df['ASSET_TYPE'].isin(asset_types))]
+    filtered_df = df[(df['LBU_CODE_NAME'].isin(lbus)) & (df['MANAGER'].isin(managers)) & (df['ASSET_TYPE'].isin(asset_types))]
     
     return filtered_df
 
