@@ -8,7 +8,7 @@ def authenticate_user():
     if "oauth" in st.secrets:
         authenticated = _check_sso_authentication()
     
-        if not authenticated:
+        if authenticated == False:
             st.error("Unable to authenticate user. Please contact the administrator.")
             st.stop()
         
@@ -43,7 +43,7 @@ def _check_sso_authentication():
     result = oauth2.authorize_button("Continue with Okta SSO", fwdoauth["redirect_uri"], fwdoauth["scope"])
 
     if not result or 'token' not in result:
-        return False
+        return None
     
     # If authorization successful, save token in session state
     ss["ST_OAUTH"] = result.get('token')

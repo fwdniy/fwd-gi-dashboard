@@ -42,7 +42,9 @@ def initialize():
     frame = inspect.stack()[1]
     caller_file = frame.filename
     page_name = caller_file.replace(f"{os.getcwd()}\\", "").replace("\\", "/")
-    page_name = "/".join(caller_file.split("/")[-2:])
+    
+    index = 2 if 'pages' in page_name else 1
+    page_name = "/".join(caller_file.split("/")[-index:])
     
     _apply_formatting()
     _initialize_snowflake()
