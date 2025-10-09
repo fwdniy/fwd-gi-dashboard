@@ -10,6 +10,8 @@ def authenticate_user():
     
         if authenticated == False:
             st.error("Unable to authenticate user. Please contact the administrator.")
+        
+        if not authenticated:
             st.stop()
         
     _get_permissions()
