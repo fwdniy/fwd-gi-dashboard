@@ -63,6 +63,14 @@ def _apply_formatting():
         st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='assets/fwd_ico.png')
     except:
         pass
+    
+    st.markdown("""
+        <style>
+            [data-testid="stToolbarActions"] {
+                display: none;
+            }
+        </style>
+        """, unsafe_allow_html=True)
 
 def _build_nav_bar(page_name: str):
     with open("assets/style.css") as css:
