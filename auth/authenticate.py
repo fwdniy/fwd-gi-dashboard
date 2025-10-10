@@ -60,7 +60,7 @@ def _check_sso_authentication():
     st.rerun()
 
 @st.cache_data(show_spinner=False)
-def get_user_permissions(force_reload=False):
+def get_user_permissions():
     sql = 'SELECT id, email, name, lbu, permissions, admin FROM supp.streamlit_users ORDER BY id;'
     df = ss.snowflake.query(sql)
         
@@ -74,6 +74,7 @@ def _get_permissions():
     if 'ST_OAUTH_EMAIL' in ss:
         email = ss['ST_OAUTH_EMAIL'].lower()
     
+    df['EMAIL'] = df['EMAIL'].str.lower()
     df = df[df['EMAIL'] == email].reset_index(drop=True)
     
     if len(df) == 1:
