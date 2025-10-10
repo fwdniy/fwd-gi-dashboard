@@ -1,15 +1,16 @@
 import streamlit as st
 
-def calculate_forward_rates_for_tenor(tenor, rate, tenors, tenor_rates, all_tenors):
+def calculate_forward_rates_for_tenor(tenor, tenors, tenor_rates, display_tenors):
     forward_rates = {}
-
-    for tenor2 in all_tenors:
+    rate = tenor_rates[tenor]
+    
+    for tenor2 in display_tenors:
         f_tenor = tenor + tenor2
 
         if tenor2 == 0:
             forward_rates[str(tenor2)] = rate
             continue
-        elif f_tenor > max(all_tenors):
+        elif f_tenor > max(display_tenors):
             continue
 
         smaller_tenor = max([t for t in tenors if t < f_tenor], default=min(tenors))
@@ -17,14 +18,15 @@ def calculate_forward_rates_for_tenor(tenor, rate, tenors, tenor_rates, all_teno
 
         if smaller_tenor != bigger_tenor:
             forward_rates[str(tenor2)] = _interpolate_forward_rate(
-                tenor, rate, f_tenor, smaller_tenor, bigger_tenor, tenor_rates
+                tenor, f_tenor, smaller_tenor, bigger_tenor, tenor_rates
             )
 
     return forward_rates
 
-def _interpolate_forward_rate(tenor, rate, f_tenor, smaller_tenor, bigger_tenor, tenor_rates):
+def _interpolate_forward_rate(tenor, f_tenor, smaller_tenor, bigger_tenor, tenor_rates):
     smaller_rate = tenor_rates[smaller_tenor]
     bigger_rate = tenor_rates[bigger_tenor]
+    rate = tenor_rates[tenor]
 
     interpolated_rate = smaller_rate + (
         (f_tenor - smaller_tenor) / (bigger_tenor - smaller_tenor)

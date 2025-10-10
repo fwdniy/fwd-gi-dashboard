@@ -44,6 +44,7 @@ def load_data(cashflow_types):
     
     return security_df, yearly_df
 
+@st.cache_data(show_spinner=False)
 def _get_asset_data(date):
     sql = f"SELECT bbgid, category, value FROM supp.cashflow_dates WHERE valuation_date = '{date}';"
     cf_df = ss['cashflow_df'] = ss.snowflake.query(sql)

@@ -9,11 +9,11 @@ def calculate_forward_rates(df):
     tenor_rates = dict(zip(tenors, rates))
     tenor_rates_forward = {}
 
-    for tenor, rate in tenor_rates.items():
+    for tenor in tenor_rates.keys():
         if tenor == 0 or tenor > max(DISPLAY_TENORS):
             continue
 
-        forward_rates = calculate_forward_rates_for_tenor(tenor, rate, tenors, tenor_rates, DISPLAY_TENORS)
+        forward_rates = calculate_forward_rates_for_tenor(tenor, tenors, tenor_rates, DISPLAY_TENORS)
         tenor_rates_forward[str(tenor)] = forward_rates
         
     return tenor_rates_forward
