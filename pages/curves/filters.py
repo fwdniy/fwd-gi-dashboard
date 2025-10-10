@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit import session_state as ss
 import pandas as pd
-from .data import get_curves
+from db.data.curve import get_curves
 from interface.filters import build_date_filter
 
 def build_filters():
