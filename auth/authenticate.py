@@ -12,7 +12,13 @@ def authenticate_user():
             st.error("Unable to authenticate user. Please contact the administrator.")
         
         if not authenticated:
-            st.sidebar.empty()
+            st.markdown("""
+                <style>
+                    [data-testid="stToolbarActions"] {
+                        display: none;
+                    }
+                </style>
+                """, unsafe_allow_html=True)
             st.stop()
         
     _get_permissions()
