@@ -49,9 +49,11 @@ def build_lbu_filter(funds = []):
     
     ss['selected_funds'] = selected_funds
     
-def build_lbu_filter_hk():
+def build_lbu_filter_hk(fund_codes = []):
     df = ss['lbu_df_hk'] = get_lbu_data_hk(SUB_LBU, HK_CODE, FUND_CODE)
     
+    df = df[df[FUND_CODE].isin(fund_codes)] if fund_codes else df
+        
     # Define the column mappings for labels and values
     column_mapping = [
         {'label': SUB_LBU, 'value': SUB_LBU},
@@ -60,8 +62,7 @@ def build_lbu_filter_hk():
     ]
     
     nested_dict = build_nested_dict(df, [mapping['value'] for mapping in column_mapping])
-    
-    
+     
     # Create tree nodes with label/value mapping
     nodes = create_tree_nodes(nested_dict, column_mapping, df)
     
