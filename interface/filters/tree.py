@@ -118,7 +118,7 @@ def build_nested_dict(df, columns):
 
     return convert(nested)
 
-#@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def _get_label_and_value(item, current_value_col, current_label_col, current_filters, df):
     """Helper function to get label and value for a node."""
     query_conditions = [f"{col}=='{val}'" for col, val in current_filters.items()]
@@ -140,7 +140,7 @@ def _get_label_and_value(item, current_value_col, current_label_col, current_fil
 
     return label, node_value
 
-#@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def create_tree_nodes(data, column_mapping, df, parent_filters=None, level=0):
     """
     Convert nested dictionary to tree select nodes structure with custom labels
@@ -150,6 +150,7 @@ def create_tree_nodes(data, column_mapping, df, parent_filters=None, level=0):
         parent_filters = {}
 
     if isinstance(data, dict):
+        data = dict(sorted(data.items()))
         for key, value in data.items():
             current_value_col = column_mapping[level]['value']
             current_label_col = column_mapping[level]['label']
@@ -168,7 +169,8 @@ def create_tree_nodes(data, column_mapping, df, parent_filters=None, level=0):
     elif isinstance(data, list):
         current_value_col = column_mapping[level]['value']
         current_label_col = column_mapping[level]['label']
-
+        data = sorted(data)
+        
         for item in data:
             current_filters = parent_filters.copy()
             
