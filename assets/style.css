@@ -51,6 +51,6 @@ div.st-key-app_title div.stHeading h1 {
     font-size: xx-large;
 }
 
-.st-ey {
-    max-width: 200px
+[data-baseweb="tag"] span[title]{
+    max-width: 300px
 }
