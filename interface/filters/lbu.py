@@ -50,7 +50,7 @@ def build_lbu_filter(funds = []):
     ss['selected_funds'] = selected_funds
     
 def build_lbu_filter_hk(fund_codes = []):
-    df = ss['lbu_df_hk'] = get_lbu_data_hk(SUB_LBU, HK_CODE, FUND_CODE)
+    df = get_lbu_data_hk()
     
     df = df[df[FUND_CODE].isin(fund_codes)] if fund_codes else df
         

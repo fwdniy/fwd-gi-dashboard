@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit import session_state as ss
 from datetime import datetime
 import pandas as pd
+from db.data.lbu import FUND_CODE, SUB_LBU, HK_CODE
 
 @st.cache_data(show_spinner=False)
 def get_funnelweb_dates() -> list[datetime]:
@@ -20,15 +21,15 @@ def get_lbu_data():
     return df
 
 @st.cache_data(show_spinner=False)
-def get_lbu_data_hk(SUB_LBU, HK_CODE, FUND_CODE):
+def get_lbu_data_hk(sub_lbu=SUB_LBU, hk_code=HK_CODE, fund_code=FUND_CODE):
     df = get_lbu_data()
     
-    df = df[df[SUB_LBU] != 'None']
-    missing_df = df[df[HK_CODE] == 'None']
+    df = df[df[sub_lbu] != 'None']
+    missing_df = df[df[hk_code] == 'None']
     
     if len(missing_df) > 0:
-        st.warning(f"The following funds is not mapped to a three letter HK code: {', '.join(missing_df[FUND_CODE].tolist())}! Please contact {st.secrets['admin']['name']}.")
-        df = df[df[HK_CODE] != 'None']
+        st.warning(f"The following funds is not mapped to a three letter HK code: {', '.join(missing_df[fund_code].tolist())}! Please contact {st.secrets['admin']['name']}.")
+        df = df[df[hk_code] != 'None']
         
     return df
 
