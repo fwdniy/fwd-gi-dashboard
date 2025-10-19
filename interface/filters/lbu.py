@@ -4,7 +4,7 @@ from db.data.data_shipment import get_lbu_data, get_lbu_data_hk
 from interface.filters.tree import build_nested_dict, create_tree_nodes, build_tree_filter, _get_expanded_values
 from db.data.lbu import LBU_GROUP, LBU_GROUP_NAME, LBU_CODE, LBU_CODE_NAME, FUND_TYPE, FUND_CODE, SUB_LBU, HK_CODE
 
-def build_lbu_filter(funds = []):
+def build_lbu_filter():
     df = get_lbu_data()
     
     lbu = ss['lbu']
@@ -31,7 +31,6 @@ def build_lbu_filter(funds = []):
         "value": "all",
         "children": nodes
     }
-    
     
     # Get expanded values only for the Select All node
     expanded_values = _get_expanded_values([all_node], None)
