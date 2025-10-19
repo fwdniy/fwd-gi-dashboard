@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit import session_state as ss
 from streamlit_tree_select import tree_select
 from collections import defaultdict
+from db.data.lbu import LBU_GROUP, LBU_CODE, FUND_TYPE, SUB_LBU, HK_CODE
 
 # Constants for column names
 FUND_TYPE = 'TYPE'
