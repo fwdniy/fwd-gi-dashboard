@@ -1,5 +1,7 @@
 import streamlit as st
 from streamlit import session_state as ss
+from datetime import datetime
+import pandas as pd
 
 @st.cache_data(show_spinner=False)
 def get_curves():
@@ -12,5 +14,16 @@ def get_curves():
     )
 
     df = ss.snowflake.query(sql)
+    
+    df['VALUATION_DATE'] = pd.to_datetime(df['VALUATION_DATE']).dt.date
 
+    return df
+
+def get_curve(curve_name, valuation_date):
+    if isinstance(valuation_date, (datetime, pd.Timestamp)):
+        valuation_date = valuation_date.date()
+    
+    df = get_curves()
+    df = df[(df['CURVE'] == curve_name) & (df['VALUATION_DATE'] == valuation_date)]
+    
     return df
