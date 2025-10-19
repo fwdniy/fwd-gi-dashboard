@@ -73,7 +73,11 @@ def build_lbu_filter_hk(fund_codes = []):
     }
     
     # Get expanded values only for the Select All node
-    expanded_values = _get_expanded_values([all_node], None)
+    expanded_level = None
+    if fund_codes:
+        expanded_level = LBU_GROUP
+        
+    expanded_values = _get_expanded_values([all_node], expanded_level)
     
     selected = build_tree_filter(
         "HK Entity / Fund Type / HK Fund Code", 
