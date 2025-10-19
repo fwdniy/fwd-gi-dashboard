@@ -5,10 +5,8 @@ from collections import defaultdict
 from db.data.lbu import LBU_GROUP, LBU_CODE, FUND_TYPE, SUB_LBU, HK_CODE
 
 # Constants for column names
-FUND_TYPE = 'TYPE'
-LBU_CODE = 'BLOOMBERG_NAME'
-LBU_GROUP = 'LBU_GROUP'
-HK_CODE = 'HK_CODE'
+
+COLUMN_ORDER = [None, LBU_GROUP, LBU_CODE, SUB_LBU, FUND_TYPE]
 
 def _collect_all_values(nodes):
     """
@@ -40,7 +38,6 @@ def _get_expanded_values(nodes, expand_to_column, current_level=None):
         list: List of values to be expanded
     """
     expanded = []
-    column_order = [None, LBU_GROUP, LBU_CODE, FUND_TYPE]  # None for 'all' node
     
     for node in nodes:
         value = node['value']
@@ -55,8 +52,8 @@ def _get_expanded_values(nodes, expand_to_column, current_level=None):
             current_col = None
             
         # Get indices for current and target levels
-        current_idx = column_order.index(current_col)
-        target_idx = column_order.index(expand_to_column)
+        current_idx = COLUMN_ORDER.index(current_col)
+        target_idx = COLUMN_ORDER.index(expand_to_column)
         
         # Only expand children if we haven't reached the target level yet
         if 'children' in node and current_idx < target_idx:
