@@ -1,3 +1,6 @@
+2025/10/20
+- Collateral Calculator: updated user interface to be easier to use
+
 2025/10/09
 - Overhauled codebase and updated Streamlit interface
 

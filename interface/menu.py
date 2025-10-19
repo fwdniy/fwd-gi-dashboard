@@ -15,7 +15,7 @@ PAGES = {
     },
     "Hong Kong": {
         "pages/hk_asset_allocation.py": "Asset Allocation",
-        "pages/collateral.py": "Collateral Calculator",
+        "pages/collateral_calculator.py": "Collateral Calculator",
         "pages/projector.py": "Projector"
     },
     "Fees": {
