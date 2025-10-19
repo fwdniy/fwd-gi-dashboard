@@ -61,7 +61,7 @@ def _get_expanded_values(nodes, expand_to_column, current_level=None):
     
     return expanded
 
-def build_tree_filter(label: str, nodes: list[dict], key: str, checked: list[str] = [], expanded: list[str] = [], height = 200):
+def build_tree_filter(label: str, nodes: list[dict], key: str, checked: list[str] = [], expanded: list[str] = [], height = 200):    
     if key not in ss:
         ss[key] = None
         st.rerun()
