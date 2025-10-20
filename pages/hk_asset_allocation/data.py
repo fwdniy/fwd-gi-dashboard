@@ -110,7 +110,7 @@ def _get_sum_df(sql=None):
     return df
 
 def _map_entity_hk_code(df):
-    lbu_df = ss['lbu_df_hk']
+    lbu_df = get_lbu_data_hk()
     
     entity_map = dict(zip(lbu_df[FUND_CODE], lbu_df[SUB_LBU]))
     hk_code_map_raw = dict(zip(lbu_df[FUND_CODE], lbu_df[HK_CODE]))
