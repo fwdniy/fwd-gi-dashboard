@@ -71,12 +71,12 @@ def build_form(df):
             error = True
             
             if submitted:
-                error = _check_form(email, name, permissions, lbu, custom_permissions)
-                
+                error = _check_form(email, name, lbu)
+
             if not error or 'user_details' in ss:
                 _add_user(email, name, permissions, lbu, custom_permissions)
                     
-def _check_form(email, name, permissions, lbu, custom_permissions):
+def _check_form(email, name, lbu):
     error_messages = []
     if email == '':
         error_messages.append('Email is required.')
@@ -84,8 +84,6 @@ def _check_form(email, name, permissions, lbu, custom_permissions):
         error_messages.append('Name is required.')
     if lbu is None:
         error_messages.append('LBU is required.')
-    if permissions == [] and custom_permissions == '':
-        error_messages.append('Permissions is required.')
 
     error = False
     
