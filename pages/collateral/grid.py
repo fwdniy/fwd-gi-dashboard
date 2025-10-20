@@ -21,6 +21,7 @@ def _build_valuations_grid(config):
     csa_mapping = {row['ID']: row['NAME'] for _, row in csa_details.iterrows()}
     df['CSA_ID'] = df['CSA_ID'].map(csa_mapping)
     df.rename(columns={'CSA_ID': 'COUNTERPARTY'}, inplace=True)
+    df['TENOR_UPPER'] = df['TENOR_UPPER'].replace(-1, None, inplace=False)
     
     df['PERCENTAGE'] = df['PERCENTAGE'] * 100
     
