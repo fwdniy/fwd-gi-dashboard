@@ -38,6 +38,7 @@ def _build_eligibility_grid(config):
     csa_mapping = {row['ID']: row['NAME'] for _, row in csa_details.iterrows()}
     df['CSA_ID'] = df['CSA_ID'].map(csa_mapping)
     df.rename(columns={'CSA_ID': 'COUNTERPARTY'}, inplace=True)
+    df.sort_values(by=['COUNTERPARTY', 'ASSET_TYPE', 'FIELD'], inplace=True)
     
     grid = AgGridBuilder(df)
     with st.expander("Eligibility Logic", expanded=True):
