@@ -3,6 +3,7 @@ from grid import AgGridBuilder
 
 def build_grid(config, df):
     _build_valuations_grid(config)
+    _build_eligibility_grid(config)
     _build_summary_grid(config, df)
     _build_main_grid(config, df)
     
@@ -26,7 +27,21 @@ def _build_valuations_grid(config):
     df['PERCENTAGE'] = df['PERCENTAGE'] * 100
     
     grid = AgGridBuilder(df)
-    grid.show_grid(height=300)
+    
+    with st.expander("Valuation Percentage Logic", expanded=True):
+        grid.show_grid(height=300)
+    
+def _build_eligibility_grid(config):
+    df = config.CSA_LOGICS
+    
+    csa_details = config.CSA_DETAILS
+    csa_mapping = {row['ID']: row['NAME'] for _, row in csa_details.iterrows()}
+    df['CSA_ID'] = df['CSA_ID'].map(csa_mapping)
+    df.rename(columns={'CSA_ID': 'COUNTERPARTY'}, inplace=True)
+    
+    grid = AgGridBuilder(df)
+    with st.expander("Eligibility Logic", expanded=True):
+        grid.show_grid(height=300)
     
 def _build_summary_grid(config, df):
     counterparties = config.CSA_COUNTERPARTIES
