@@ -20,6 +20,7 @@ def filter_corporate_bond_csas(config, selected_cps=None, selected_asset_types=N
     csa_valuations = config.CSA_VALUATIONS
     csa_details = config.CSA_DETAILS
     csa_funds_mapped = config.CSA_FUNDS_MAPPED
+    csa_logics = config.CSA_LOGICS
     
     corp_csa_ids = csa_valuations[csa_valuations['ASSET_TYPE'] == 'Corporate Bonds']['CSA_ID'].unique().tolist()
     corp_csa_details = csa_details[csa_details['ID'].isin(corp_csa_ids)]
@@ -31,6 +32,7 @@ def filter_corporate_bond_csas(config, selected_cps=None, selected_asset_types=N
     
     csa_valuations = csa_valuations[csa_valuations['CSA_ID'].isin(corp_csa_ids)]
     csa_funds_mapped = csa_funds_mapped[csa_funds_mapped['CSA_ID'].isin(corp_csa_ids)]
+    csa_logics = csa_logics[csa_logics['CSA_ID'].isin(corp_csa_ids)]
     
     if selected_asset_types is not None:
         csa_valuations = csa_valuations[csa_valuations['ASSET_TYPE'].isin(selected_asset_types)]
@@ -39,6 +41,7 @@ def filter_corporate_bond_csas(config, selected_cps=None, selected_asset_types=N
     config.CSA_FUNDS_MAPPED = csa_funds_mapped
     config.CSA_VALUATIONS = csa_valuations
     config.CSA_DETAILS = corp_csa_details
+    config.CSA_LOGICS = csa_logics
     
     return config
 
