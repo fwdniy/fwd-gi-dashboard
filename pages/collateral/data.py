@@ -171,9 +171,6 @@ def _add_haircut_valuations(valuation_logic, df, agencies, agency_mappings, cp):
         
         if pd.isna(tenor):
             tenor = 0
-        
-        if row['SECURITY_NAME'] == 'DTE 2.95 03/01/50':
-            pass
                     
         for _, logic in valuation_logic.iterrows():
             tenor_lower = logic['TENOR_LOWER']
