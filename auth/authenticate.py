@@ -65,7 +65,7 @@ def _check_sso_authentication():
 
     st.rerun()
 
-@st.cache_data(ttl=3600, show_spinner=False)(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_user_permissions():
     sql = 'SELECT id, email, name, lbu, permissions, admin FROM supp.streamlit_users ORDER BY id;'
     df = ss.snowflake.query(sql)
