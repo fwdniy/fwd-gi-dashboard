@@ -14,7 +14,7 @@ def get_data():
     
     return df
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_positions(selected_dates):
     selected_dates_string = "', '".join([date.strftime('%Y-%m-%d') for date in selected_dates])
     
@@ -64,7 +64,7 @@ def get_fee_data(config):
     
     return config
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_calc_modes():
     sql = 'SELECT id, mode FROM fees.calc_mode;'
     df = ss.snowflake.query(sql)
@@ -73,7 +73,7 @@ def _get_calc_modes():
     
     return mode_dict, mode_id_dict
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_mv_modes():
     sql = 'SELECT id, mode FROM fees.mv_mode;'
     df = ss.snowflake.query(sql)
@@ -82,7 +82,7 @@ def _get_mv_modes():
     
     return mode_dict, mode_id_dict
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_managers():
     sql = 'SELECT id, name, mv_mode_id FROM supp.manager_group;'
     df = ss.snowflake.query(sql)
@@ -92,7 +92,7 @@ def _get_managers():
     
     return manager_dict, manager_id_dict, manager_mv_dict
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_users():
     df = get_user_permissions()
     user_dict = dict(zip(df['ID'], df['EMAIL']))
@@ -100,21 +100,21 @@ def _get_users():
     
     return user_dict, user_id_dict
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_ima_fees():
     sql = 'SELECT id, lbu_code, manager_id, asset_type, effective_date, created_at, created_by_id FROM fees.ima_fees;'
     df = ss.snowflake.query(sql)
     
     return df
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_ima_fees_details():
     sql = 'SELECT id, fee_id, fee_bps, calc_mode_id, calc_mode_args, created_at, created_by_id FROM fees.ima_fees_bps;'
     df = ss.snowflake.query(sql)
     
     return df
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_custom_manager_data():
     sql = 'SELECT manager_id, category, value, value2, created_at, created_by_id FROM fees.custom_fees;'
     df = ss.snowflake.query(sql)

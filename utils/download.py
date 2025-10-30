@@ -5,7 +5,7 @@ import pandas as pd
 from io import BytesIO
 from datetime import datetime
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _to_excel(df):
     output = BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:

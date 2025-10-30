@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 from db.data.lbu import FUND_CODE, SUB_LBU, HK_CODE
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_funnelweb_dates() -> list[datetime]:
     sql = 'SELECT DISTINCT closing_date FROM funnelweb WHERE closing_date >= \'2021-12-31\' ORDER BY closing_date;'
     df = ss.snowflake.query(sql)
@@ -13,14 +13,14 @@ def get_funnelweb_dates() -> list[datetime]:
     
     return dates
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_lbu_data():
     sql = "SELECT l.group_name, f.lbu, f.type, f.short_name, l.bloomberg_name, l.lbu_group, f.sub_lbu, f.vfa, f.hk_code FROM supp.fund AS f LEFT JOIN supp.lbu AS l ON l.name = f.lbu WHERE l.bloomberg_name <> \'LT\' AND f.type <> 'N/A' ORDER BY group_name, lbu, sub_lbu, type, short_name;"
     df = ss.snowflake.query(sql)
     
     return df
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_lbu_data_hk(sub_lbu=SUB_LBU, hk_code=HK_CODE, fund_code=FUND_CODE):
     df = get_lbu_data()
     
@@ -33,7 +33,7 @@ def get_lbu_data_hk(sub_lbu=SUB_LBU, hk_code=HK_CODE, fund_code=FUND_CODE):
         
     return df
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_hk_code_dict():
     lbu_df = get_lbu_data_hk()
     
@@ -41,7 +41,7 @@ def get_hk_code_dict():
     
     return hk_code_dict
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_fx_data():
     """Get all FX data (consider using more specific functions above instead)"""
     sql: str = 'SELECT valuation_date, fx, rate FROM supp.fx_rates WHERE valuation_date >= \'2021-12-31\' ORDER BY valuation_date, fx;'

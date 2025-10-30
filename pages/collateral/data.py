@@ -227,7 +227,7 @@ def get_csa_data(config):
     
     return config
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_csa_funds_mapped():
     sql = """
         SELECT 
@@ -246,7 +246,7 @@ def _get_csa_funds_mapped():
     
     return csa_funds_mapped
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_csa_details():
     sql = """
         WITH max_dates AS (
@@ -283,7 +283,7 @@ def _get_csa_details():
     
     return csa_details
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_csa_logics():
     sql = """
         SELECT 
@@ -300,7 +300,7 @@ def _get_csa_logics():
     
     return csa_logics
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_csa_valuations():
     sql = """
         SELECT 
@@ -322,7 +322,7 @@ def _get_csa_valuations():
     
     return csa_valuations
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_ratings_mapping(agencies):
     sql = """
         SELECT 
@@ -360,7 +360,7 @@ def get_ratings_mapping(agencies):
     
     return agency_mappings
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_funnelweb_data(date, config):
     '''
     Fetches the funnelweb data based on the fields specified by the collateral logic

@@ -20,7 +20,7 @@ def verify_and_load_data():
     
     return df
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _prepare_asset_allocation_data(fund_codes):
     """Process and validate the asset allocation data"""
     # Get raw data
@@ -45,7 +45,7 @@ def _get_data():
     
     return df
     
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_asset_allocation_data(current_date, comparison_date):
     current_date_string = current_date.strftime('%Y-%m-%d')
     comparison_date_string = comparison_date.strftime('%Y-%m-%d')
@@ -154,7 +154,7 @@ def _reorder_columns(df, weighted_columns):
     
     return df[cols]
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def process_data(df):
     """Process asset allocation data with calculations and formatting"""
     # Get parameters

@@ -77,7 +77,7 @@ def build_tree_filter(label: str, nodes: list[dict], key: str, checked: list[str
     
     return selected
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def build_nested_dict(df, columns):
     """
     Build a nested dictionary from a DataFrame based on a list of column names.
@@ -116,7 +116,7 @@ def build_nested_dict(df, columns):
 
     return convert(nested)
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_label_and_value(item, current_value_col, current_label_col, current_filters, df):
     """Helper function to get label and value for a node."""
     query_conditions = [f"{col}=='{val}'" for col, val in current_filters.items()]
@@ -138,7 +138,7 @@ def _get_label_and_value(item, current_value_col, current_label_col, current_fil
 
     return label, node_value
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def create_tree_nodes(data, column_mapping, df, parent_filters=None, level=0):
     """
     Convert nested dictionary to tree select nodes structure with custom labels

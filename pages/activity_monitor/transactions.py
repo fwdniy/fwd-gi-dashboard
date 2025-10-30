@@ -5,7 +5,7 @@ import numpy as np
 from st_aggrid import JsCode
 from grid.formatting import format_numbers, conditional_formatting
 
-#@st.cache_data(show_spinner=False)
+#@st.cache_data(ttl=3600, show_spinner=False)
 def compute_transactions(df):
     """Compute transactions for specific types in the grid"""
     increase_columns = {}
@@ -39,7 +39,7 @@ def compute_transactions(df):
     
     return df, trans_cols, trans_col_headers
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _build_start_end_data(df):
     """Get start and end dataframes for the selected date range"""
     start_date = ss.start_date_string

@@ -82,7 +82,7 @@ def _get_start_end_positions(df):
     
     return start_df, end_df
 
-@st.cache_data
+@st.cache_data(ttl=3600, show_spinner=False)
 def _build_config_lists(config):
     """Build lists of columns from config"""
     identifier_columns = [column.upper() for column in config.IDENTIFIER_COLUMNS]
@@ -144,7 +144,7 @@ def _join_saa_group(df):
     
     return df
 
-@st.cache_data
+@st.cache_data(ttl=3600, show_spinner=False)
 def _build_saa_group_mapping():
     """Build mapping of fund short name to SAA group"""
     df = ss.snowflake.query("SELECT short_name, saa_group, lbu_group FROM supp.fund f, supp.lbu l WHERE f.lbu = l.name;")

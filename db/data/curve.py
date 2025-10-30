@@ -3,7 +3,7 @@ from streamlit import session_state as ss
 from datetime import datetime
 import pandas as pd
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_curves():
     sql = (
         "SELECT valuation_date, curve, fx, tenor, rate "

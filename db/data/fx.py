@@ -5,13 +5,13 @@ import pandas as pd
 
 from .data_shipment import get_fx_data
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_fx_list() -> list[str]:
     """Get a list of unique FX currencies"""
     df = get_fx_data()
     return sorted(df['FX'].unique())
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_fx_rates_for_date(valuation_date: datetime) -> dict[str, float]:
     """Get all FX rates for a specific date
     
@@ -28,7 +28,7 @@ def get_fx_rates_for_date(valuation_date: datetime) -> dict[str, float]:
     date_df = df[df['VALUATION_DATE'] == valuation_date]
     return dict(zip(date_df['FX'], date_df['RATE']))
 
-#@st.cache_data(show_spinner=False)
+#@st.cache_data(ttl=3600, show_spinner=False)
 def get_fx_rate(fx: str, valuation_date: datetime) -> float:
     """Get a specific FX rate for a date
     

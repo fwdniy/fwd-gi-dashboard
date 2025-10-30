@@ -52,7 +52,7 @@ def get_data(config, bar):
     
     return df
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_average_costs(date):
     """Get average costs for all positions as of a specific date"""
     average_cost_sql = f"""
@@ -165,7 +165,7 @@ def _compute_average_costs(position_ids, position_changes, positions, prices, fi
         
     return average_costs
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_positions(config, start_date, end_date, start_average_costs, end_average_costs, fund_codes):
     """Get position data for start and end date, patched with average costs and other overrides"""
     sql = _build_sql(config, start_date, end_date, fund_codes)
@@ -178,7 +178,7 @@ def _get_positions(config, start_date, end_date, start_average_costs, end_averag
     
     return df
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _build_sql(config, start_date, end_date, fund_codes):
     """Build SQL query to get position data for start and end date"""
     fund_codes_string = "', '".join(fund_codes)

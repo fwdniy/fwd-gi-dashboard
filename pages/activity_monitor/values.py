@@ -4,7 +4,7 @@ from st_aggrid import JsCode
 
 from grid.formatting import format_numbers, conditional_formatting
 
-#@st.cache_data(show_spinner=False)
+#@st.cache_data(ttl=3600, show_spinner=False)
 def build_value_columns(config, df, selected_values):
     """Build value columns for the grid. This includes the start and end date values and the delta value."""
             
