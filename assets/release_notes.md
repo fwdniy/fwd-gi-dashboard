@@ -1,5 +1,6 @@
 2025/10/20
 - Collateral Calculator: updated user interface to be easier to use
+- Added support for night mode
 
 2025/10/09
 - Overhauled codebase and updated Streamlit interface
