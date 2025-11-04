@@ -146,6 +146,9 @@ def _compute_notional(unit, position, mortgage_fac, principal_fac, fx_rate, net_
     
     notional = unit * position * mortgage_fac * principal_fac * fx_rate
     
+    if net_mv == 0:
+        return 0
+    
     if notional / net_mv > 100:
         notional /= 1000
     
