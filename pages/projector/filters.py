@@ -18,7 +18,7 @@ def build_filters(cashflow_types):
 def build_liability_group_filters():
     date = ss.selected_date
     df = get_liabilities(date)
-    
+
     groups = list(df['GROUP_NAME'].unique())
     
     if len(groups) == 0:
@@ -36,7 +36,7 @@ def _get_funds(selected_groups):
 
     return funds
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_fund_mapping():
     sql = 'SELECT cashflow_name, short_name FROM supp.fund WHERE cashflow_name IS NOT NULL ORDER BY cashflow_name'
     df = ss.snowflake.query(sql)

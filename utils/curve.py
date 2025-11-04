@@ -23,19 +23,7 @@ def calculate_forward_rates_for_tenor(tenor, tenors, tenor_rates, display_tenors
 
     return forward_rates
 
-def _interpolate_forward_rate(tenor, f_tenor, smaller_tenor, bigger_tenor, tenor_rates):
-    smaller_rate = tenor_rates[smaller_tenor]
-    bigger_rate = tenor_rates[bigger_tenor]
-    rate = tenor_rates[tenor]
-
-    interpolated_rate = smaller_rate + (
-        (f_tenor - smaller_tenor) / (bigger_tenor - smaller_tenor)
-        * (bigger_rate - smaller_rate)
-    )
-
-    return (interpolated_rate * f_tenor - rate * tenor) / (f_tenor - tenor)
-
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def convert_tenors_to_float(rates: dict[str, float]):
     tenor_mapping: dict[str, float] = {"1m": 1 / 12, "3m": 3 / 12, "6m": 6 / 12}
     rates_converted: dict[float, float] = {}
@@ -52,7 +40,7 @@ def convert_tenors_to_float(rates: dict[str, float]):
 
     return rates_converted
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def convert_floats_to_tenor(tenors: list[float]):
     # Round tenor_mapping values to 6 decimal places
     tenor_mapping: dict[str, float] = {key: round(value, 6) for key, value in {"1m": 1 / 12, "3m": 3 / 12, "6m": 6 / 12}.items()}

@@ -4,7 +4,7 @@ import pandas as pd
 
 from .cashflow import build_cashflows, build_yearly_cashflow_df
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_liabilities(date):
     sql = f"SELECT group_name, year, value, mode FROM liability_profile.hk_liabilities WHERE as_of_date = (SELECT max(as_of_date) AS max_date FROM liability_profile.hk_liabilities WHERE as_of_date <= '{date}');"
     df = ss.snowflake.query(sql)
@@ -44,7 +44,7 @@ def load_data(cashflow_types):
     
     return security_df, yearly_df
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _get_asset_data(date):
     sql = f"SELECT bbgid, category, value FROM supp.cashflow_dates WHERE valuation_date = '{date}';"
     cf_df = ss['cashflow_df'] = ss.snowflake.query(sql)
