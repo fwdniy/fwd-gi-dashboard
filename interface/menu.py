@@ -4,6 +4,8 @@ from db.snowflake_streamlit import SnowflakeStreamlit
 from auth.authenticate import authenticate_user, add_login_name
 import inspect
 import os
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 PAGES = {
     "General": {
@@ -63,6 +65,31 @@ def _apply_formatting():
         st.set_page_config(layout="wide", page_title='Stilson Dashboard', page_icon='assets/fwd_ico.png')
     except:
         pass
+
+def log_activity(page_name):
+    if "oauth" not in st.secrets:
+        return
+    
+    if 'page_name' in ss and page_name == ss.page_name:
+        return
+
+    sql = f"""
+        INSERT INTO supp.streamlit_activity (
+            timestamp, 
+            email, 
+            name, 
+            page
+        ) VALUES (
+            '{datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y-%m-%d %H:%M:%S')}', 
+            '{ss.ST_OAUTH_EMAIL}', 
+            '{ss.nickname}', 
+            '{page_name}'
+        );
+    """
+
+    ss.snowflake.execute(sql)
+    
+    ss.page_name = page_name
 
 def _build_nav_bar(page_name: str):
     with open("assets/style.css") as css:
