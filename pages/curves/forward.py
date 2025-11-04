@@ -23,10 +23,10 @@ def format_forward_rates(tenor_rates_forward):
 
     tenor_columns = [float(col) for col in grid_df.columns if col != 'index']
     tenor_dict = dict(zip(tenor_columns, convert_floats_to_tenor(tenor_columns)))
-    tenor_dict['index'] = 'Forward \ Tenor'
+    tenor_dict['index'] = 'Forward \\ Tenor'
 
     grid_df = grid_df.rename(columns=tenor_dict)
-    grid_df['Forward \ Tenor'] = convert_floats_to_tenor(
+    grid_df['Forward \\ Tenor'] = convert_floats_to_tenor(
         [float(tenor) for tenor in grid_df['Forward \\ Tenor']]
     )
 
