@@ -27,6 +27,8 @@ def _build_selected_grid(df, selected_years):
     
     grid = AgGridBuilder(df, min_width=100)
     grid.add_column('VALUE', cell_style=None)
+    grid.add_column('COUPON', cell_style=None)
+    grid.add_column('PRINCIPAL', cell_style=None)
     grid.add_column('NOTIONAL', cell_style=None)
     grid.show_grid()
     

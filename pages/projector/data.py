@@ -81,7 +81,7 @@ def build_asset_liability_df(asset_df, cashflow_types):
     
     df.fillna(0, inplace=True)
     
-    df['Net Cashflow'] = df.drop(columns=['YEAR']).sum(axis=1)
+    df['Net Cashflow'] = df.drop(columns=['YEAR', 'PRINCIPAL', 'COUPON']).sum(axis=1)
     df['Cumulative Cashflow'] = df['Net Cashflow'].cumsum()
     
     return df

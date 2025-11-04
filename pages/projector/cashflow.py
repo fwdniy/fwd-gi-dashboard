@@ -29,9 +29,12 @@ COLUMN_MAPPING = {
     'value': 'VALUE',
     'notional': 'NOTIONAL',
     'cashflow': 'CASHFLOW',
-    'cashflow_notional': 'CASHFLOW_NOTIONAL',
+    'cashflow_dollar': 'CASHFLOW_DOLLAR',
+    'coupon_dollar': 'COUPON_DOLLAR',
+    'principal_dollar': 'PRINCIPAL_DOLLAR',
     'bbg_asset_type': 'BBG_ASSET_TYPE',
     'net_mv': 'NET_MV',
+    'principal': 'PRINCIPAL',
 }
 
 def build_cashflows(pos_df, cf_df):
@@ -52,38 +55,39 @@ def build_cashflows(pos_df, cf_df):
     df = pd.merge(df, cf_df, left_on='BBGID_V2', right_on='BBGID', how='left')
 
     cashflows_list = []
+    coupon_dollars_list = []
+    principal_dollars_list = []
     notionals_list = []
-    cashflows_notional_list = []
+    cashflow_dollars_list = []
 
-    for index, row in df.iterrows():
-        if row['BBGID_V2'] == 'COBQ3267243':
-            print()
-        
+    for _, row in df.iterrows():        
         cashflow_columns = ['maturity', 'call_date', 'call_price', 'redemption_value', 'coupon', 'freq', 'first_coupon', 'penultimate_coupon']
-        cashflow = _compute_and_store(index, row, cashflow_columns, {}, _compute_cashflows)
+        
+        cashflow_kwargs = _build_kwargs(row, cashflow_columns)
+        cashflow, coupons, principal = _compute_cashflows(**cashflow_kwargs)
 
-        notional_columns = ['unit', 'position', 'mortgage_fac', 'principal_fac', 'fx_rate', 'net_mv']        
-        notional = _compute_and_store(index, row, notional_columns, {}, _compute_notional)
+        notional_columns = ['unit', 'position', 'mortgage_fac', 'principal_fac', 'fx_rate', 'net_mv']
+        notional_kwargs = _build_kwargs(row, notional_columns)
+        notional = _compute_notional(**notional_kwargs)
 
-        cashflow_notional = _adjust_cashflows(cashflow, notional)
+        cashflow_dollar = _adjust_cashflows(cashflow, notional)
+        coupons_dollar = _adjust_cashflows(coupons, notional)
+        principal_dollar = _adjust_cashflows(principal, notional)
 
         cashflows_list.append(cashflow)
         notionals_list.append(notional)
-        cashflows_notional_list.append(cashflow_notional)
+        cashflow_dollars_list.append(cashflow_dollar)
+        coupon_dollars_list.append(coupons_dollar)
+        principal_dollars_list.append(principal_dollar)
 
     # Add new columns to the DataFrame
     df[COLUMN_MAPPING['cashflow']] = cashflows_list
     df[COLUMN_MAPPING['notional']] = notionals_list
-    df[COLUMN_MAPPING['cashflow_notional']] = cashflows_notional_list
+    df[COLUMN_MAPPING['cashflow_dollar']] = cashflow_dollars_list
+    df[COLUMN_MAPPING['coupon_dollar']] = coupon_dollars_list
+    df[COLUMN_MAPPING['principal_dollar']] = principal_dollars_list
 
     return df
-        
-def _compute_and_store(index, row, columns, dict, func):
-    kwargs = _build_kwargs(row, columns)
-    result = func(**kwargs)
-    dict[index] = result
-    
-    return result
 
 def _compute_cashflows(maturity, call_date, call_price, redemption_value, coupon, freq, first_coupon, penultimate_coupon):
     selected_date = datetime.combine(ss.selected_date, datetime.min.time())
@@ -100,7 +104,12 @@ def _compute_cashflows(maturity, call_date, call_price, redemption_value, coupon
     final_payment = principal + coupon
 
     cashflows = {}
+    coupons = {}
+    principals = {}
+    
     cashflows[to_date_string(max_date)] = final_payment
+    coupons[to_date_string(max_date)] = coupon
+    principals[to_date_string(max_date)] = principal
 
     if freq != 0:
         per_x_months = 12 / freq
@@ -114,7 +123,8 @@ def _compute_cashflows(maturity, call_date, call_price, redemption_value, coupon
             loop_date = loop_date - relativedelta(months=per_x_months)
         
         while loop_date >= selected_date:
-            cashflows[to_date_string(loop_date)] = coupon
+            coupons[to_date_string(loop_date)] = cashflows[to_date_string(loop_date)] = coupon
+            principals[to_date_string(loop_date)] = 0
             loop_date -= relativedelta(months=per_x_months)
         
         if first_coupon > loop_date and first_coupon < selected_date:
@@ -125,9 +135,9 @@ def _compute_cashflows(maturity, call_date, call_price, redemption_value, coupon
         if last_date == None:
             last_date = selected_date
 
-        cashflows[last_date] = 0
+        coupons[last_date] = principals[last_date] = cashflows[last_date] = 0
 
-    return cashflows
+    return cashflows, coupons, principals
 
 def _compute_notional(unit, position, mortgage_fac, principal_fac, fx_rate, net_mv):
     mortgage_fac = 1 if mortgage_fac == 0 else mortgage_fac
@@ -167,7 +177,7 @@ def to_date_string(timestamp):
 def build_yearly_cashflow_df(df, cashflow_types):
     date = ss.selected_comparison_date
     
-    cashflow_columns = ['year', 'value']
+    cashflow_columns = ['year', 'value', 'principal', 'coupon']
     columns = ['fund_code', 'fwd_asset_type', 'year', 'value', 'position_id', 'security_name', 'bbgid_v2', 'notional', 'coupon', 'freq', 'time_until_maturity']
     columns = list(dict.fromkeys(cashflow_columns + columns))
     
@@ -181,28 +191,41 @@ def build_yearly_cashflow_df(df, cashflow_types):
                 column_name = COLUMN_MAPPING[column]
                 row_data[column_name] = row[column_name]
         
-        cashflow = row[COLUMN_MAPPING['cashflow_notional']]
+        cashflow = row[COLUMN_MAPPING['cashflow_dollar']]
+        coupons = row[COLUMN_MAPPING['coupon_dollar']]
+        principal = row[COLUMN_MAPPING['principal_dollar']]
         
         yearly_cashflow = {}
-        
-        for payment_date, value in cashflow.items():
+        yearly_principal = {}
+        yearly_coupon = {}
+
+        for payment_date in cashflow.keys():
             year = relativedelta(datetime.strptime(payment_date, "%Y-%m-%d"), date).years
             
             if year not in yearly_cashflow.keys():
-                yearly_cashflow[year] = value
+                yearly_cashflow[year] = cashflow[payment_date]
+                yearly_principal[year] = principal[payment_date]
+                yearly_coupon[year] = coupons[payment_date]
             else:
-                yearly_cashflow[year] += value
+                yearly_cashflow[year] += cashflow[payment_date]
+                yearly_principal[year] += principal[payment_date]
+                yearly_coupon[year] += coupons[payment_date]
 
         for year, value in yearly_cashflow.items():
-            row_data_copy = row_data.copy()  # Create a detached copy of row_data
+            row_data_copy = row_data.copy()
             row_data_copy[COLUMN_MAPPING['year']] = year + 1
             row_data_copy[COLUMN_MAPPING['value']] = value
+            row_data_copy[COLUMN_MAPPING['principal']] = yearly_principal[year]
+            row_data_copy[COLUMN_MAPPING['coupon']] = yearly_coupon[year]
             rows.append(row_data_copy)
 
     security_df = pd.DataFrame(rows, columns=[COLUMN_MAPPING[column] for column in columns])
-    security_df = security_df.sort_values(by=[COLUMN_MAPPING[column] for column in cashflow_columns], ascending=[True, False])
-    yearly_df = security_df.groupby([COLUMN_MAPPING['year']], as_index=False)[COLUMN_MAPPING['value']].sum()
-    yearly_df[COLUMN_MAPPING['value']] = yearly_df[COLUMN_MAPPING['value']] / 1_000_000
+    security_df = security_df.sort_values(by=[COLUMN_MAPPING[column] for column in cashflow_columns], ascending=[True if column == 'year' else False for column in cashflow_columns])
+    yearly_df = security_df[[COLUMN_MAPPING[column] for column in cashflow_columns]].copy()
+    yearly_df = yearly_df.groupby([COLUMN_MAPPING['year']], as_index=False).sum(numeric_only=True)
+
+    yearly_df[[COLUMN_MAPPING['principal'], COLUMN_MAPPING['coupon'], COLUMN_MAPPING['value']]] /= 1_000_000
+    
     yearly_df = yearly_df.rename(columns={COLUMN_MAPPING['value']: cashflow_types['asset']})    
 
     return security_df, yearly_df
