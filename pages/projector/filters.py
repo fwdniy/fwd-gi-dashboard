@@ -49,11 +49,11 @@ def _build_cashflow_types_filter(cashflow_types):
     default_values = ['asset', 'g_liab']
 
     # Dynamically find the labels corresponding to the default values
-    default_labels = [cashflow_types[value] for value in default_values]
+    default_labels = sorted([cashflow_types[value] for value in default_values])
 
     selected_options_labels = st.segmented_control(
         'Cashflow Options',
-        cashflow_types.values(),
+        sorted(cashflow_types.values()),
         default=default_labels,  # Use the dynamically found labels
         key='selected_options_labels',
         selection_mode='multi'
