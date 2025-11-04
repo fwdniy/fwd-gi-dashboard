@@ -13,7 +13,7 @@ def build_forward_grid():
 
     grid = AgGridBuilder(grid_df)
     grid.add_columns(
-        [col for col in grid_df.columns if col != 'Forward \ Tenor'],
+        [col for col in grid_df.columns if col != 'Forward \\ Tenor'],
         row_group=False,
         max_width=60
     )
