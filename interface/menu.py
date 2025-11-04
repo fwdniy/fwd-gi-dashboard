@@ -53,6 +53,7 @@ def initialize():
     authenticate_user()
     _build_nav_bar(page_name)
     add_login_name()
+    log_activity(page_name)
     
 def _initialize_snowflake():
     if 'snowflake' in ss:
