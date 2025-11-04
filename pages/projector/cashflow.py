@@ -21,6 +21,7 @@ COLUMN_MAPPING = {
     'principal_fac': 'PRINCIPAL_FACTOR',
     'fx_rate': 'FX_RATE',
     'fwd_asset_type': 'FWD_ASSET_TYPE',
+    'manager': 'MANAGER',
     'security_name': 'SECURITY_NAME',
     'position_id': 'POSITION_ID',
     'bbgid_v2': 'BBGID_V2',
@@ -178,7 +179,7 @@ def build_yearly_cashflow_df(df, cashflow_types):
     date = ss.selected_comparison_date
     
     cashflow_columns = ['year', 'value', 'principal', 'coupon']
-    columns = ['fund_code', 'fwd_asset_type', 'year', 'value', 'position_id', 'security_name', 'bbgid_v2', 'notional', 'coupon', 'freq', 'time_until_maturity']
+    columns = ['fund_code', 'fwd_asset_type', 'manager', 'year', 'value', 'position_id', 'security_name', 'bbgid_v2', 'notional', 'coupon', 'freq', 'time_until_maturity']
     columns = list(dict.fromkeys(cashflow_columns + columns))
     
     rows = []

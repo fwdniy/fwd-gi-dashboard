@@ -48,7 +48,7 @@ def load_data(cashflow_types):
 def _get_asset_data(date):
     sql = f"SELECT bbgid, category, value FROM supp.cashflow_dates WHERE valuation_date = '{date}';"
     cf_df = ss['cashflow_df'] = ss.snowflake.query(sql)
-    sql = f"SELECT closing_date, position_id, lbu_code, fund_code, fwd_asset_type, account_code, bbg_asset_type, security_name, bbgid_v2, isin, effective_maturity, maturity, next_call_date, coupon_rate, coupnfreq, position, unit, mtge_factor, principal_factor, redemption_value, next_call_price, currency, fx_rate, net_mv, time_until_maturity FROM funnel.funnelweb WHERE closing_date = '{date}' AND lbu_group = 'HK' AND is_bbg_fi = TRUE;"
+    sql = f"SELECT closing_date, position_id, lbu_code, fund_code, manager, fwd_asset_type, account_code, bbg_asset_type, security_name, bbgid_v2, isin, effective_maturity, maturity, next_call_date, coupon_rate, coupnfreq, position, unit, mtge_factor, principal_factor, redemption_value, next_call_price, currency, fx_rate, net_mv, time_until_maturity FROM funnel.funnelweb WHERE closing_date = '{date}' AND lbu_group IN ('HK', 'JP', 'TH') AND is_bbg_fi = TRUE;"
     pos_df = ss['pos_df'] = ss.snowflake.query(sql)
     
     return cf_df, pos_df
