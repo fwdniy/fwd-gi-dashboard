@@ -225,6 +225,8 @@ def build_ratings_profile():
     column_order = ['ENTITY', 'HK_CODE', 'FINAL_RATING', 'SUM_NET_MV']
     df = df[column_order]
     
+    st.write("Ratings by Fund Code")
+    
     build_grid_ratings(df)
 
 @st.fragment
