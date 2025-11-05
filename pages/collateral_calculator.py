@@ -31,6 +31,19 @@ class CollateralCalculatorConfig:
     CSA_VALUATIONS = None
     CSA_COUNTERPARTIES = None
 
+    FUNDS = {
+        'Par': [
+            'HK: Trad', 'HK: MF1', 'HK: MF2', 'HK: MF3-5/10p', 'HK: MF4-5/10p',
+            'HK: MF5-5/10p', 'HK: MF6', 'HK: CrisisXD', 'HK: W ICON', 'HK: W ICON 4',
+            'HK: W ICON 5 RMB', 'HK: W ICON 5', 'HK: UL1', 'HK: UL2', 'HK: UL2.1',
+            'HK: UL2.2', 'HK: Provie', 'HK: IUL'
+        ],
+        'Non Par': [
+            'HK: SHF', 'HK: Trad Non-Par', 'HK: BSH', 'HK: MTE', 'HK: PDA', 'HK: DCA'
+        ]
+    }
+
+
 initialize()
 
 build_filters(CollateralCalculatorConfig)
