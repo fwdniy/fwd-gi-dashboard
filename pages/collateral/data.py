@@ -31,6 +31,8 @@ def get_data(config):
     df = get_funnelweb_data(date, config)
 
     config, df = _add_hk_codes(config, df)
+    
+    df = df[df['FUND_CODE'].isin(ss.get('selected_funds'))].reset_index(drop=True)
 
     agency_mappings = config.AGENCY_MAPPINGS = get_ratings_mapping(list(config.AGENCIES.keys()))
     
