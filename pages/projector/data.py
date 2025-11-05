@@ -66,7 +66,7 @@ def _clean_positions(df):
 
     return df
 
-def build_asset_liability_df(asset_df, cashflow_types):
+def build_asset_liability_df(asset_df):
     date = ss.selected_date
     groups = ss.selected_groups
     

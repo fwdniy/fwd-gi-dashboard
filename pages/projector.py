@@ -13,6 +13,6 @@ verify_to_load()
 
 security_df, yearly_df = load_data(CASHFLOW_TYPES)
 
-yearly_df = build_asset_liability_df(yearly_df, CASHFLOW_TYPES)
+yearly_df = build_asset_liability_df(yearly_df)
     
 build_visuals(yearly_df, CASHFLOW_TYPES, CASHFLOW_COLORS, security_df)
