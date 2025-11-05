@@ -1,11 +1,13 @@
 import streamlit as st
 from streamlit import session_state as ss
-from interface.filters import build_lbu_filter_hk
+from interface.filters import build_lbu_filter_hk, build_custom_tree_filter
 from .data import get_csa_data
+import pandas as pd
+from db.data.lbu import FUND_TYPE, FUND_CODE
 
 @st.fragment
 def build_filters(config):
-    with st.expander('Filters', True):                
+    with st.expander('Filters', True):
         config = get_csa_data(config)
         
         config = filter_corporate_bond_csas(config)
@@ -14,7 +16,7 @@ def build_filters(config):
         
         build_asset_type_filter(config)
         
-        build_lbu_filter_hk(config.CSA_FUNDS_MAPPED['FUND_CODE'].tolist())
+        build_custom_fund_filter(config.FUNDS)
 
 def filter_corporate_bond_csas(config, selected_cps=None, selected_asset_types=None):
     csa_valuations = config.CSA_VALUATIONS
@@ -62,3 +64,29 @@ def build_asset_type_filter(config):
     config = filter_corporate_bond_csas(config, selected_asset_types=ss.selected_asset_types)
 
     return config
+
+def build_custom_fund_filter(funds):
+    df = pd.DataFrame(
+        [(key, value) for key, values in funds.items() for value in values],
+        columns=[FUND_TYPE, FUND_CODE ]
+    )
+    
+    column_mapping = [
+        {'label': FUND_TYPE, 'value': FUND_TYPE},
+        {'label': FUND_CODE, 'value': FUND_CODE}
+    ]
+    
+    
+    selected = build_custom_tree_filter(
+        'Fund Type / Fund Code*',
+        'lbu_filter_custom',
+        df,
+        column_mapping,
+        funds,
+    )
+        
+    selected_funds = [selection.replace(FUND_CODE + ':', "") for selection in selected['checked'] if FUND_CODE in selection]
+    
+    ss['selected_funds'] = selected_funds
+    
+    st.caption('*The list of funds are overriden and limited by request of HK Investments as of Nov 2025.')
