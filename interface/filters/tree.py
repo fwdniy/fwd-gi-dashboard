@@ -117,10 +117,8 @@ def build_nested_dict(df, columns):
     return convert(nested)
 
 @st.cache_data(ttl=3600, show_spinner=False)
-def _get_label_and_value(item, current_value_col, current_label_col, current_filters, df):
+def _get_label_and_value(item, current_value_col, current_label_col, current_filters, df, level):
     """Helper function to get label and value for a node."""
-    query_conditions = [f"{col}=='{val}'" for col, val in current_filters.items()]
-    #label_row = df.query(" and ".join(query_conditions)) if query_conditions else df[df[current_value_col] == item]
     label_row = df[df[current_value_col] == item]
     label = label_row.iloc[0][current_label_col] if not label_row.empty else item
 
@@ -129,7 +127,7 @@ def _get_label_and_value(item, current_value_col, current_label_col, current_fil
         parent_values = list(current_filters.values())
         parent_name = parent_values[-1]
         
-        if parent_keys[-1] == FUND_TYPE:
+        if parent_keys[-1] == FUND_TYPE and level != 0:
             parent_name = parent_values[-2]
         
         node_value = f"{current_value_col}:{parent_name}:{item}"
@@ -156,7 +154,7 @@ def create_tree_nodes(data, column_mapping, df, parent_filters=None, level=0):
             current_filters = parent_filters.copy()
             current_filters[current_value_col] = key
 
-            label, node_value = _get_label_and_value(key, current_value_col, current_label_col, current_filters, df)
+            label, node_value = _get_label_and_value(key, current_value_col, current_label_col, current_filters, df, level)
 
             node = {"label": label, "value": node_value}
             children = create_tree_nodes(value, column_mapping, df, current_filters, level + 1)
@@ -172,8 +170,30 @@ def create_tree_nodes(data, column_mapping, df, parent_filters=None, level=0):
         for item in data:
             current_filters = parent_filters.copy()
             
-            label, node_value = _get_label_and_value(item, current_value_col, current_label_col, current_filters, df)
+            label, node_value = _get_label_and_value(item, current_value_col, current_label_col, current_filters, df, level)
 
             nodes.append({"label": label, "value": node_value})
 
     return nodes
+
+def build_custom_tree_filter(title, key, df, column_mapping, nested_dict, expanded_level=None, height=300):
+    nodes = create_tree_nodes(nested_dict, column_mapping, df)
+    
+    all_node = {
+        "label": "Select All",
+        "value": "all",
+        "children": nodes
+    }
+    
+    expanded_values = _get_expanded_values([all_node], expanded_level)
+    
+    selected = build_tree_filter(
+        title, 
+        [all_node], 
+        key, 
+        ["all"], 
+        expanded_values, 
+        height
+    )
+    
+    return selected

@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit import session_state as ss
 from db.data.data_shipment import get_lbu_data, get_lbu_data_hk
-from interface.filters.tree import build_nested_dict, create_tree_nodes, build_tree_filter, _get_expanded_values
+from interface.filters.tree import build_nested_dict, build_custom_tree_filter
 from db.data.lbu import LBU_GROUP, LBU_GROUP_NAME, LBU_CODE, LBU_CODE_NAME, FUND_TYPE, FUND_CODE, SUB_LBU, HK_CODE
 
 def build_lbu_filter():
@@ -22,26 +22,12 @@ def build_lbu_filter():
     
     nested_dict = build_nested_dict(df, [mapping['value'] for mapping in column_mapping])
     
-    # Create tree nodes with label/value mapping
-    nodes = create_tree_nodes(nested_dict, column_mapping, df)
-    
-    # Create "Select All" node at the top with all nodes as children
-    all_node = {
-        "label": "Select All",
-        "value": "all",
-        "children": nodes
-    }
-    
-    # Get expanded values only for the Select All node
-    expanded_values = _get_expanded_values([all_node], None)
-    
-    selected = build_tree_filter(
-        "LBU Group / LBU Code / Fund Type / Fund Code", 
-        [all_node], 
-        "lbu_filter", 
-        ["all"], 
-        expanded_values, 
-        300
+    selected = build_custom_tree_filter(
+        'LBU Group / LBU Code / Fund Type / Fund Code', 
+        'lbu_filter',
+        df,
+        column_mapping,
+        nested_dict
     )
     
     selected_funds = [selection.replace(FUND_CODE + ':', "") for selection in selected['checked'] if FUND_CODE in selection]
@@ -62,30 +48,17 @@ def build_lbu_filter_hk(fund_codes = []):
     
     nested_dict = build_nested_dict(df, [mapping['value'] for mapping in column_mapping])
      
-    # Create tree nodes with label/value mapping
-    nodes = create_tree_nodes(nested_dict, column_mapping, df)
-    
-    # Create "Select All" node at the top with all nodes as children
-    all_node = {
-        "label": "Select All",
-        "value": "all",
-        "children": nodes
-    }
-    
-    # Get expanded values only for the Select All node
     expanded_level = None
     if fund_codes:
         expanded_level = LBU_GROUP
         
-    expanded_values = _get_expanded_values([all_node], expanded_level)
-    
-    selected = build_tree_filter(
-        "HK Entity / Fund Type / HK Fund Code", 
-        [all_node], 
-        "lbu_filter_hk", 
-        ["all"], 
-        expanded_values, 
-        300
+    selected = build_custom_tree_filter(
+        'HK Entity / Fund Type / HK Fund Code', 
+        'lbu_filter_hk',
+        df,
+        column_mapping,
+        nested_dict,
+        expanded_level=expanded_level
     )
     
     mapping_dict = {f"{row[SUB_LBU]}:{row[HK_CODE]}": row[FUND_CODE] for _, row in df.iterrows()}
