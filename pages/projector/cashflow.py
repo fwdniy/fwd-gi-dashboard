@@ -60,12 +60,17 @@ def build_cashflows(pos_df, cf_df):
     principal_dollars_list = []
     notionals_list = []
     cashflow_dollars_list = []
+    time_until_maturity_list = []
 
     for _, row in df.iterrows():        
         cashflow_columns = ['maturity', 'call_date', 'call_price', 'redemption_value', 'coupon', 'freq', 'first_coupon', 'penultimate_coupon']
         
         cashflow_kwargs = _build_kwargs(row, cashflow_columns)
         cashflow, coupons, principal = _compute_cashflows(**cashflow_kwargs)
+        
+        maturity = max(cashflow.keys())
+        maturity = datetime.strptime(maturity, "%Y-%m-%d").date()
+        time_until_maturity = int(round((maturity - ss.selected_date).days / 365.25 * 10**6)) / 10**6
 
         notional_columns = ['unit', 'position', 'mortgage_fac', 'principal_fac', 'fx_rate', 'net_mv']
         notional_kwargs = _build_kwargs(row, notional_columns)
@@ -80,6 +85,7 @@ def build_cashflows(pos_df, cf_df):
         cashflow_dollars_list.append(cashflow_dollar)
         coupon_dollars_list.append(coupons_dollar)
         principal_dollars_list.append(principal_dollar)
+        time_until_maturity_list.append(time_until_maturity)
 
     # Add new columns to the DataFrame
     df[COLUMN_MAPPING['cashflow']] = cashflows_list
@@ -87,6 +93,7 @@ def build_cashflows(pos_df, cf_df):
     df[COLUMN_MAPPING['cashflow_dollar']] = cashflow_dollars_list
     df[COLUMN_MAPPING['coupon_dollar']] = coupon_dollars_list
     df[COLUMN_MAPPING['principal_dollar']] = principal_dollars_list
+    df[COLUMN_MAPPING['time_until_maturity']] = time_until_maturity_list
 
     return df
 
@@ -95,8 +102,11 @@ def _compute_cashflows(maturity, call_date, call_price, redemption_value, coupon
 
     max_date = maturity.to_pydatetime()
     principal = redemption_value
+    
+    if call_date is not pd.NaT and call_date.to_pydatetime() != max_date and ss.to_next_call_date:
+        max_date = call_date.to_pydatetime()
 
-    if call_date is not pd.NaT and call_date.to_pydatetime() == max_date and call_price != 0.0:  # Sentinel value for missing dates
+    if call_date is not pd.NaT and call_date.to_pydatetime() == max_date and call_price != 0.0:
         principal = call_price
 
     if principal == 0.0:

@@ -15,6 +15,10 @@ def build_filters(cashflow_types):
         build_liability_group_filters()
         _build_cashflow_types_filter(cashflow_types)
         
+        st.number_input('Reinvestment Spread', value=100.0, key='reinvestment_spread', format='%f')
+        
+        st.checkbox('To Next Call Date Only', value=False, key='to_next_call_date')
+        
 def build_liability_group_filters():
     date = ss.selected_date
     df = get_liabilities(date)
@@ -46,7 +50,7 @@ def _get_fund_mapping():
     return mapping
 
 def _build_cashflow_types_filter(cashflow_types):
-    default_values = ['asset', 'g_liab']
+    default_values = ['asset', 'g_liab', 'reinv']
 
     # Dynamically find the labels corresponding to the default values
     default_labels = sorted([cashflow_types[value] for value in default_values])
