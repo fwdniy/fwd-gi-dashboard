@@ -1,11 +1,9 @@
 import streamlit as st
 from streamlit import session_state as ss
 import pandas as pd
-from db.data.data_shipment import get_lbu_data, get_funnelweb_dates, get_funnelweb_data
-from db.data.ratings import get_ratings_index, get_ratings_mapping
+from db.data.data_shipment import get_lbu_data
+from db.data.ratings import get_ratings_index
 from auth import get_user_permissions
-from pages.collateral.ratings import convert_csa_valuation_ratings
-from pages.collateral.data import _add_haircut_valuations
 
 def get_data(config):
     config.CATEGORY = _get_generic_data('category')
