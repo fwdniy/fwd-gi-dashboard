@@ -15,7 +15,7 @@ def get_funnelweb_dates() -> list[datetime]:
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def get_lbu_data():
-    sql = "SELECT l.group_name, f.lbu, f.type, f.short_name, l.bloomberg_name, l.lbu_group, f.sub_lbu, f.vfa, f.hk_code FROM supp.fund AS f LEFT JOIN supp.lbu AS l ON l.name = f.lbu WHERE l.bloomberg_name <> \'LT\' AND f.type <> 'N/A' ORDER BY group_name, lbu, sub_lbu, type, short_name;"
+    sql = "SELECT l.id, l.group_name, f.lbu, f.type, f.short_name, l.bloomberg_name, l.lbu_group, f.sub_lbu, f.vfa, f.hk_code FROM supp.fund AS f LEFT JOIN supp.lbu AS l ON l.name = f.lbu WHERE l.bloomberg_name <> \'LT\' AND f.type <> 'N/A' ORDER BY group_name, lbu, sub_lbu, type, short_name;"
     df = ss.snowflake.query(sql)
     
     return df
