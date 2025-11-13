@@ -1,1 +1,1 @@
-from .authenticate import authenticate_user
+from .authenticate import authenticate_user, get_user_permissions
