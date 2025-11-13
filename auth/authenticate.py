@@ -27,7 +27,7 @@ def authenticate_user():
         _set_debug_permissions()
     
 def _set_debug_permissions():
-    ss['permissions'] = ['Admin', 'Fees']
+    ss['permissions'] = ['Admin', 'Fees', 'Assumptions']
     ss['lbu'] = 'Group'
     ss['nickname'] = ' to Debug Mode'
 
