@@ -23,6 +23,9 @@ PAGES = {
     "Fees": {
         "pages/fees.py": "Fees Dashboard"
     },
+    "Assumptions": {
+        "pages/assumptions.py": "Economic Assumptions"
+    },
     "Admin": {
         "pages/users.py": "Users",
         "pages/lbu_manager.py": "LBU Manager"
@@ -37,7 +40,8 @@ PAGE_PERMS = {
     "Hong Kong": {"LBU": "HK" },
     "Admin": {"Permission": "Admin"},
     "Dev": {"Permission": "Admin"},
-    "Fees": {"Permission": "Fees"}
+    "Fees": {"Permission": "Fees"},
+    "Assumptions": {"Permission": "Assumptions"},
 }
 
 def initialize():
