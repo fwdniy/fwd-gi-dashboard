@@ -50,7 +50,7 @@ def _get_fund_mapping():
     return mapping
 
 def _build_cashflow_types_filter(cashflow_types):
-    default_values = ['asset', 'g_liab', 'reinv']
+    default_values = ['asset', 'g_liab']#, 'reinv']
 
     # Dynamically find the labels corresponding to the default values
     default_labels = sorted([cashflow_types[value] for value in default_values])
