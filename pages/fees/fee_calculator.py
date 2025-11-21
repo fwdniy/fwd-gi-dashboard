@@ -186,7 +186,7 @@ def _calculate_fees_mv(df, fees_df):
     })
     
     # Convert to bps for fees and display in thousands
-    results_df['FEE_MIL'] = results_df['NET_MV'] * results_df['FEE_BPS'] / 10_000 * 1_000
+    results_df['FEE_K'] = results_df['NET_MV'] * results_df['FEE_BPS'] / 10_000 * 1_000
     
     lbus = get_lbu_data()
     lbu_group_dict = lbus.set_index('BLOOMBERG_NAME')['GROUP_NAME'].to_dict()
@@ -197,6 +197,6 @@ def _calculate_fees_mv(df, fees_df):
     lbu_code_dict['MC'] = lbus[lbus['SHORT_NAME'].str.contains('Macau', na=False)].iloc[0]['SUB_LBU']
     results_df['LBU_CODE_NAME'] = results_df['LBU_CODE'].map(lbu_code_dict)
     
-    results_df = results_df[['LBU_GROUP_NAME', 'LBU_CODE_NAME', 'LBU_CODE', 'MANAGER', 'ASSET_TYPE', 'NET_MV', 'FEE_BPS', 'FEE_MIL']]
+    results_df = results_df[['LBU_GROUP_NAME', 'LBU_CODE_NAME', 'LBU_CODE', 'MANAGER', 'ASSET_TYPE', 'NET_MV', 'FEE_BPS', 'FEE_K']]
 
     return results_df

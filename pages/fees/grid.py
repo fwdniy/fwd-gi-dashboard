@@ -7,16 +7,14 @@ def build_grid(df):
     modes = {'Asset Type': 'ASSET_TYPE', 'Manager': 'MANAGER'}
     pivot_mode = build_pivot_filter(modes)
     period_mode = build_period_filter()
-    group_column = [column for column in modes.values() if column != pivot_mode][0]
-    
-    df['FEE_MIL'] = df['FEE_MIL'] / period_mode
-    
+    df['FEE_K'] = df['FEE_K'] / period_mode
+        
     grid = AgGridBuilder(df)
     group_columns = ['LBU_GROUP_NAME', 'LBU_CODE_NAME', group_column]
     
     grid.add_options(group_total='bottom', header_name=' / '.join(group_columns), group_expanded=1)
     grid.add_columns(group_columns, None, sort='desc')
-    grid.add_values(['NET_MV', 'FEE_MIL'], ['MV ($ mn)', 'Fee ($ k)'], max_width=120)
+    grid.add_values(['NET_MV', 'FEE_K'], ['MV ($ mn)', 'Fee ($ k)'], max_width=120)
     
     valueComparator = """
         function weightedAverage(params) {                        
