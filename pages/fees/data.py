@@ -102,7 +102,35 @@ def _get_users():
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def _get_ima_fees():
-    sql = 'SELECT id, lbu_code, manager_id, asset_type, effective_date, created_at, created_by_id FROM fees.ima_fees;'
+    sql = """
+    WITH max_date AS (
+        SELECT 
+            lbu_code, 
+            manager_id, 
+            MAX(effective_date) AS max_eff_date 
+        FROM 
+            fees.ima_fees 
+        GROUP BY 
+            lbu_code, 
+            manager_id
+    )
+    SELECT 
+        id, 
+        f.lbu_code, 
+        f.manager_id, 
+        asset_type, 
+        effective_date, 
+        created_at, 
+        created_by_id 
+    FROM 
+        fees.ima_fees f
+    JOIN 
+        max_date m 
+    ON 
+        f.lbu_code = m.lbu_code 
+        AND f.manager_id = m.manager_id 
+        AND effective_date = max_eff_date;
+    """
     df = ss.snowflake.query(sql)
     
     return df

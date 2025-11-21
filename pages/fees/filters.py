@@ -46,11 +46,16 @@ def build_fees_filters(df):
     return filtered_df
 
 def build_pivot_filter(modes):
-    pivot_mode = st.segmented_control('Pivot Mode', list(modes.keys()), key='pivot_mode', default=list(modes.keys())[0])
+    pivot_mode = st.segmented_control('Pivot Column*', list(modes.keys()), key='pivot_mode', default='Manager')
     return modes[pivot_mode]
+
+def build_row_group_filter(modes):
+    row_groups = st.multiselect('Row Group', list(modes.keys()), key='row_group', default=list(modes.keys()))
+    
+    return row_groups
 
 def build_period_filter():
     periods = {'Monthly': 12, 'Quarterly': 4, 'Yearly': 1}
     
-    period_mode = st.segmented_control('Period', list(periods.keys()), key='period_mode', default='Monthly')
+    period_mode = st.segmented_control('Period^', list(periods.keys()), key='period_mode', default='Monthly')
     return periods[period_mode]

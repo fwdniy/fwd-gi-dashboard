@@ -1,18 +1,20 @@
 import streamlit as st
 from grid import AgGridBuilder
-from grid.js import get_weighted_average_sum
-from .filters import build_pivot_filter, build_period_filter
+from .filters import build_pivot_filter, build_row_group_filter, build_period_filter
+from utils.download import create_download_button
 
-def build_grid(df):
-    modes = {'Asset Type': 'ASSET_TYPE', 'Manager': 'MANAGER'}
-    pivot_mode = build_pivot_filter(modes)
+def build_grid(df, modes):
+    pivot_mode = build_pivot_filter(modes)    
+    
+    group_column_labels = build_row_group_filter({key: value for key, value in modes.items() if value != pivot_mode})
+    group_columns = [modes[mode] for mode in group_column_labels]
+    
     period_mode = build_period_filter()
     df['FEE_K'] = df['FEE_K'] / period_mode
         
     grid = AgGridBuilder(df)
-    group_columns = ['LBU_GROUP_NAME', 'LBU_CODE_NAME', group_column]
     
-    grid.add_options(group_total='bottom', header_name=' / '.join(group_columns), group_expanded=1)
+    grid.add_options(group_total='bottom', header_name=' / '.join(group_column_labels), group_expanded=1)
     grid.add_columns(group_columns, None, sort='desc')
     grid.add_values(['NET_MV', 'FEE_K'], ['MV ($ mn)', 'Fee ($ k)'], max_width=120)
     
@@ -24,7 +26,7 @@ def build_grid(df):
             console.log(params);
             console.log(params.pivotResultColumn.colId);
             let colIdParts = params.pivotResultColumn.colId.split('_');
-            let asset_type = colIdParts[{INDEX}];
+            let asset_type = colIdParts[colIdParts.length - 3];
             
             params.rowNode.allLeafChildren.forEach((value) => {
                 console.log(value);
@@ -52,3 +54,5 @@ def build_grid(df):
     #grid.add_value('FEE_BPS', 'Fee (bps)', max_width=100)
     grid.set_pivot_column(pivot_mode)
     grid.show_grid()
+    st.caption('*Pivot column means the grouping used in the columns.')
+    st.caption('^Period refers to the divisor of the fees (Monthly = 12, Quarterly = 4, Yearly = 1). The data used is still based on the manager\'s billing frequency (monthly / quarterly).')
