@@ -35,7 +35,7 @@ class AgGridBuilder:
         gb.configure_default_column(resizable=True, editable=editable, minWidth=min_width, filter=False, maxWidth=max_width)
         
         self.gb = gb
-        self.df = df
+        self.df = df.copy()
         self.charts = []
         
     def add_options(self, **kwargs) -> None:
