@@ -37,9 +37,12 @@ def build_fees_filters(df):
     managers = df['MANAGER'].unique().tolist()
     asset_types = df['ASSET_TYPE'].unique().tolist()
     
-    lbus = st.multiselect('LBU', lbus, default=lbus, key='selected_lbu')
-    managers = st.multiselect('Manager', managers, default=managers, key='selected_manager')
-    asset_types = st.multiselect('Asset Type', asset_types, default=asset_types, key='selected_asset_type')
+    with st.expander('LBU / Manager / Asset Type Filters', False):
+        lbus = st.multiselect('LBU', lbus, default=lbus, key='selected_lbu')
+        managers = st.multiselect('Manager', managers, default=managers, key='selected_manager')
+        asset_types = st.multiselect('Asset Type', asset_types, default=asset_types, key='selected_asset_type')
+        st.checkbox('Apollo DM/EM Classification', key='dm_em_filter')
+        st.caption('Apollo DM / EM classification will show developed countries for Corporate Bonds - US and emerging markets for Corporate Bonds - Asia. Based on MSCI Markets Definition.')
 
     filtered_df = df[(df['LBU_CODE_NAME'].isin(lbus)) & (df['MANAGER'].isin(managers)) & (df['ASSET_TYPE'].isin(asset_types))]
     
