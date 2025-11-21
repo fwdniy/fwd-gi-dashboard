@@ -29,7 +29,10 @@ def _calculate_mv(df, fees_df, lbu, manager, asset_type, mv_mode_id, securities=
     fees_df = fees_df[(fees_df['MANAGER'] == manager) & (fees_df['LBU_CODE'] == lbu)]
     manager_asset_types = fees_df['ASSET_TYPE'].unique()
     
-    filtered_df = _filter_asset_type(df, asset_type, manager_asset_types)
+    if 'dm_em_filter' not in ss:
+        ss['dm_em_filter'] = False
+    
+    filtered_df = _filter_asset_type(df, asset_type, manager_asset_types, manager)
     
     if securities != []:
         filtered_df = filtered_df[filtered_df['BBGID_V2'].isin(securities)]
@@ -41,12 +44,18 @@ def _calculate_mv(df, fees_df, lbu, manager, asset_type, mv_mode_id, securities=
         
     return mv
     
-def _filter_asset_type(df, asset_type, manager_asset_types):
+def _filter_asset_type(df, asset_type, manager_asset_types, manager):
     if asset_type == 'All':
         return df
     elif asset_type == 'Other':
         return df[~df['FWD_ASSET_TYPE'].isin(manager_asset_types)]
     else:
+        if ss.dm_em_filter and manager == 'Apollo':
+            if asset_type == 'Corporate Bonds - US':
+                return df[(df['DEVELOPED_COUNTRY'] == True) & (df['FWD_ASSET_TYPE'].str.contains('Corporate Bonds'))]
+            elif 'Corporate Bonds' in asset_type:
+                return df[(df['DEVELOPED_COUNTRY'] == False) & (df['FWD_ASSET_TYPE'].str.contains('Corporate Bonds'))]
+            
         return df[df['FWD_ASSET_TYPE'] == asset_type]
     
 def _filter_dates(df, mv_mode_id):

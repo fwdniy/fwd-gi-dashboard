@@ -18,7 +18,7 @@ def get_data():
 def _get_positions(selected_dates):
     selected_dates_string = "', '".join([date.strftime('%Y-%m-%d') for date in selected_dates])
     
-    sql = f"""SELECT closing_date, position_id, lbu_group, lbu_code, fund_code, manager, fwd_asset_type, bbg_asset_type, l1_asset_type, security_name, net_mv, first_acquired_date, is_ig, currency, fx_rate, bbgid_v2, ytm 
+    sql = f"""SELECT closing_date, position_id, lbu_group, lbu_code, fund_code, manager, fwd_asset_type, bbg_asset_type, l1_asset_type, security_name, net_mv, first_acquired_date, is_ig, currency, fx_rate, bbgid_v2, ytm, developed_country  
             FROM funnel.funnelweb 
             WHERE closing_date IN ('{selected_dates_string}') 
             ORDER BY closing_date"""
