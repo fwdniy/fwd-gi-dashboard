@@ -164,7 +164,6 @@ def process_fee_data(config):
     config.FEE_DETAILS = df2
     
     df2_highest = df2.loc[df2.groupby('FEE_ID')['ID'].idxmax()]
-    #df2_highest = df2_highest[['FEE_ID', 'FEE_BPS', 'CALC_MODE', 'CALC_MODE_ARGS_DICT', 'CREATED_AT', 'CREATED_BY']]
     df2_highest = df2_highest.rename({'CREATED_AT': 'CREATED_AT_FEE', 'CREATED_BY': 'CREATED_BY_FEE'}, axis=1)
     
     config.FEES = df.merge(df2_highest, left_on='ID', right_on='FEE_ID', how='left')

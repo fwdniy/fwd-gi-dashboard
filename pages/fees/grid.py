@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit import session_state as ss
 from grid import AgGridBuilder
 from .filters import build_pivot_filter, build_row_group_filter, build_period_filter
 from utils.download import create_download_button
@@ -51,8 +52,12 @@ def build_grid(df, modes):
     valueComparator = valueComparator.replace("{PIVOT_COLUMN}", pivot_mode)
     
     grid.add_value('FEE_BPS', 'Fee (bps)', valueComparator, max_width=100)
-    #grid.add_value('FEE_BPS', 'Fee (bps)', max_width=100)
+    
     grid.set_pivot_column(pivot_mode)
     grid.show_grid()
+    
+    file_name = f'Fees Data {ss.selected_month_end}'
+    create_download_button(df, file_name, file_name, "Unpivoted Data", True)
+    
     st.caption('*Pivot column means the grouping used in the columns.')
     st.caption('^Period refers to the divisor of the fees (Monthly = 12, Quarterly = 4, Yearly = 1). The data used is still based on the manager\'s billing frequency (monthly / quarterly).')
