@@ -15,6 +15,7 @@ class FeeConfig:
     FEE_DETAILS = None
     FEES = None
     CUSTOM_MANAGER_DATA = None
+    GRID_MODES = {'LBU': 'LBU_GROUP_NAME', 'Sub LBU': 'LBU_CODE_NAME', 'Manager': 'MANAGER', 'Asset Type': 'ASSET_TYPE'}
 
 initialize()
 
@@ -24,10 +25,10 @@ df = get_data()
 
 get_fee_data(FeeConfig)
 
-config = process_fee_data(FeeConfig)
+process_fee_data(FeeConfig)
 
-fees_df = calculate_fees(df, config)
+fees_df = calculate_fees(df, FeeConfig)
 
 fees_df = build_fees_filters(fees_df)
 
-build_grid(fees_df)
+build_grid(fees_df, FeeConfig.GRID_MODES)
