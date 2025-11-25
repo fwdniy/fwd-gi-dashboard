@@ -104,16 +104,21 @@ def add_login_name():
     
     footer = f"""
         <style>
-            .footer {{
-                position: fixed;
-                bottom: 0;
+            [data-testid="stSidebar"]::after {{
+                content: "{footer_text}";
+                display: block;
+                position: absolute;
+                bottom: 0px;
+                font-size: 12px;
+                color: inherit;
                 width: 100%;
                 text-align: left;
+                background-color: inherit;
+                padding-left: 24px;
+                padding-bottom: 10px;
+                padding-top: 10px;
             }}
         </style>
-        <div class="footer">
-            <p>{footer_text}</p>
-        </div>
         """
 
     st.sidebar.markdown(footer, unsafe_allow_html=True)
