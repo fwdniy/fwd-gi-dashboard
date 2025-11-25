@@ -45,7 +45,7 @@ PAGE_PERMS = {
     "Dev": {"Permission": "Admin"},
     "Fees": {"Permission": "Fees"},
     "Assumptions": {"Permission": "Assumptions"},
-    "Japan": {"Permission": "Japan"},
+    "Japan": {"Permission": "SPA"},
 }
 
 def initialize():
