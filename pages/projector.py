@@ -3,7 +3,7 @@ from interface import initialize
 from pages.projector import build_filters, verify_to_load, load_asset_cashflow_data, build_asset_liability_df, build_visuals, get_liabilities
 
 LBUS = ['HK', 'TH', 'JP']
-CASHFLOW_COLORS = {'asset': '#F3BB90', 'prem_cf': '#B5E6A2', 'g_liab': '#A9A9A9', 'ng_liab': '#F2CEEF', 'net_liab': '#D9A7A7'}
+CASHFLOW_TYPES = {'asset': 'Asset Cashflows', 'prem_cf': 'Premiums', 'g_liab': 'Guaranteed Liabilities', 'ng_liab': 'Non-Guaranteed Liabilities', 'net_liab': 'Net Liabilities'}
 
 initialize()
 
