@@ -26,7 +26,7 @@ COLUMN_MAPPING = {
     'position_id': 'POSITION_ID',
     'bbgid_v2': 'BBGID_V2',
     'time_until_maturity': 'TIME_UNTIL_MATURITY',
-    'year': 'YEAR',
+    'period': 'PERIOD',
     'value': 'VALUE',
     'notional': 'NOTIONAL',
     'cashflow': 'CASHFLOW',
@@ -188,11 +188,11 @@ def to_date_string(timestamp):
         return None
     return timestamp.strftime('%Y-%m-%d')
 
-def build_yearly_cashflow_df(df, cashflow_types):
+def build_cashflow_df(df, cashflow_types, monthly=False):
     date = ss.selected_comparison_date
     
-    cashflow_columns = ['year', 'value', 'principal', 'coupon']
-    columns = ['fund_code', 'fwd_asset_type', 'manager', 'year', 'value', 'position_id', 'security_name', 'bbgid_v2', 'notional', 'coupon', 'freq', 'time_until_maturity']
+    cashflow_columns = ['period', 'value', 'principal', 'coupon']
+    columns = ['fund_code', 'fwd_asset_type', 'manager', 'period', 'value', 'position_id', 'security_name', 'bbgid_v2', 'notional', 'coupon', 'freq', 'time_until_maturity']
     columns = list(dict.fromkeys(cashflow_columns + columns))
     
     rows = []
@@ -209,37 +209,42 @@ def build_yearly_cashflow_df(df, cashflow_types):
         coupons = row[COLUMN_MAPPING['coupon_dollar']]
         principal = row[COLUMN_MAPPING['principal_dollar']]
         
-        yearly_cashflow = {}
-        yearly_principal = {}
-        yearly_coupon = {}
+        period_cashflow = {}
+        period_principal = {}
+        period_coupon = {}
 
         for payment_date in cashflow.keys():
-            year = relativedelta(datetime.strptime(payment_date, "%Y-%m-%d"), date).years
+            relative_time = relativedelta(datetime.strptime(payment_date, "%Y-%m-%d"), date)
             
-            if year not in yearly_cashflow.keys():
-                yearly_cashflow[year] = cashflow[payment_date]
-                yearly_principal[year] = principal[payment_date]
-                yearly_coupon[year] = coupons[payment_date]
+            if not monthly:
+                period = relative_time.years
             else:
-                yearly_cashflow[year] += cashflow[payment_date]
-                yearly_principal[year] += principal[payment_date]
-                yearly_coupon[year] += coupons[payment_date]
+                period = relative_time.years * 12 + relative_time.months
+            
+            if period not in period_cashflow.keys():
+                period_cashflow[period] = cashflow[payment_date]
+                period_principal[period] = principal[payment_date]
+                period_coupon[period] = coupons[payment_date]
+            else:
+                period_cashflow[period] += cashflow[payment_date]
+                period_principal[period] += principal[payment_date]
+                period_coupon[period] += coupons[payment_date]
 
-        for year, value in yearly_cashflow.items():
+        for period, value in period_cashflow.items():
             row_data_copy = row_data.copy()
-            row_data_copy[COLUMN_MAPPING['year']] = year + 1
+            row_data_copy[COLUMN_MAPPING['period']] = period + 1
             row_data_copy[COLUMN_MAPPING['value']] = value
-            row_data_copy[COLUMN_MAPPING['principal']] = yearly_principal[year]
-            row_data_copy[COLUMN_MAPPING['coupon']] = yearly_coupon[year]
+            row_data_copy[COLUMN_MAPPING['principal']] = period_principal[period]
+            row_data_copy[COLUMN_MAPPING['coupon']] = period_coupon[period]
             rows.append(row_data_copy)
 
     security_df = pd.DataFrame(rows, columns=[COLUMN_MAPPING[column] for column in columns])
-    security_df = security_df.sort_values(by=[COLUMN_MAPPING[column] for column in cashflow_columns], ascending=[True if column == 'year' else False for column in cashflow_columns])
-    yearly_df = security_df[[COLUMN_MAPPING[column] for column in cashflow_columns]].copy()
-    yearly_df = yearly_df.groupby([COLUMN_MAPPING['year']], as_index=False).sum(numeric_only=True)
+    security_df = security_df.sort_values(by=[COLUMN_MAPPING[column] for column in cashflow_columns], ascending=[True if column == 'period' else False for column in cashflow_columns])
+    cashflow_df = security_df[[COLUMN_MAPPING[column] for column in cashflow_columns]].copy()
+    cashflow_df = cashflow_df.groupby([COLUMN_MAPPING['period']], as_index=False).sum(numeric_only=True)
 
-    yearly_df[[COLUMN_MAPPING['principal'], COLUMN_MAPPING['coupon'], COLUMN_MAPPING['value']]] /= 1_000_000
+    cashflow_df[[COLUMN_MAPPING['principal'], COLUMN_MAPPING['coupon'], COLUMN_MAPPING['value']]] /= 1_000_000
     
-    yearly_df = yearly_df.rename(columns={COLUMN_MAPPING['value']: cashflow_types['asset']})    
+    cashflow_df = cashflow_df.rename(columns={COLUMN_MAPPING['value']: cashflow_types['asset']})    
 
-    return security_df, yearly_df
+    return security_df, cashflow_df

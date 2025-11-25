@@ -20,8 +20,7 @@ def build_filters(cashflow_types):
         st.checkbox('To Next Call Date Only', value=False, key='to_next_call_date')
         
 def build_liability_group_filters():
-    date = ss.selected_date
-    df = get_liabilities(date)
+    df = get_liabilities()
 
     groups = list(df['GROUP_NAME'].unique())
     
