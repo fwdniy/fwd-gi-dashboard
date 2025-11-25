@@ -14,6 +14,7 @@ PAGES = {
         "pages/curves.py": "Curves",
         "pages/pivot.py": "Funnelweb Pivot Table",
         "pages/repos.py": "Repos",
+        "pages/projector.py": "Projector",
     },
     "Hong Kong": {
         "pages/hk_asset_allocation.py": "Asset Allocation",
