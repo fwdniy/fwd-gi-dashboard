@@ -46,6 +46,7 @@ def get_fund_names():
     
     return funds
 
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_funnelweb_metrics():
     funds = get_fund_names()
     fund_string = "', '".join(funds)
@@ -73,29 +74,32 @@ def get_funnelweb_metrics():
     
     return df
 
-def get_yields():
-    sql = """
+@st.cache_data(ttl=3600, show_spinner=False)
+def get_yields(date):
+    date = ss.selected_date
+    
+    sql = f"""
         SELECT 
             tenor, 
             rate 
         FROM 
             supp.curve_rates 
         WHERE 
-            valuation_date = '2025-11-21' 
+            valuation_date = '{date.strftime('%Y-%m-%d')}' 
             AND curve = 'USD_govt' 
             AND tenor IN ('10', '15', '20');
     """
     
     ust_df = ss.snowflake.query(sql)
     
-    sql = """
+    sql = f"""
         SELECT 
             '10' AS tenor, 
             spread_bid 
         FROM 
             supp.cds_rates 
         WHERE 
-            valuation_date = '2025-11-21' 
+            valuation_date = '{date.strftime('%Y-%m-%d')}' 
             AND name = 'CDX IG CDSI GEN 10Y Corp';
     """
     
