@@ -82,6 +82,8 @@ def log_activity(page_name):
     if 'page_name' in ss and page_name == ss.page_name:
         return
 
+    ss.page_name = page_name
+
     sql = f"""
         INSERT INTO supp.streamlit_activity (
             timestamp, 
@@ -97,8 +99,6 @@ def log_activity(page_name):
     """
 
     ss.snowflake.execute(sql)
-    
-    ss.page_name = page_name
 
 def _build_nav_bar(page_name: str):
     with open("assets/style.css") as css:
