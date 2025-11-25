@@ -20,6 +20,9 @@ PAGES = {
         "pages/hk_asset_allocation.py": "Asset Allocation",
         "pages/collateral_calculator.py": "Collateral Calculator",
     },
+    "Japan": {
+        "pages/japan_monitor.py": "SPA Monitor"
+    },
     "Fees": {
         "pages/fees.py": "Fees Dashboard"
     },
@@ -42,6 +45,7 @@ PAGE_PERMS = {
     "Dev": {"Permission": "Admin"},
     "Fees": {"Permission": "Fees"},
     "Assumptions": {"Permission": "Assumptions"},
+    "Japan": {"Permission": "Japan"},
 }
 
 def initialize():
