@@ -75,7 +75,7 @@ def get_funnelweb_metrics():
     return df
 
 @st.cache_data(ttl=3600, show_spinner=False)
-def get_yields(date):
+def get_yields():
     date = ss.selected_date
     
     sql = f"""
