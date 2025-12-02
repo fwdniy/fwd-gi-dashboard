@@ -11,6 +11,7 @@ class CollateralCalculatorConfig:
         'BBGID_V2',
         'ISIN',
         'NET_MV',
+        'POSITION',
         'PLEDGE_POS',
     ]
     
