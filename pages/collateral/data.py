@@ -120,6 +120,7 @@ def calculate_haircuts(config, fw_df):
     
     mv_columns = [col.replace('Percentage', 'MV') for col in cp_columns]
     mv_data = fw_df[cp_columns].mul(fw_df['NET_MV'], axis=0)
+    mv_data = mv_data.div(fw_df['POSITION'], axis=0).mul(fw_df['POSITION'] + fw_df['PLEDGE_POS'], axis=0)
     mv_data.columns = mv_columns
     
     for cp_col, mv_col in zip(cp_columns, mv_columns):
