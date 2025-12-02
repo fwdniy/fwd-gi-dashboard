@@ -15,7 +15,7 @@ class CollateralCalculatorConfig:
         'PLEDGE_POS',
     ]
     
-    EXTRA_FIELDS = ['POSITION',
+    EXTRA_FIELDS = [
         'UNIT',
         'ISSUER',
     ]
