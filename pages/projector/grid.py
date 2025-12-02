@@ -22,6 +22,7 @@ def _build_selected_grid(df, selected_periods, period):
         return
     
     selected_periods = list(selected_periods[period])
+    df = df.rename(columns={'PERIOD': period})
     df = df[df[period].isin(selected_periods)]
     df = df.sort_values(by=[period, 'VALUE'], ascending=[True, False])
     
