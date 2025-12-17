@@ -15,7 +15,7 @@ class FeeConfig:
     FEE_DETAILS = None
     FEES = None
     CUSTOM_MANAGER_DATA = None
-    GRID_MODES = {'LBU': 'LBU_GROUP_NAME', 'Sub LBU': 'LBU_CODE_NAME', 'Manager': 'MANAGER', 'Asset Type': 'ASSET_TYPE'}
+    GRID_MODES = {'LBU': 'LBU_GROUP_NAME', 'Sub LBU': 'LBU_CODE_NAME', 'Fund Code': 'FUND_CODE', 'Manager': 'MANAGER', 'Asset Type': 'ASSET_TYPE'}
 
 initialize()
 

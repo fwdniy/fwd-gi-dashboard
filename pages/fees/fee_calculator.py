@@ -19,12 +19,16 @@ def calculate_fees(df, config):
     
     fees_df = _calculate_blackrock_fee(df, fees_df, custom_fees_df)
     
-    results_df = _calculate_fees_mv(df, fees_df)
-
+    results_df = _calculate_fees_mv(df, fees_df, config)
+    
     return results_df
 
-def _calculate_mv(df, fees_df, lbu, manager, asset_type, mv_mode_id, securities=[]):
+def _calculate_mv(df, fees_df, lbu, manager, asset_type, mv_mode_id, securities=[], fund_code=None):
     df = df[(df['MANAGER'] == manager) & (df['LBU_CODE'] == lbu)]
+    
+    if fund_code != None:
+        df = df[df['FUND_CODE'] == fund_code]
+    
     df = _filter_dates(df, mv_mode_id)
     fees_df = fees_df[(fees_df['MANAGER'] == manager) & (fees_df['LBU_CODE'] == lbu)]
     manager_asset_types = fees_df['ASSET_TYPE'].unique()
@@ -145,7 +149,7 @@ def _calculate_blackrock_fee(df, fees_df, securities_df):
     
     return fees_df
 
-def _calculate_fees_mv(df, fees_df):
+def _calculate_fees_mv(df, fees_df, config):
     categories_df = df[(df['MANAGER'] != 'FWD') & (df['L1_ASSET_TYPE'] != 'Derivatives') & (df['FWD_ASSET_TYPE'] != 'Other Assets')]
     categories = categories_df[['LBU_CODE', 'MANAGER', 'FWD_ASSET_TYPE']].drop_duplicates()
     
@@ -157,7 +161,6 @@ def _calculate_fees_mv(df, fees_df):
         manager = row['MANAGER']
         asset_type = row['FWD_ASSET_TYPE']
         manager_df = fees_df[(fees_df['MANAGER'] == manager) & (fees_df['LBU_CODE'] == lbu) & (fees_df['ASSET_TYPE'] == asset_type)]
-        identifier = f"{lbu}/{manager}/{asset_type}"
         
         if len(manager_df) == 1:
             fee = manager_df.iloc[0]['FEE_BPS']
@@ -178,18 +181,23 @@ def _calculate_fees_mv(df, fees_df):
         
         mv_mode_id = manager_df.iloc[0]['MANAGER_MV_MODE_ID']
         
-        mv = _calculate_mv(df, fees_df, lbu, manager, asset_type, mv_mode_id)
+        fund_codes = df[(df['MANAGER'] == manager) & (df['LBU_CODE'] == lbu) & (df['FWD_ASSET_TYPE'] == asset_type)]['FUND_CODE'].unique()
+        
+        for fund_code in fund_codes:            
+            identifier = f"{lbu}|{manager}|{fund_code}|{asset_type}"
+            mv = _calculate_mv(df, fees_df, lbu, manager, asset_type, mv_mode_id, fund_code=fund_code)
 
-        if pd.isna(mv):
-            continue
+            if pd.isna(mv):
+                continue
 
-        mvs[identifier] = mv
-        fees[identifier] = fee
+            mvs[identifier] = mv
+            fees[identifier] = fee
         
     results_df = pd.DataFrame({
-        'LBU_CODE': [k.split('/')[0] for k in mvs.keys()],
-        'MANAGER': [k.split('/')[1] for k in mvs.keys()],
-        'ASSET_TYPE': [k.split('/')[2] for k in mvs.keys()],
+        'LBU_CODE': [k.split('|')[0] for k in mvs.keys()],
+        'MANAGER': [k.split('|')[1] for k in mvs.keys()],
+        'FUND_CODE': [k.split('|')[2] for k in mvs.keys()],
+        'ASSET_TYPE': [k.split('|')[3] for k in mvs.keys()],
         'NET_MV': list(mvs.values()),
         'FEE_BPS': [fees[k] for k in mvs.keys()]
     })
@@ -206,6 +214,6 @@ def _calculate_fees_mv(df, fees_df):
     lbu_code_dict['MC'] = lbus[lbus['SHORT_NAME'].str.contains('Macau', na=False)].iloc[0]['SUB_LBU']
     results_df['LBU_CODE_NAME'] = results_df['LBU_CODE'].map(lbu_code_dict)
     
-    results_df = results_df[['LBU_GROUP_NAME', 'LBU_CODE_NAME', 'LBU_CODE', 'MANAGER', 'ASSET_TYPE', 'NET_MV', 'FEE_BPS', 'FEE_K']]
+    results_df = results_df[list(config.GRID_MODES.values()) + ['NET_MV', 'FEE_BPS', 'FEE_K']]
 
     return results_df
