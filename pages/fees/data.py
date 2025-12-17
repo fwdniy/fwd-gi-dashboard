@@ -18,7 +18,7 @@ def get_data():
 def _get_positions(selected_dates):
     selected_dates_string = "', '".join([date.strftime('%Y-%m-%d') for date in selected_dates])
     
-    sql = f"""SELECT closing_date, position_id, lbu_group, lbu_code, fund_code, manager, fwd_asset_type, bbg_asset_type, l1_asset_type, security_name, net_mv, first_acquired_date, is_ig, currency, fx_rate, bbgid_v2, ytm, developed_country  
+    sql = f"""SELECT closing_date, position_id, lbu_group, lbu_code, fund_code, manager, fwd_asset_type, bbg_asset_type, l1_asset_type, security_name, net_mv, first_acquired_date, is_ig, currency, fx_rate, bbgid_v2, ytm, developed_country, coll_typ   
             FROM funnel.funnelweb 
             WHERE closing_date IN ('{selected_dates_string}') 
             ORDER BY closing_date"""
@@ -41,9 +41,16 @@ def _filter_data(df):
     df.loc[cash_mask, 'FWD_ASSET_TYPE'] = 'Cash'
     
     # Apollo Treasury Msak
-    apollo_mask = (df['BBG_ASSET_TYPE'] == 'Treasury') & (df['MANAGER'] == 'Apollo')
-    df.loc[apollo_mask, 'FWD_ASSET_TYPE'] = 'Cash'
-    
+    apollo_cash_mask = (df['BBG_ASSET_TYPE'] == 'Treasury') & (df['MANAGER'] == 'Apollo')
+    df.loc[apollo_cash_mask, 'FWD_ASSET_TYPE'] = 'Cash'
+    non_corp_hga_asset_types = ['ASSET BACKED', 'MORTGAGE BACKED']
+    apollo_hga_corp_mask = (df['FWD_ASSET_TYPE'] == 'Private Debt') & (df['BBG_ASSET_TYPE'] == 'Corporate Bond') & (~df['COLL_TYP'].isin(non_corp_hga_asset_types)) & (df['MANAGER'] == 'Apollo')
+    apollo_dm_corp_mask = (df['DEVELOPED_COUNTRY'] == True) & (df['FWD_ASSET_TYPE'] == 'Corporate Bonds - Asia') & (df['MANAGER'] == 'Apollo')
+    apollo_repo_mask = (df['BBG_ASSET_TYPE'] == 'Repo Liability') & (df['MANAGER'] == 'Apollo')
+    apollo_gov_corp_mask = (df['BBG_ASSET_TYPE'] == 'Government Bond') & (df['MANAGER'] == 'Apollo')
+    df.loc[apollo_hga_corp_mask | apollo_dm_corp_mask | apollo_repo_mask, 'FWD_ASSET_TYPE'] = 'Corporate Bonds - US'
+    df.loc[apollo_gov_corp_mask, 'FWD_ASSET_TYPE'] = 'Corporate Bonds - Asia'
+        
     # Negative cash
     neg_cash_mask = (df['BBG_ASSET_TYPE'] == 'Cash') & (df['NET_MV'] < 0.0)
     df.loc[neg_cash_mask, 'NET_MV'] = 0.0
