@@ -41,10 +41,12 @@ def _calculate_mv(df, fees_df, lbu, manager, asset_type, mv_mode_id, securities=
     if securities != []:
         filtered_df = filtered_df[filtered_df['BBGID_V2'].isin(securities)]
     
-    if mv_mode_id == 2.0 or mv_mode_id == 4.0:
+    if mv_mode_id == 2.0 or mv_mode_id == 4.0 or mv_mode_id == 5.0:
         mv = filtered_df.groupby('CLOSING_DATE')['NET_MV'].sum().mean() / 1_000_000
     elif mv_mode_id == 3.0:
         mv = filtered_df.groupby('CLOSING_DATE')['NET_MV'].sum().mean() / 1_000_000 / 3
+    else:
+        raise ValueError(f"Invalid MV Mode ID: {mv_mode_id}")
         
     return mv
     
@@ -79,8 +81,11 @@ def _filter_dates(df, mv_mode_id):
         df.loc[df['CLOSING_DATE'].isin(p_quarter_dates), 'CLOSING_DATE'] = 'Last Quarter'
         
         return df
-    else:
-        return df
+    elif mv_mode_id == 5.0:
+        dates = ss.selected_dates[:3]
+        return df[df['CLOSING_DATE'].isin(dates)]
+    
+    raise ValueError(f"Invalid MV Mode ID: {mv_mode_id}")
     
 def _calculate_tiered_fee(mv, tier_dict, category = ''):
     currency = tier_dict['currency']
